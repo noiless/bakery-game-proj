@@ -5,13 +5,13 @@ class Obj;
 
 class State {
 public:
-	int nextStateNum;
+	//int nextStateNum;
 
-	State *nextState;
+	//State *nextState;
 
-	virtual void doAction() = 0;	//
+	//virtual void doAction() = 0;	//
 
 	//make Action, Sequence, Spawn, ... and this->runAction();
-	virtual void initAction(Obj* obj) = 0;
+	//virtual void initAction(Obj* obj) = 0;
 
 };

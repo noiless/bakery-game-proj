@@ -4,7 +4,7 @@
 
 class Player : public Obj {
 public:
-	Player() : Obj(this) {
+	Player() {
 		init();
 	}
 
@@ -14,9 +14,10 @@ public:
 
 	cocos2d::Vec2 moveLen;
 
-	bool moveLenUpdate(float delta);
-	
 	cocos2d::Camera* cam;
 
+	bool setPlayerMoveLen(float actionDuration);
+
 	void update(float) override;
+
 };

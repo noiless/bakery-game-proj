@@ -22,6 +22,7 @@ Scene* GameWorld::createScene()
 // on "init" you need to initialize your instance
 bool GameWorld::init()
 {
+
     //////////////////////////////
     // 1. super init first
     if ( !Scene::init() )
@@ -32,13 +33,14 @@ bool GameWorld::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-
-
     /////////////////////////////
     // 3. add your codes below...
 
     // add a label shows "Hello World"
     // create and initialize a label
+
+	Sprite *map = Sprite::create("map.png");
+	this->addChild(map, -1);	//가장 먼저 맵을 그린다.
     
     auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
     
@@ -56,36 +58,33 @@ bool GameWorld::init()
     sprite1->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 
 
+	//init pool's object
+	objManager->ObjInit();
 
-	ObjRabbit* m1;
-	//ObjRabbit* m2;
-
-	m1 = new ObjRabbit;
-	//m1->objImg = Sprite::create("test2.png");
-	//m1->objImg->setPosition(100, 100);
-
-	//m1->objImg->runAction(RepeatForever::create(m1->state->initActionTemp(m1)));
-	
-
-	this->addChild(m1);
-	this->addChild(m1->objImg);
-
-	
-
-	//m2 = new ObjRabbit;
-	//m2->objImg = Sprite::create("test3.png");
-	//m2->speed = 100;
-	//m2->objImg->setPosition(600, 100);
-	//m2->moveLen = Vec2(-(m2->speed), 0);
-	//auto s1 = Sequence::create(MoveBy::create(2, Vec2(m2->speed * -2, 0)), nullptr);
-	//m2->objImg->runAction(s1);
-
-	//this->addChild(m2);
-	//this->addChild(m2->objImg);
-
-	//가장 마지막에 플레이어 생성
+	//가장 처음에 플레이어 생성
 	player = new Player;
-	this->addChild(player);
+	player->objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+	this->addChild(player, 3);
+
+	auto eventListener = EventListenerKeyboard::create();
+
+	eventListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_Z) {
+
+			//CREATE NEW RABBIT OBJECT
+			ObjRabbit* newRabbit = objManager->getFreeObjRabbit();
+
+			CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL");
+
+			newRabbit->init(Vec2(0, 0));	//초기 위치 이용해 초기화
+
+			this->addChild(newRabbit);
+			
+		}
+
+	};
+
+	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
     return true;
 }

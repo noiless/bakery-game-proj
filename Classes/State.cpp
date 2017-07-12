@@ -2,7 +2,3 @@
 
 
 USING_NS_CC;
-
-void checkCond() {
-
-}

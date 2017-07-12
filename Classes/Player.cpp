@@ -1,24 +1,21 @@
 #include "Player.h"
 #include "GameScene.h"
 
-#define LEFT_ARROW 0
-#define RIGHT_ARROW 1
-#define UP_ARROW 2
-#define DOWN_ARROW 3
+#include "ObjRabbit.h"
 
 USING_NS_CC;
 
 bool Player::init() {
 
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = cocos2d::Director::getInstance()->getVisibleOrigin();
+	GameWorld::objManager->addObject(this);	//availList에 추가
+
+	typecode = TYPECODE_PEOPLE;
 
 	isMoving[0] = false; isMoving[1] = false; isMoving[2] = false; isMoving[3] = false;
 
 	moveLen = Vec2(0, 0);
 
 	objImg = Sprite::create("test.png");
-	objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
 	auto eventListener = EventListenerKeyboard::create();
 
@@ -26,34 +23,36 @@ bool Player::init() {
 
 		switch (keyCode) {
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-			isMoving[LEFT_ARROW] = true;
+			isMoving[DIR_LEFT] = true; dir = DIR_LEFT;
 			break;
 		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-			isMoving[RIGHT_ARROW] = true;
+			isMoving[DIR_RIGHT] = true; dir = DIR_RIGHT;
 			break;
 		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-			isMoving[UP_ARROW] = true;
+			isMoving[DIR_UP] = true; dir = DIR_UP;
 			break;
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-			isMoving[DOWN_ARROW] = true;
+			isMoving[DIR_DOWN] = true; dir = DIR_DOWN;
 			break;
 		}
 	};
 
 	eventListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event) {
 
+		dir = DIR_NONE;
+
 		switch (keyCode) {
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-			isMoving[LEFT_ARROW] = false;
+			isMoving[DIR_LEFT] = false;
 			break;
 		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-			isMoving[RIGHT_ARROW] = false;
+			isMoving[DIR_RIGHT] = false;
 			break;
 		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-			isMoving[UP_ARROW] = false;
+			isMoving[DIR_UP] = false;
 			break;
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-			isMoving[DOWN_ARROW] = false;
+			isMoving[DIR_DOWN] = false;
 			break;
 		}
 
@@ -61,37 +60,31 @@ bool Player::init() {
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, objImg);
 	this->addChild(objImg);
-	
 	this->scheduleUpdate();
-
-
-
-	
 
 	return true;
 }
 
-
-bool Player::moveLenUpdate(float delta) {
+bool Player::setPlayerMoveLen(float actionDuration) {
 	//좌
-	if (isMoving[LEFT_ARROW]) {
-		moveLen = Vec2(-speed * delta, 0);
+	if (isMoving[DIR_LEFT]) {
+		moveLen = Vec2(-speed * actionDuration, 0);
 	}
 	//우
-	else if (isMoving[RIGHT_ARROW]) {
-		moveLen = Vec2(speed * delta, 0);
+	else if (isMoving[DIR_RIGHT]) {
+		moveLen = Vec2(speed * actionDuration, 0);
 	}
 	//상
-	else if (isMoving[UP_ARROW]) {
-		moveLen = Vec2(0, speed * delta);
+	else if (isMoving[DIR_UP]) {
+		moveLen = Vec2(0, speed * actionDuration);
 	}
 	//하
-	else if (isMoving[DOWN_ARROW]) {
-		moveLen = Vec2(0, -speed * delta);
+	else if (isMoving[DIR_DOWN]) {
+		moveLen = Vec2(0, -speed * actionDuration);
 	}
 	else {
-		moveLen = Vec2(0, 0);
-		return false;	//움직이지 않고 있을 경우에만 false 반환
+		//움직이지 않을 때 false 반환
+		return false;
 	}
 
 	return true;
@@ -100,19 +93,19 @@ bool Player::moveLenUpdate(float delta) {
 void Player::update(float delta) {
 
 	//현재 움직이는 중인지 확인
-	moveLenUpdate(delta);
+	if (setPlayerMoveLen(delta)) {
 
-	Rect exBox; //해당 방향으로 움직였을 때의 예상 바운딩박스
+		Rect exBox; //해당 방향으로 움직였을 때의 예상 바운딩박스
 
-	cam = Camera::getDefaultCamera();
+		cam = Camera::getDefaultCamera();
 
-	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+		//moveLen = speed * delta
+		exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
+		//plyer only collision start
 
-	//plyer only collision start
-		
-		//충돌 체크
-		if (GameWorld::objManager->checkCollision(this, exBox, moveLen)) {
+			//충돌 체크
+		if (GameWorld::objManager->checkMoveCollision(this, exBox, moveLen)) {
 			//충돌하지 않으면 이동
 			objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
 		}
@@ -120,8 +113,11 @@ void Player::update(float delta) {
 		//플레이어 이동에 따라 카메라 이동
 		cam->setPosition(objImg->getPosition());
 
-	//plyer only collision end
+		//plyer only collision end
 
+
+	}
+	//general object collision check
 
 		//if (GameWorld::objManager->checkCollision(this, exBox)) {
 		//	//충돌하지 않으면 이동
