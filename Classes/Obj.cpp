@@ -9,9 +9,6 @@ int Obj::totalObjNum = 0;
 Obj::Obj(){
 	objIndex = totalObjNum;
 	totalObjNum++;
-
-	CCLOG("%d", objIndex);
-
 }
 
 

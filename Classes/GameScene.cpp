@@ -57,9 +57,9 @@ bool GameWorld::init()
     // position the sprite on the center of the screen
     sprite1->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 
-
 	//init pool's object
 	objManager->ObjInit();
+
 
 	//가장 처음에 플레이어 생성
 	player = new Player;
@@ -79,12 +79,16 @@ bool GameWorld::init()
 			newRabbit->init(Vec2(0, 0));	//초기 위치 이용해 초기화
 
 			this->addChild(newRabbit);
+
+			//CREATE NEW RABBIT OBJECT END
 			
 		}
 
 	};
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
+
+	this->addChild(objManager);
 
     return true;
 }

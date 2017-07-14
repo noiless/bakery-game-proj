@@ -16,10 +16,14 @@ public:
 	//};
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
+	int HP;
+
+	virtual void loseHP();
 
 	void update(float) override;
 
 	virtual bool init(cocos2d::Vec2 initPos);
+	virtual bool ObjRabbit::deInit();
 
 	cocos2d::Vec2 rabbitSight[3];
 

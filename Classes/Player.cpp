@@ -7,15 +7,20 @@ USING_NS_CC;
 
 bool Player::init() {
 
-	GameWorld::objManager->addObject(this);	//availList에 추가
+	GameWorld::objManager->addObjectAvailList(this);	//availList에 추가
 
 	typecode = TYPECODE_PEOPLE;
+	HP = 10;
 
 	isMoving[0] = false; isMoving[1] = false; isMoving[2] = false; isMoving[3] = false;
 
 	moveLen = Vec2(0, 0);
 
-	objImg = Sprite::create("test.png");
+	objImg = Sprite::create("player_down.png");
+
+	attack = new Attack(objImg);
+
+	//objImg->addChild(attack);
 
 	auto eventListener = EventListenerKeyboard::create();
 
@@ -25,21 +30,32 @@ bool Player::init() {
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
 			isMoving[DIR_LEFT] = true; dir = DIR_LEFT;
 			break;
+
 		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 			isMoving[DIR_RIGHT] = true; dir = DIR_RIGHT;
 			break;
+
 		case EventKeyboard::KeyCode::KEY_UP_ARROW:
 			isMoving[DIR_UP] = true; dir = DIR_UP;
 			break;
+
 		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 			isMoving[DIR_DOWN] = true; dir = DIR_DOWN;
 			break;
 		}
+
+		//화살표와 별개로 X입력 받음
+		if (keyCode == EventKeyboard::KeyCode::KEY_X) {
+			if (!attack->showing) {
+				attack->init(objImg);
+			}
+		}
+
+		attack->callerDir = dir;
+
 	};
 
 	eventListener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event* event) {
-
-		dir = DIR_NONE;
 
 		switch (keyCode) {
 		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
@@ -60,27 +76,36 @@ bool Player::init() {
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, objImg);
 	this->addChild(objImg);
+	
 	this->scheduleUpdate();
 
 	return true;
+}
+
+void Player::loseHP() {
+	HP--;
 }
 
 bool Player::setPlayerMoveLen(float actionDuration) {
 	//좌
 	if (isMoving[DIR_LEFT]) {
 		moveLen = Vec2(-speed * actionDuration, 0);
+		objImg->setRotation(90);
 	}
 	//우
 	else if (isMoving[DIR_RIGHT]) {
 		moveLen = Vec2(speed * actionDuration, 0);
+		objImg->setRotation(-90);
 	}
 	//상
 	else if (isMoving[DIR_UP]) {
 		moveLen = Vec2(0, speed * actionDuration);
+		objImg->setRotation(180);
 	}
 	//하
 	else if (isMoving[DIR_DOWN]) {
 		moveLen = Vec2(0, -speed * actionDuration);
+		objImg->setRotation(0);
 	}
 	else {
 		//움직이지 않을 때 false 반환
@@ -105,7 +130,7 @@ void Player::update(float delta) {
 		//plyer only collision start
 
 			//충돌 체크
-		if (GameWorld::objManager->checkMoveCollision(this, exBox, moveLen)) {
+		if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
 			//충돌하지 않으면 이동
 			objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
 		}

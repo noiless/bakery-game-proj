@@ -4,15 +4,13 @@
 class ObjRabbit;
 class StateRabbitNormal;
 class StateRabbitRun;
+class StateRabbitDead;
 
 USING_NS_CC;
 
 class StateRabbit //: public State
 {
 public:
-	StateRabbit();
-	~StateRabbit();
-
 	virtual void initAction(ObjRabbit * obj) = 0;
 	virtual bool checkTransitionCond(ObjRabbit * obj) = 0;
 
@@ -22,6 +20,7 @@ public:
 
 	static StateRabbitNormal* rabbitNormal;
 	static StateRabbitRun* rabbitRun;
+	static StateRabbitDead* rabbitDead;
 };
 
 //토끼 : 통상 상태 클래스
@@ -29,12 +28,6 @@ class StateRabbitNormal : public StateRabbit
 {
 public:
 	StateRabbitNormal() {
-	};
-
-	StateRabbitNormal(ObjRabbit * obj) {
-		//object pool 적용할거면 initAction을 생성자가 아니고 해당 인스턴스가 재배정 될 때에 호출해줘야 한다.
-		CCLOG("이거 안불리죠?");
-		initAction(obj);
 	};
 
 	virtual void initAction(ObjRabbit * obj);
@@ -52,11 +45,22 @@ public:
 
 	};
 
-	StateRabbitRun(ObjRabbit * obj) {
-		initAction(obj);
-	};
-
 	virtual void initAction(ObjRabbit * obj);
 	virtual bool checkTransitionCond(ObjRabbit * obj);
 
+};
+
+class StateRabbitDead : public StateRabbit
+{
+public:
+	StateRabbitDead() {
+
+	}
+
+	StateRabbitDead(ObjRabbit * obj) {
+
+	}
+
+	virtual void initAction(ObjRabbit * obj);
+	virtual bool checkTransitionCond(ObjRabbit * obj);
 };

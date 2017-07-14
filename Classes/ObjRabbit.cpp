@@ -3,11 +3,8 @@
 
 USING_NS_CC;
 
-ObjRabbit::ObjRabbit() : inUse(false) {
+ObjRabbit::ObjRabbit() : inUse(false), HP(5) {
 	typecode = TYPECODE_RABBIT;
-
-	//첫 state는 normal
-	state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitNormal);
 
 	objImg = Sprite::create("rabbit_normal_down.png");
 
@@ -24,23 +21,54 @@ bool ObjRabbit::init(Vec2 initPos)
 	//member value init
 	inUse = true;	//오브젝트를 사용 중인 것으로 변경
 
+	HP = 5;
+
 	//re set sprite position
 	objImg->setPosition(initPos);
+	objImg->setOpacity(255);	//opacity 초기화
 
 	//init action
+	//첫 state는 normal
+	state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitNormal);
 	state->initAction(this);
-
+	
 	this->scheduleUpdate();	//오브젝트 풀링으로 하면 이걸 오브젝트를 지정할 때 해준다.
 
 	return true;
 
 }
 
+//오브젝트의 소멸
+//테스팅 안해봄ㅇㅅㅇㅅㅇ
+bool ObjRabbit::deInit()
+{
+	CCLOG("deinit");
+	//member value init
+	
+	inUse = false;	//오브젝트를 사용하지 않도록 변경
+	this->objImg->unscheduleUpdate();	//img의 스케줄 제거
+	this->removeFromParent();
+
+	return true;
+
+}
+
+
+void ObjRabbit::loseHP() {
+	HP--;
+	CCLOG("%d HP %d",objIndex,HP);
+	if (HP <= 0) {
+		//state 변경 후 action 초기화
+		state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitDead);
+		state->initAction(this);
+	}
+}
+
 
 void ObjRabbit::updateRabbitSight(){
 	//update Vec2 rabbitSight[3]
 
-	rabbitSight[0] = objImg->getPosition();	// +objImg->getAnchorPointInPoints();
+	rabbitSight[0] = objImg->getPosition();	
 
 	if (dir == DIR_LEFT) {
 		rabbitSight[1] = Vec2(rabbitSight[0].x - objImg->getBoundingBox().size.width * 1.5, rabbitSight[0].y + objImg->getBoundingBox().size.height * 1.5);
@@ -81,7 +109,7 @@ void ObjRabbit::update(float delta) {
 	newRect.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
 	//check collision
-	if (!GameWorld::objManager->checkMoveCollision(this, newRect, moveLen * delta)) {
+	if (!GameWorld::objManager->checkMoveCollision(this, &newRect, &(moveLen * delta))) {
 		//충돌 상태인 경우 pausedTime 증가
 		pausedTime += delta;
 	}
