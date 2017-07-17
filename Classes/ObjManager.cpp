@@ -138,53 +138,51 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 
 bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 
-	/////시야 차단........
+	Vec2* tri = obj->rabbitSight;
 
-	//Vec2* tri = obj->rabbitSight;
+	//1
+	float slope1 = (tri[0].y - tri[1].y) / (tri[0].x - tri[1].x);
+	float b1 = tri[0].y - slope1 * tri[0].x;
 
-	////1
-	//float slope1 = (tri[0].y - tri[1].y) / (tri[0].x - tri[1].x);
-	//float b1 = tri[0].y - slope1 * tri[0].x;
+	//2
+	float slope2 = (tri[0].y - tri[2].y) / (tri[0].x - tri[2].x);
+	float b2 = tri[0].y - slope2 * tri[0].x;
 
-	////2
-	//float slope2 = (tri[0].y - tri[2].y) / (tri[0].x - tri[2].x);
-	//float b2 = tri[0].y - slope2 * tri[0].x;
+	for each (Obj* i in objAvailList)
+	{
+		if (i->typecode != TYPECODE_PEOPLE) {
+			continue;
+		}
 
-	//for each (Obj* i in objAvailList)
-	//{
-	//	if (i->typecode != TYPECODE_PEOPLE) {
-	//		continue;
-	//	}
-
-	//	Vec2 rectPoint[4];
-	//	rectPoint[0] = Vec2(i->objImg->getBoundingBox().getMaxX(), i->objImg->getBoundingBox().getMaxY());
-	//	rectPoint[1] = Vec2(i->objImg->getBoundingBox().getMinX(), i->objImg->getBoundingBox().getMaxY());
-	//	rectPoint[2] = Vec2(i->objImg->getBoundingBox().getMaxX(), i->objImg->getBoundingBox().getMinY());
-	//	rectPoint[3] = Vec2(i->objImg->getBoundingBox().getMinX(), i->objImg->getBoundingBox().getMinY());
+		Vec2 rectPoint[4];
+		rectPoint[0] = Vec2(i->objImg->getBoundingBox().getMaxX(), i->objImg->getBoundingBox().getMaxY());
+		rectPoint[1] = Vec2(i->objImg->getBoundingBox().getMinX(), i->objImg->getBoundingBox().getMaxY());
+		rectPoint[2] = Vec2(i->objImg->getBoundingBox().getMaxX(), i->objImg->getBoundingBox().getMinY());
+		rectPoint[3] = Vec2(i->objImg->getBoundingBox().getMinX(), i->objImg->getBoundingBox().getMinY());
 
 
-	//	//삼각형 내에 사각형의 꼭짓점이 포함되는지 확인
-	//	for (int index = 0; index < 4; index++) {
-	//		if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
-	//			&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index])) 
-	//		{
-	//			CCLOG("1 %d %d", index, i->objIndex);
-	//			return true;
-	//		}
-	//			
-	//	}
+		//삼각형 내에 사각형의 꼭짓점이 포함되는지 확인
+		for (int index = 0; index < 4; index++) {
+			if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
+				&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index])) 
+			{
+				CCLOG("1 %d %d", index, i->objIndex);
+				return true;
+			}
+				
+		}
 
-	//	//사각형 내에 삼각형의 꼭짓점이 포함되는지 확인
-	//	for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
-	//		if (i->objImg->getBoundingBox().containsPoint(tri[index])) 
-	//		{
-	//			CCLOG("2 %d %d", index, i->objIndex);
-	//			return true;
-	//		}
-	//			
-	//	}
+		//사각형 내에 삼각형의 꼭짓점이 포함되는지 확인
+		for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
+			if (i->objImg->getBoundingBox().containsPoint(tri[index])) 
+			{
+				CCLOG("2 %d %d", index, i->objIndex);
+				return true;
+			}
+				
+		}
 
-	//}
+	}
 
 	//겹치지 않는다면 false 반환
 	return false;

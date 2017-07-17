@@ -10,6 +10,7 @@ USING_NS_CC;
 
 ObjManager *GameWorld::objManager = new ObjManager;
 Player *GameWorld::player;
+UI * GameWorld::ui;
 
 
 Scene* GameWorld::createScene()
@@ -89,6 +90,10 @@ bool GameWorld::init()
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
 	this->addChild(objManager);
+
+	ui = new UI();
+	this->addChild(ui, 5);
+	ui->init();
 
     return true;
 }

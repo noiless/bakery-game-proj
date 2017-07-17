@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "ObjManager.h"
 #include "Obj.h"
+#include "UI.h"
 
 
 class GameWorld : public cocos2d::Scene
@@ -22,6 +23,7 @@ public:
 
 	static ObjManager *objManager;
 	static Player *player;
+	static UI *ui;
 
 	bool isMoving[4];
 

@@ -180,8 +180,10 @@ void StateRabbitDead::initAction(ObjRabbit * obj) {
 	
 	obj->unscheduleUpdate(); //업데이트 중지
 
-
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
+
+	//유저 재료 포인트 상승
+	GameWorld::ui->myBreadPointGrow();
 
 	//action 설정
 	auto fadeout = FadeOut::create(actionDuration);
@@ -193,12 +195,6 @@ void StateRabbitDead::initAction(ObjRabbit * obj) {
 	});
 
 	obj->objImg->runAction(Sequence::create(fadeout, callback, nullptr));
-
-	////////////////////////////////
-	//
-	//	여기에 플레이와 관련된 변수(게이지 수치) 변동
-	//
-	////////////////////////////////
 
 }
 
