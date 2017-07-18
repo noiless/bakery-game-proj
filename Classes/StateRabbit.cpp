@@ -6,8 +6,13 @@
 USING_NS_CC;
 
 ////StateRabbit func
+StateRabbitNormal *StateRabbit::rabbitNormal = new StateRabbitNormal;
+StateRabbitRun *StateRabbit::rabbitRun = new StateRabbitRun;
+StateRabbitDead *StateRabbit::rabbitDead = new StateRabbitDead;
 
-bool StateRabbit::checkSight(ObjRabbit * obj) {
+////StateRabbitNormal Func
+
+bool StateRabbitNormal::checkSight(ObjRabbit * obj) {
 	if (GameWorld::objManager->checkSightCollision(obj)) {
 		return true;
 	}
@@ -15,14 +20,6 @@ bool StateRabbit::checkSight(ObjRabbit * obj) {
 		return false;
 	}
 }
-
-StateRabbitNormal *StateRabbit::rabbitNormal = new StateRabbitNormal;
-StateRabbitRun *StateRabbit::rabbitRun = new StateRabbitRun;
-StateRabbitDead *StateRabbit::rabbitDead = new StateRabbitDead;
-
-
-
-////StateRabbitNormal Func
 
 //state init
 void StateRabbitNormal::initAction(ObjRabbit* obj) {
@@ -40,8 +37,8 @@ void StateRabbitNormal::initAction(ObjRabbit* obj) {
 	MoveBy *move1 = StateRabbitNormal::makeRandDir(obj);
 	obj->moveLen = obj->setMoveLen(obj->dir, obj->speed);	//이동 방향, 속도에 따른 moveLen 초기화
 
-															//move2 : 2초간 휴식
-	MoveBy *move2 = MoveBy::create(actionDuration, Vec2(0, 0));
+	//move2 : 2초간 휴식
+	DelayTime *move2 = DelayTime::create(2);
 
 	//시퀸스의 종료를 알리기 위한 callback func
 	auto callback = CallFunc::create(
@@ -95,8 +92,8 @@ bool StateRabbitNormal::checkTransitionCond(ObjRabbit * obj) {
 	obj->updateRabbitSight();
 
 	//Run 상태로의 전이 조건 확인
-	if (StateRabbit::checkSight(obj)) {
-		//normal 상태로 전이
+	if (StateRabbitNormal::checkSight(obj)) {
+		//Run 상태로 전이
 		obj->rabbitSightTri->clear();	//시야 삼각형 제거
 		obj->getActionManager()->removeActionByTag(0, obj->objImg);	//액션 제거
 		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_run_down.png"));	//sprite 이미지 재설정

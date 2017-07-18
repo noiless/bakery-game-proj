@@ -5,7 +5,6 @@ USING_NS_CC;
 
 ObjRabbit::ObjRabbit() : inUse(false), HP(5) {
 	typecode = TYPECODE_RABBIT;
-
 	objImg = Sprite::create("rabbit_normal_down.png");
 
 	rabbitSightTri = DrawNode::create();
@@ -39,14 +38,12 @@ bool ObjRabbit::init(Vec2 initPos)
 }
 
 //오브젝트의 소멸
-//테스팅 안해봄ㅇㅅㅇㅅㅇ
 bool ObjRabbit::deInit()
 {
-	CCLOG("deinit");
+	CCLOG("deinit rabbit");
 	//member value init
 	
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->objImg->unscheduleUpdate();	//img의 스케줄 제거
 	this->removeFromParent();
 
 	return true;
@@ -105,7 +102,6 @@ void ObjRabbit::update(float delta) {
 	}
 
 	Rect newRect;
-
 	newRect.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
 	//check collision

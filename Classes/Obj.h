@@ -1,6 +1,5 @@
 #pragma once
 #include <cocos2d.h>
-#include <State.h>
 
 #define DIR_NONE -1
 #define DIR_LEFT 0
@@ -11,10 +10,13 @@
 #define TYPECODE_NONE -1
 #define TYPECODE_PEOPLE 0
 #define TYPECODE_RABBIT 1
+#define TYPECODE_TREE 2
 
 class Obj : public cocos2d::Node {
+
 private:
 	static int totalObjNum;
+
 public:
 	Obj();
 	~Obj();
@@ -23,13 +25,13 @@ public:
 	int speed;
 	int typecode = TYPECODE_NONE;	//각 클래스가 가지는 타입
 	int HP = 5;	//각 오브젝트의 체력
-
-	cocos2d::Sprite *objImg;
-	cocos2d::Vec2 moveLen;	//speed * delta값
-
 	int dir;	//현재의 방향
 	float pausedTime = 0;
 
+	cocos2d::Sprite *objImg;
+	cocos2d::Vec2 moveLen;	//speed * delta값
 	cocos2d::Vec2 setMoveLen(int dir, float speed);
+
 	virtual void loseHP() = 0;
+	virtual bool deInit() = 0;
 };

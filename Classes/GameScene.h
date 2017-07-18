@@ -19,15 +19,12 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(GameWorld);
 
-	cocos2d::Sprite* sprite1;
+	cocos2d::Sprite* sprite1;	//나중에 안쓰일것
 
 	static ObjManager *objManager;
 	static Player *player;
 	static UI *ui;
 
-	bool isMoving[4];
-
-	
 };
 
 

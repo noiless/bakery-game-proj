@@ -8,13 +8,11 @@ class StateRabbitDead;
 
 USING_NS_CC;
 
-class StateRabbit //: public State
+class StateRabbit
 {
 public:
 	virtual void initAction(ObjRabbit * obj) = 0;
 	virtual bool checkTransitionCond(ObjRabbit * obj) = 0;
-
-	bool checkSight(ObjRabbit * obj);
 
 	int actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
 
@@ -26,14 +24,15 @@ public:
 //토끼 : 통상 상태 클래스
 class StateRabbitNormal : public StateRabbit
 {
+private:
+	MoveBy* makeRandDir(ObjRabbit* obj);
 public:
 	StateRabbitNormal() {
 	};
 
 	virtual void initAction(ObjRabbit * obj);
 	virtual bool checkTransitionCond(ObjRabbit * obj);
-
-	MoveBy* makeRandDir(ObjRabbit* obj);
+	bool checkSight(ObjRabbit * obj);
 
 };
 
@@ -42,7 +41,6 @@ class StateRabbitRun : public StateRabbit
 {
 public:
 	StateRabbitRun() {
-
 	};
 
 	virtual void initAction(ObjRabbit * obj);
@@ -54,11 +52,6 @@ class StateRabbitDead : public StateRabbit
 {
 public:
 	StateRabbitDead() {
-
-	}
-
-	StateRabbitDead(ObjRabbit * obj) {
-
 	}
 
 	virtual void initAction(ObjRabbit * obj);

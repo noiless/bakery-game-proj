@@ -5,14 +5,13 @@ USING_NS_CC;
 
 
 ObjManager::ObjManager() {
-	
-
 }
 
 void ObjManager::ObjInit() {
-	//시작 후 초기화...
+	//시작 후 초기화
 	for (int i = 0; i < MAX_OBJ_NUM; i++) {
 		objRabbitList[i] = new ObjRabbit;
+		objTreeList[i] = new ObjTree;
 	}
 }
 
@@ -21,11 +20,12 @@ void ObjManager::addObjectAvailList(Obj *obj) {
 	objAvailList.push_back(obj);
 }
 
-//테스팅 안해봄
+
 void ObjManager::deleteObjectAvailList(Obj *obj) {
 	objAvailList.remove(obj);
 	CCLOG("delete from avail list\n");
 }
+
 
 ObjRabbit* ObjManager::getFreeObjRabbit() {
 
@@ -39,6 +39,19 @@ ObjRabbit* ObjManager::getFreeObjRabbit() {
 
 	//모든 오브젝트가 사용중이면 nullptr 반환
 	return nullptr;	
+}
+
+ObjTree* ObjManager::getFreeObjTree() {
+	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+		//사용중이지 않은 오브젝트를 찾아 반환
+		if (!objTreeList[i]->inUse) {
+			addObjectAvailList(dynamic_cast<Obj*> (objTreeList[i]));	//사용할 오브젝트를 availList에 넣어줌
+			return objTreeList[i];
+		}
+	}
+
+	//모든 오브젝트가 사용중이면 nullptr 반환
+	return nullptr;
 }
 
 
@@ -112,9 +125,9 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 	for each (Obj* i in objAvailList)
 	{
 
-		if (i->typecode != TYPECODE_RABBIT) {	//임시... 나중엔 객체 타입별로 분류할 것?
-			continue;
-		}
+		//if (i->typecode != TYPECODE_RABBIT) {	//임시... 나중엔 객체 타입별로 분류할 것?
+		//	continue;
+		//}
 
 		//충돌시
 		if (exBox->intersectsRect(i->objImg->getBoundingBox())) {

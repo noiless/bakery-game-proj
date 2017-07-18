@@ -5,6 +5,10 @@
 
 USING_NS_CC;
 
+bool Player::deInit() {
+	return true;
+}
+
 bool Player::init() {
 
 	GameWorld::objManager->addObjectAvailList(this);	//availList¿¡ Ãß°¡

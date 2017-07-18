@@ -2,7 +2,7 @@
 #include "SimpleAudioEngine.h"
 
 #include "ObjRabbit.h"
-
+#include "ObjTree.h"
 
 #include<iostream>
 
@@ -61,8 +61,26 @@ bool GameWorld::init()
 	//init pool's object
 	objManager->ObjInit();
 
+	//plant trees
+	for (int i = 0; i < 3; i++) {
+		//CREATE NEW TREE OBJECT
+		
+		ObjTree* newTree = objManager->getFreeObjTree();
 
-	//가장 처음에 플레이어 생성
+		CCASSERT((newTree != nullptr), "NEED LARGER OBJECT POOL");
+
+		newTree->init(Vec2(i * 700 - 700, 0));	//초기 위치 이용해 초기화
+
+		this->addChild(newTree);
+
+		//CREATE NEW TREE OBJECT END
+
+	}
+
+	
+
+
+	//플레이어 생성
 	player = new Player;
 	player->objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(player, 3);
@@ -70,9 +88,11 @@ bool GameWorld::init()
 	auto eventListener = EventListenerKeyboard::create();
 
 	eventListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event) {
+		//토끼 생성
 		if (keyCode == EventKeyboard::KeyCode::KEY_Z) {
 
 			//CREATE NEW RABBIT OBJECT
+			
 			ObjRabbit* newRabbit = objManager->getFreeObjRabbit();
 
 			CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL");

@@ -6,30 +6,24 @@
 class StateRabbit;
 
 class ObjRabbit : public Obj {
-
-public:
-
-	ObjRabbit();
-
-	//ObjRabbit(cocos2d::Vec2 initPos) : Obj(this) {
-	//	init(initPos);
-	//};
-
-	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
+private:
 	int HP;
 
-	virtual void loseHP();
-
 	void update(float) override;
+	
+public:
+	ObjRabbit();
 
 	virtual bool init(cocos2d::Vec2 initPos);
-	virtual bool ObjRabbit::deInit();
+	virtual bool deInit();
+
+	virtual void loseHP();
+	void updateRabbitSight();
+
+	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
 
 	cocos2d::Vec2 rabbitSight[3];
-
 	cocos2d::DrawNode* rabbitSightTri;
-
-	void updateRabbitSight();
 
 	StateRabbit* state;
 

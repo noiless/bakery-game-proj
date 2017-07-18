@@ -6,10 +6,10 @@
 #define MY_BAR_ORIGIN (myMoneyLabel->getPosition() - Vec2(BAR_WEIHT, LABEL_FONT_SIZE + BAR_HEIGHT))
 #define OTHER_BAR_ORIGIN (otherMoneyLabel->getPosition() + Vec2(0, -LABEL_FONT_SIZE - BAR_HEIGHT))
 #define AD_BAR_ORIGIN ((MY_BAR_ORIGIN + OTHER_BAR_ORIGIN) / 2)
+#define USER_CHANGE_UNIT 10
+#define TIME_CHANGE_UNIT 3
 
 USING_NS_CC;
-
-
 
 
 //생성자 - 변수 초기화
@@ -81,38 +81,40 @@ void UI::otherBreadSold() {
 }
 
 void UI::myBreadPointGrow() {
-	if (myBreadPoint < 90)
-		myBreadPoint += 10;
+	if (myBreadPoint < (100 - USER_CHANGE_UNIT))
+		myBreadPoint += USER_CHANGE_UNIT;
 	else 
 		myBreadPoint = 100;
 }
 
 void UI::otherBreadPointDown() {
-	if (otherBreadPoint > 5)
-		otherBreadPoint -= 5;
+	if (otherBreadPoint > USER_CHANGE_UNIT)
+		otherBreadPoint -= USER_CHANGE_UNIT;
 	else
 		otherBreadPoint = 0;
 }
 
 void UI::myAdPointGrow() {
-	if (adPoint < 100)
-		adPoint++;
+	if (adPoint < (100 - USER_CHANGE_UNIT))
+		adPoint += USER_CHANGE_UNIT;
+	else
+		adPoint = 100;
 }
 
 //1초마다 포인트 관련한 처리
 void UI::allPointChange() {
-	if (adPoint > 5)
-		adPoint -= 5;
+	if (adPoint > TIME_CHANGE_UNIT)
+		adPoint -= TIME_CHANGE_UNIT;
 	else
 		adPoint = 0;
 
-	if (myBreadPoint > 5)
-		myBreadPoint -= 5;
+	if (myBreadPoint > TIME_CHANGE_UNIT)
+		myBreadPoint -= TIME_CHANGE_UNIT;
 	else
 		myBreadPoint = 0;
 
-	if (otherBreadPoint < 95)
-		otherBreadPoint += 5;
+	if (otherBreadPoint < (100- TIME_CHANGE_UNIT))
+		otherBreadPoint += TIME_CHANGE_UNIT;
 	else
 		otherBreadPoint = 100;
 
@@ -121,7 +123,7 @@ void UI::allPointChange() {
 	otherMoney += 1000;
 	/////////temp end
 
-	CCLOG("point changed");
+	//CCLOG("point changed");
 }
 
 void UI::drawUI() {
@@ -144,7 +146,7 @@ void UI::drawUI() {
 	myBreadBar->drawSolidRect(MY_BAR_ORIGIN + Vec2(1, 1), MY_BAR_ORIGIN + Vec2(myBreadPoint * 1.2, BAR_HEIGHT), Color4F::RED);
 
 	myBreadBox->clear();
-	myBreadBox->drawRect(MY_BAR_ORIGIN, MY_BAR_ORIGIN + Vec2(BAR_WEIHT, BAR_HEIGHT), Color4F::BLACK);	//이걸 오리진으로 바꾸다 말았어
+	myBreadBox->drawRect(MY_BAR_ORIGIN, MY_BAR_ORIGIN + Vec2(BAR_WEIHT, BAR_HEIGHT), Color4F::BLACK);
 
 	otherBreadBar->clear();
 	otherBreadBar->drawSolidRect(OTHER_BAR_ORIGIN + Vec2(1, 1), OTHER_BAR_ORIGIN + Vec2(otherBreadPoint * 1.2, BAR_HEIGHT), Color4F::BLUE);

@@ -5,25 +5,25 @@
 
 
 class Player : public Obj {
+private:
+	bool isMoving[4];
+	cocos2d::Vec2 moveLen;
+	cocos2d::Camera* cam;
+	Attack* attack;
+	int HP;
+
+	bool setPlayerMoveLen(float actionDuration);
+	void update(float) override;
+	virtual bool deInit();
+	virtual bool init();
+
 public:
 	Player() {
 		init();
 	}
+	virtual void loseHP();
 
-	virtual bool init();
-	int HP;
 	int dir;
 	int speed = 500;
-	bool isMoving[4];
-
-	cocos2d::Vec2 moveLen;
-
-	cocos2d::Camera* cam;
-
-	Attack* attack;
-
-	bool setPlayerMoveLen(float actionDuration);
-
-	void update(float) override;
-	virtual void loseHP();
+	
 };
