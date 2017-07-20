@@ -42,7 +42,6 @@ void Attack::update(float) {
 		//newOrigin
 		Vec2 p = attackImg->convertToWorldSpace(Vec2(attackImg->getBoundingBox().origin.x, attackImg->getBoundingBox().origin.y) - anchorDiff);
 
-
 		switch (callerDir) {
 		case DIR_LEFT:
 			p.y = p.y - attackImg->getBoundingBox().size.width;
@@ -68,4 +67,53 @@ void Attack::update(float) {
 		
 	}
 	
+}
+
+/////class AcornAttack
+
+AcornAttack::AcornAttack()  : Attack() {
+	attackImg = Sprite::create("acorn.png");
+	this->addChild(attackImg);
+}
+
+bool AcornAttack::init(ObjSquaral* caller) {
+	attackImg->setPosition(caller->objImg->getPosition());
+	attackImg->setRotation(caller->objImg->getRotation());
+	//position, rotation 설정
+
+	this->scheduleUpdate();
+
+	caller->addChild(this);
+
+	callerIndex = caller->objIndex;
+
+	MoveBy* move1 = MoveBy::create(0.5, Vec2(caller->squaralSightRadius * 2 * cos(CC_DEGREES_TO_RADIANS(attackImg->getRotation() + 90)), caller->squaralSightRadius * 2 * sin(- CC_DEGREES_TO_RADIANS(attackImg->getRotation() + 90))));
+
+	CCLOG("%f %f", cos(CC_DEGREES_TO_RADIANS(attackImg->getRotation())), sin(CC_DEGREES_TO_RADIANS(attackImg->getRotation())));
+
+	auto callback = CallFunc::create(
+		[=]()
+	{
+		inUse = false;
+		this->unscheduleUpdate();
+		this->removeFromParent();
+
+	});
+
+	this->attackImg->runAction(Sequence::create(move1, callback, nullptr));
+
+	return true;
+}
+
+
+void AcornAttack::update(float delta) {
+
+	//다른 오브젝트와 충돌확인
+
+	if (GameWorld::objManager->checkAttackCollision(callerIndex, &attackImg->getPosition(), attackImg->getContentSize().width / 2)) {
+		attackImg->getActionManager()->removeAllActionsFromTarget(attackImg);
+		inUse = false;
+		this->unscheduleUpdate();
+		this->removeFromParent();
+	}
 }

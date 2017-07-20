@@ -10,6 +10,36 @@ StateRabbitNormal *StateRabbit::rabbitNormal = new StateRabbitNormal;
 StateRabbitRun *StateRabbit::rabbitRun = new StateRabbitRun;
 StateRabbitDead *StateRabbit::rabbitDead = new StateRabbitDead;
 
+void StateRabbit::doTransition(ObjRabbit* obj, int source, int dest) {
+
+	//source에 상관 없이 사망 처리
+	if (dest == STATE_RABBIT_DEAD) {
+
+		obj->state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitDead);
+		obj->state->initAction(obj);
+	}
+	else if (source == STATE_RABBIT_NORMAL && dest == STATE_RABBIT_RUN) {
+		// NORMAL->RUN 전이
+
+		experimental::AudioEngine::play2d("sound_rabbit_dead.mp3", false, 1.0f, &rabbitDeadEffect);
+		obj->rabbitSightTri->clear();	//시야 삼각형 제거
+		obj->objImg->getActionManager()->removeActionByTag(0, obj->objImg);	//액션 제거
+		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_run_down.png"));	//sprite 이미지 재설정
+		obj->state = StateRabbit::rabbitRun;	//rabbitRun으로의 상태 전이
+		obj->state->initAction(obj);
+		
+	}
+	else if (source == STATE_RABBIT_RUN && dest == STATE_RABBIT_NORMAL) {
+		//RUN->NORMAL 전이
+
+		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_normal_down.png"));	//sprite image 변경
+		obj->state = StateRabbit::rabbitNormal;	//rabbitNormal으로의 상태 전이
+		obj->state->initAction(obj);
+
+	}
+
+}
+
 ////StateRabbitNormal Func
 
 bool StateRabbitNormal::checkSight(ObjRabbit * obj) {
@@ -91,15 +121,17 @@ bool StateRabbitNormal::checkTransitionCond(ObjRabbit * obj) {
 
 	obj->updateRabbitSight();
 
+	//Dead 상태로의 조건 확인
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_RABBIT_NORMAL, STATE_RABBIT_DEAD);
+		return true;
+	}
 	//Run 상태로의 전이 조건 확인
-	if (StateRabbitNormal::checkSight(obj)) {
+	else if (StateRabbitNormal::checkSight(obj)) {
 		//Run 상태로 전이
-		obj->rabbitSightTri->clear();	//시야 삼각형 제거
-		obj->getActionManager()->removeActionByTag(0, obj->objImg);	//액션 제거
-		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_run_down.png"));	//sprite 이미지 재설정
-		obj->state = StateRabbit::rabbitRun;	//rabbitRun으로의 상태 전이
-		obj->state->initAction(obj);
 
+		doTransition(obj, STATE_RABBIT_NORMAL, STATE_RABBIT_RUN);
+		
 		return true;
 	}
 	else {
@@ -154,10 +186,15 @@ void StateRabbitRun::initAction(ObjRabbit * obj) {
 
 bool StateRabbitRun::checkTransitionCond(ObjRabbit * obj) {
 
-	if (obj->objImg->getNumberOfRunningActions() == 0) {	//action이 완료되었을 때
-		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_normal_down.png"));	//sprite image 변경
-		obj->state = StateRabbit::rabbitNormal;	//rabbitNormal으로의 상태 전이
-		obj->state->initAction(obj);
+	//Dead 상태로의 조건 확인
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_RABBIT_RUN, STATE_RABBIT_DEAD);
+		return true;
+	}
+	else if (obj->objImg->getNumberOfRunningActions() == 0) {	//action이 완료되었을 때
+
+		doTransition(obj, STATE_RABBIT_RUN, STATE_RABBIT_NORMAL);
+
 		return true;
 	}
 	else {

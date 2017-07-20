@@ -141,6 +141,7 @@ void UI::drawUI() {
 	myMoneyLabel->setPosition(cam->getPosition() + Vec2(visibleSize.width/2, visibleSize.height / 2));
 	otherMoneyLabel->setPosition(cam->getPosition() + Vec2(- visibleSize.width / 2, visibleSize.height / 2));
 
+
 	//draw box, bar
 	myBreadBar->clear();
 	myBreadBar->drawSolidRect(MY_BAR_ORIGIN + Vec2(1, 1), MY_BAR_ORIGIN + Vec2(myBreadPoint * 1.2, BAR_HEIGHT), Color4F::RED);

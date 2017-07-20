@@ -1,5 +1,6 @@
 #pragma once
 #include "cocos2d.h"
+#include "AudioEngine.h" 
 
 class ObjRabbit;
 class StateRabbitNormal;
@@ -8,13 +9,22 @@ class StateRabbitDead;
 
 USING_NS_CC;
 
+enum {STATE_RABBIT_NORMAL, STATE_RABBIT_RUN, STATE_RABBIT_DEAD};
+
 class StateRabbit
 {
 public:
+	StateRabbit() {
+		rabbitDeadEffect.name = "rabbitDeadEffect";
+		rabbitDeadEffect.maxInstances = 10;
+	}
 	virtual void initAction(ObjRabbit * obj) = 0;
 	virtual bool checkTransitionCond(ObjRabbit * obj) = 0;
+	void doTransition(ObjRabbit* obj, int source, int dest);
 
 	int actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+
+	experimental::AudioProfile rabbitDeadEffect;
 
 	static StateRabbitNormal* rabbitNormal;
 	static StateRabbitRun* rabbitRun;

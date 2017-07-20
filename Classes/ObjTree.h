@@ -4,11 +4,14 @@
 #include "StateTree.h"
 
 class ObjTree : public Obj {
+private:
+	int HP;
+
 public: 
 	ObjTree();
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
-	int HP;
+	
 
 	virtual void loseHP();
 

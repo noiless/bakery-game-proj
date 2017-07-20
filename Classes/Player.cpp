@@ -1,7 +1,8 @@
 #include "Player.h"
 #include "GameScene.h"
-
 #include "ObjRabbit.h"
+
+
 
 USING_NS_CC;
 
@@ -24,7 +25,8 @@ bool Player::init() {
 
 	attack = new Attack(objImg);
 
-	//objImg->addChild(attack);
+	playerAttactEffect.name = "playerAttactEffect";
+	playerAttactEffect.maxInstances = 10;
 
 	auto eventListener = EventListenerKeyboard::create();
 
@@ -51,6 +53,7 @@ bool Player::init() {
 		//화살표와 별개로 X입력 받음
 		if (keyCode == EventKeyboard::KeyCode::KEY_X) {
 			if (!attack->showing) {
+				experimental::AudioEngine::play2d("sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
 				attack->init(objImg);
 			}
 		}
@@ -124,8 +127,6 @@ void Player::update(float delta) {
 	//현재 움직이는 중인지 확인
 	if (setPlayerMoveLen(delta)) {
 
-		Rect exBox; //해당 방향으로 움직였을 때의 예상 바운딩박스
-
 		cam = Camera::getDefaultCamera();
 
 		//moveLen = speed * delta
@@ -146,14 +147,6 @@ void Player::update(float delta) {
 
 
 	}
-	//general object collision check
-
-		//if (GameWorld::objManager->checkCollision(this, exBox)) {
-		//	//충돌하지 않으면 이동
-		//	objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
-		//	cam->setPosition(objImg->getPosition());
-		//}
-
 	
 	
 }

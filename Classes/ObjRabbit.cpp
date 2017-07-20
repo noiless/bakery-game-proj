@@ -3,7 +3,7 @@
 
 USING_NS_CC;
 
-ObjRabbit::ObjRabbit() : inUse(false), HP(5) {
+ObjRabbit::ObjRabbit() : inUse(false), HP(5), pausedTime(0) {
 	typecode = TYPECODE_RABBIT;
 	objImg = Sprite::create("rabbit_normal_down.png");
 
@@ -54,17 +54,10 @@ bool ObjRabbit::deInit()
 void ObjRabbit::loseHP() {
 	HP--;
 	CCLOG("%d HP %d",objIndex,HP);
-	if (HP <= 0) {
-		//state 변경 후 action 초기화
-		state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitDead);
-		state->initAction(this);
-	}
 }
 
 
 void ObjRabbit::updateRabbitSight(){
-	//update Vec2 rabbitSight[3]
-
 	rabbitSight[0] = objImg->getPosition();	
 
 	if (dir == DIR_LEFT) {
@@ -96,16 +89,15 @@ void ObjRabbit::update(float delta) {
 	state->checkTransitionCond(this);
 
 	if (pausedTime > state->actionDuration) {
-		objImg->stopActionByTag(0);
+		objImg->stopAllActions();
 		pausedTime = 0;	//멈춘 시간 초기화
 		state->initAction(this);
 	}
 
-	Rect newRect;
-	newRect.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
 	//check collision
-	if (!GameWorld::objManager->checkMoveCollision(this, &newRect, &(moveLen * delta))) {
+	if (!GameWorld::objManager->checkMoveCollision(this, &exBox, &(moveLen * delta))) {
 		//충돌 상태인 경우 pausedTime 증가
 		pausedTime += delta;
 	}

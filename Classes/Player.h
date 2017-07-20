@@ -1,16 +1,20 @@
 #pragma once
-#include "cocos2d.h";
+#include "cocos2d.h"
 #include "Obj.h"
 #include "Attack.h"
+#include "AudioEngine.h"  
 
+USING_NS_CC;
 
 class Player : public Obj {
 private:
 	bool isMoving[4];
-	cocos2d::Vec2 moveLen;
-	cocos2d::Camera* cam;
+	Vec2 moveLen;
+	Camera* cam;
 	Attack* attack;
 	int HP;
+	experimental::AudioProfile playerAttactEffect;
+	Rect exBox;
 
 	bool setPlayerMoveLen(float actionDuration);
 	void update(float) override;
@@ -23,7 +27,9 @@ public:
 	}
 	virtual void loseHP();
 
+	
 	int dir;
 	int speed = 500;
+	
 	
 };

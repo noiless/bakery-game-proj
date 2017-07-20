@@ -1,6 +1,7 @@
 #pragma once
 #include <cocos2d.h>
 
+
 #define DIR_NONE -1
 #define DIR_LEFT 0
 #define DIR_RIGHT 1
@@ -11,6 +12,7 @@
 #define TYPECODE_PEOPLE 0
 #define TYPECODE_RABBIT 1
 #define TYPECODE_TREE 2
+#define TYPECODE_SQUARAL 3
 
 class Obj : public cocos2d::Node {
 

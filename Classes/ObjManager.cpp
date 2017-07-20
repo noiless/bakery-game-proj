@@ -12,6 +12,8 @@ void ObjManager::ObjInit() {
 	for (int i = 0; i < MAX_OBJ_NUM; i++) {
 		objRabbitList[i] = new ObjRabbit;
 		objTreeList[i] = new ObjTree;
+		ObjSquaralList[i] = new ObjSquaral;
+		ObjAcornList[i] = new AcornAttack;
 	}
 }
 
@@ -25,6 +27,39 @@ void ObjManager::deleteObjectAvailList(Obj *obj) {
 	objAvailList.remove(obj);
 	CCLOG("delete from avail list\n");
 }
+
+void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
+
+	ObjRabbit* newRabbit = getFreeObjRabbit();
+
+	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
+
+	newRabbit->init(initPos);	//초기 위치 이용해 초기화
+
+	parent->addChild(newRabbit);
+}
+
+void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
+	ObjTree* newTree = getFreeObjTree();
+
+	CCASSERT((newTree != nullptr), "NEED LARGER OBJECT POOL : Tree");
+
+	newTree->init(initPos);	//초기 위치 이용해 초기화
+
+	parent->addChild(newTree);
+}
+
+void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
+	ObjSquaral* newSquaral = getFreeObjSquaral();
+
+	CCASSERT((newSquaral != nullptr), "NEED LARGER OBJECT POOL : Squaral");
+
+	newSquaral->init(initPos);	//초기 위치 이용해 초기화
+
+	parent->addChild(newSquaral);
+}
+
+
 
 
 ObjRabbit* ObjManager::getFreeObjRabbit() {
@@ -47,6 +82,19 @@ ObjTree* ObjManager::getFreeObjTree() {
 		if (!objTreeList[i]->inUse) {
 			addObjectAvailList(dynamic_cast<Obj*> (objTreeList[i]));	//사용할 오브젝트를 availList에 넣어줌
 			return objTreeList[i];
+		}
+	}
+
+	//모든 오브젝트가 사용중이면 nullptr 반환
+	return nullptr;
+}
+
+ObjSquaral* ObjManager::getFreeObjSquaral() {
+	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+		//사용중이지 않은 오브젝트를 찾아 반환
+		if (!ObjSquaralList[i]->inUse) {
+			addObjectAvailList(dynamic_cast<Obj*> (ObjSquaralList[i]));	//사용할 오브젝트를 availList에 넣어줌
+			return ObjSquaralList[i];
 		}
 	}
 
@@ -141,7 +189,7 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 
 	//각 충돌한 물체에 대한 처리
 	for each (Obj* i in playerCollisionList) {
-		i->loseHP();	//<-한꺼번에 나중에 처리...?
+		i->loseHP();	//<-한꺼번에 나중에 처리
 	}
 	playerCollisionList.clear();
 
@@ -153,6 +201,7 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 
 	Vec2* tri = obj->rabbitSight;
 
+	
 	//1
 	float slope1 = (tri[0].y - tri[1].y) / (tri[0].x - tri[1].x);
 	float b1 = tri[0].y - slope1 * tri[0].x;
@@ -201,7 +250,8 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 	return false;
 }
 
-bool ObjManager::checkSightCond(int dir, float slope1, float b1, float slope2, float b2, Vec2* rectPoint) {
+//토끼용
+bool ObjManager::checkSightCond(int dir, float slope1, float b1, float slope2, float b2, const Vec2* rectPoint) {
 	if (dir == DIR_LEFT) {
 		return ((slope1 * rectPoint->x - rectPoint->y + b1 > 0)
 			&& (slope2 * rectPoint->x - rectPoint->y + b2 < 0));
@@ -242,4 +292,85 @@ bool ObjManager::checkSightCond3(int dir, Vec2* triP1, Vec2* rectPoint) {
 			return true;
 	}
 	return false;
+}
+
+Obj* ObjManager::checkSightCollision(ObjSquaral * obj){
+
+	//1
+	float b1 = obj->objImg->getPositionY() - obj->objImg->getPositionX();
+
+	//2
+	float b2 = obj->objImg->getPositionY() + obj->objImg->getPositionX();
+
+	for each (Obj* i in objAvailList)
+	{
+		if (i->typecode != TYPECODE_PEOPLE) {
+			continue;
+		}
+
+		//오브젝트가 원과 충돌하는지 확인
+		if (!i->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius))
+			continue;
+
+		//범위가 보고 있는 방향의 범위인지 확인 - 범위에 오브젝트의 중심이 포함되는지 확인
+		if (checkSightCond(obj->dir, b1, b2, &(i->objImg->getPosition()))) {
+			return i;	//충돌한 오브젝트 반환
+		}
+	}
+
+	return nullptr;
+}
+
+//다람쥐용 시야 체크
+bool ObjManager::checkSightCond(int dir, float b1, float b2, const cocos2d::Vec2* rectPos) {
+	if (dir == DIR_LEFT) {
+		return ((rectPos->x - rectPos->y + b1 < 0)
+			&& (-rectPos->x - rectPos->y + b2 > 0));
+	}
+	else if (dir == DIR_RIGHT) {
+		return ((rectPos->x - rectPos->y + b1 > 0)
+			&& (-rectPos->x - rectPos->y + b2 < 0));
+	}
+	else if (dir == DIR_UP) {
+		return ((rectPos->x - rectPos->y + b1 < 0)
+			&& (-rectPos->x - rectPos->y + b2 < 0));
+	}
+	else if (dir == DIR_DOWN) {
+		return ((rectPos->x - rectPos->y + b1 > 0)
+			&& (-rectPos->x - rectPos->y + b2 > 0));
+	}
+	else {
+		return false;
+	}
+}
+
+//다람쥐용 공격 체크
+bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius) {
+	bool hit = false;
+
+	//충돌한 물체 검출
+	for each (Obj* i in objAvailList)
+	{
+
+		if (i->objIndex == callerIndex) {	//발사자는 충돌 체크에서 제외
+			continue;
+		}
+
+		//충돌시
+		if (i->objImg->getBoundingBox().intersectsCircle(*center, radius)) {
+
+			acornCollisionList.pushBack(i);
+			hit = true;
+
+		}
+	}
+
+	//각 충돌한 물체에 대한 처리
+	for each (Obj* i in acornCollisionList) {
+		if (i->typecode == TYPECODE_PEOPLE)
+			i->loseHP();	//<-한꺼번에 나중에 처리
+	}
+	acornCollisionList.clear();
+
+	return hit;
 }

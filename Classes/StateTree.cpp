@@ -26,15 +26,7 @@ void StateTreeNormal::initAction(ObjTree * obj) {
 	auto createRabbit = CallFunc::create(
 		[=]
 	{
-		ObjRabbit* newRabbit = GameWorld::objManager->getFreeObjRabbit();
-
-		CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL");
-
-		newRabbit->init(obj->objImg->getPosition() + Vec2(0, obj->objImg->getContentSize().height / 2));
-
-		obj->getParent()->addChild(newRabbit);
-
-		
+		GameWorld::objManager->getObjRabbitFromPool(obj->getParent() ,obj->objImg->getPosition() - Vec2(0, obj->objImg->getContentSize().height - 1));
 
 	});
 
@@ -59,6 +51,9 @@ void StateTreeDead::initAction(ObjTree * obj) {
 	GameWorld::ui->myAdPointGrow();
 
 	obj->objImg->stopAllActions();	//기존의 액션 중지
+
+	//사운드 재생
+	experimental::AudioEngine::play2d("sound_tree_dead.mp3", false, 0.3, &treeDeadEffect);
 
 	//action 설정
 	auto fadeout = FadeOut::create(2);

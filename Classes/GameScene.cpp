@@ -1,8 +1,5 @@
 #include "GameScene.h"
-#include "SimpleAudioEngine.h"
-
-#include "ObjRabbit.h"
-#include "ObjTree.h"
+#include "AudioEngine.h"
 
 #include<iostream>
 
@@ -63,27 +60,15 @@ bool GameWorld::init()
 
 	//plant trees
 	for (int i = 0; i < 3; i++) {
-		//CREATE NEW TREE OBJECT
-		
-		ObjTree* newTree = objManager->getFreeObjTree();
 
-		CCASSERT((newTree != nullptr), "NEED LARGER OBJECT POOL");
-
-		newTree->init(Vec2(i * 700 - 700, 0));	//초기 위치 이용해 초기화
-
-		this->addChild(newTree);
-
-		//CREATE NEW TREE OBJECT END
-
+		objManager->getObjTreeFromPool(this, Vec2(i * 700 - 700, 0));
 	}
-
-	
-
 
 	//플레이어 생성
 	player = new Player;
 	player->objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(player, 3);
+
 
 	auto eventListener = EventListenerKeyboard::create();
 
@@ -91,23 +76,15 @@ bool GameWorld::init()
 		//토끼 생성
 		if (keyCode == EventKeyboard::KeyCode::KEY_Z) {
 
-			//CREATE NEW RABBIT OBJECT
-			
-			ObjRabbit* newRabbit = objManager->getFreeObjRabbit();
-
-			CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL");
-
-			newRabbit->init(Vec2(0, 0));	//초기 위치 이용해 초기화
-
-			this->addChild(newRabbit);
-
-			//CREATE NEW RABBIT OBJECT END
+			objManager->getObjSquaralFromPool(this, Vec2(0,0));
 			
 		}
 
 	};
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
+
+	objManager->getObjSquaralFromPool(this, Vec2(-100, -100));
 
 	this->addChild(objManager);
 
