@@ -28,6 +28,9 @@ private:
 	ObjRabbit* getFreeObjRabbit();
 	ObjTree* getFreeObjTree();
 	ObjSquaral* getFreeObjSquaral();
+	AcornAttack* getFreeAcornAttack();
+
+	Vec2 createColCheck(Vec2* pos, const cocos2d::Size* size);
 	
 
 public:
@@ -41,6 +44,7 @@ public:
 	void getObjRabbitFromPool(Node * parent, Vec2 initPos);
 	void getObjTreeFromPool(Node * parent, Vec2 initPos);
 	void getObjSquaralFromPool(Node * parent, Vec2 initPos);
+	void getObjAcornFromPool(Node * parent, ObjSquaral* caller);
 
 	bool checkMoveCollision(Obj *obj, cocos2d::Rect* exBox, cocos2d::Vec2* moveLen);
 	bool checkAttackCollision(cocos2d::Rect* exBox);

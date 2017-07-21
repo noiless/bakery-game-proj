@@ -73,6 +73,7 @@ void Attack::update(float) {
 
 AcornAttack::AcornAttack()  : Attack() {
 	attackImg = Sprite::create("acorn.png");
+	inUse = false;
 	this->addChild(attackImg);
 }
 
@@ -81,15 +82,15 @@ bool AcornAttack::init(ObjSquaral* caller) {
 	attackImg->setRotation(caller->objImg->getRotation());
 	//position, rotation ¼³Á¤
 
+	inUse = true;
+
 	this->scheduleUpdate();
 
-	caller->addChild(this);
+	//caller->addChild(this);
 
 	callerIndex = caller->objIndex;
 
 	MoveBy* move1 = MoveBy::create(0.5, Vec2(caller->squaralSightRadius * 2 * cos(CC_DEGREES_TO_RADIANS(attackImg->getRotation() + 90)), caller->squaralSightRadius * 2 * sin(- CC_DEGREES_TO_RADIANS(attackImg->getRotation() + 90))));
-
-	CCLOG("%f %f", cos(CC_DEGREES_TO_RADIANS(attackImg->getRotation())), sin(CC_DEGREES_TO_RADIANS(attackImg->getRotation())));
 
 	auto callback = CallFunc::create(
 		[=]()

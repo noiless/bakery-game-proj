@@ -118,11 +118,12 @@ bool StateSquaralNormal::checkSight(ObjSquaral * obj) {
 //다람쥐 : 공격 상태 클래스
 
 void StateSquaralAttack::initAction(ObjSquaral * obj) {
+	//obj->moveLen = Vec2::ZERO;
+
 	auto callback = CallFunc::create(
 		[=]
 	{
-		AcornAttack *newAcorn = new AcornAttack;	//나중에 오브젝트 매니저에서 풀로 관리해줄것...?
-		newAcorn->init(obj);
+		GameWorld::objManager->getObjAcornFromPool(obj->getParent(), obj);
 
 	});
 
@@ -138,8 +139,9 @@ bool StateSquaralAttack::checkTransitionCond(ObjSquaral * obj) {
 	float radVal = atan2f((obj->target->objImg->getPositionY() - obj->objImg->getPositionY()) , (obj->target->objImg->getPositionX() - obj->objImg->getPositionX()));
 	obj->objImg->setRotation( - CC_RADIANS_TO_DEGREES(radVal) - 90);
 
+	obj->moveLen = Vec2::ZERO;
 
-	//더이상 충돌하지 않을 때 노말 상태로 전이
+	//타겟이 시야 범위에서 벗어났을때 노말 상태로 전이
 	if (!obj->target->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2)) {
 		doTransition(obj, STATE_SQUARAL_ATTACK, STATE_SQUARAL_NORMAL);
 	}

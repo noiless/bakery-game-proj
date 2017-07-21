@@ -51,6 +51,9 @@ public:
 //다람쥐 : 공격 상태 클래스
 class StateSquaralAttack : public StateSquaral
 {
+private:
+	float imgDir;
+	int looking;
 public:
 	StateSquaralAttack() {
 	};

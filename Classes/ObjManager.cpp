@@ -32,9 +32,9 @@ void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 
 	ObjRabbit* newRabbit = getFreeObjRabbit();
 
-	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
+	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");	//max num * 2로 하고 오브젝트 풀 내에 들어갈 오브젝트들 더 제작
 
-	newRabbit->init(initPos);	//초기 위치 이용해 초기화
+	newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
 	parent->addChild(newRabbit);
 }
@@ -44,7 +44,7 @@ void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
 
 	CCASSERT((newTree != nullptr), "NEED LARGER OBJECT POOL : Tree");
 
-	newTree->init(initPos);	//초기 위치 이용해 초기화
+	newTree->init(createColCheck(&initPos, &(objTreeList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
 	parent->addChild(newTree);
 }
@@ -54,9 +54,19 @@ void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
 
 	CCASSERT((newSquaral != nullptr), "NEED LARGER OBJECT POOL : Squaral");
 
-	newSquaral->init(initPos);	//초기 위치 이용해 초기화
+	newSquaral->init(createColCheck(&initPos, &(ObjSquaralList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
 	parent->addChild(newSquaral);
+}
+
+void ObjManager::getObjAcornFromPool(Node * parent, ObjSquaral* caller) {
+	AcornAttack* newAcorn = getFreeAcornAttack();
+
+	CCASSERT((newAcorn != nullptr), "NEED LARGER OBJECT POOL : Acorn");
+
+	newAcorn->init(caller);	//초기 위치 이용해 초기화
+
+	parent->addChild(newAcorn);
 }
 
 
@@ -100,6 +110,57 @@ ObjSquaral* ObjManager::getFreeObjSquaral() {
 
 	//모든 오브젝트가 사용중이면 nullptr 반환
 	return nullptr;
+}
+
+AcornAttack* ObjManager::getFreeAcornAttack() {
+	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+		//사용중이지 않은 오브젝트를 찾아 반환
+		if (!ObjAcornList[i]->inUse) {
+			//availList에 추가하지 않음			
+			return ObjAcornList[i];
+		}
+	}
+
+	//모든 오브젝트가 사용중이면 nullptr 반환
+	return nullptr;
+}
+
+Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
+
+	int randDir;
+	Rect exBox;
+	exBox.setRect(pos->x - size->width / 2, pos->y - size->height / 2, size->width, size->height);
+
+	for each (Obj* i in objAvailList)
+	{
+		//충돌시
+		if (exBox.intersectsRect(i->objImg->getBoundingBox())) {
+
+			randDir = rand() % 4;
+
+			//좌
+			if (randDir == DIR_LEFT) {
+				pos->x = (i->objImg->getBoundingBox().getMaxX() + exBox.size.width / 2 + 1);
+			}
+			//우
+			else if (randDir == DIR_RIGHT){
+				pos->x = (i->objImg->getBoundingBox().getMinX() - exBox.size.width / 2 - 1);
+
+			}
+			//y축으로 움직이고 있었을 때
+			//상
+			else if (randDir == DIR_UP) {
+				pos->y =  (i->objImg->getBoundingBox().getMinY() - exBox.size.height / 2 - 1);
+
+			}
+			//하
+			else if (randDir == DIR_DOWN) {
+				pos->y = (i->objImg->getBoundingBox().getMaxY() + exBox.size.height / 2 + 1);
+			}
+		}
+	}
+
+	return *pos;
 }
 
 
@@ -148,9 +209,6 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 
 					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox->size.height / 2 + 1);
 				}
-				else {
-					CCLOG("error");
-				}
 
 			}
 
@@ -165,6 +223,8 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 	return true;
 
 }
+
+
 
 bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 	bool hit = false;
