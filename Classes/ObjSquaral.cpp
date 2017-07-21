@@ -6,6 +6,7 @@
 
 ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(150) {
 	typecode = TYPECODE_SQUARAL;
+	normalTime = 0;
 	objImg = Sprite::create("squaral_down.png");
 
 	squaralSightCircle = DrawNode::create();
@@ -32,6 +33,12 @@ bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 }
 
 bool ObjSquaral::deInit() {
+	CCLOG("deinit squaral");
+	//member value init
+
+	inUse = false;	//오브젝트를 사용하지 않도록 변경
+	this->removeFromParent();
+
 	return true;
 }
 
@@ -71,7 +78,7 @@ void ObjSquaral::update(float delta) {
 	state->checkTransitionCond(this);
 
 	if (pausedTime > state->actionDuration) {
-		objImg->stopAllActions();
+		objImg->getActionManager()->removeAllActionsFromTarget(objImg);
 		pausedTime = 0;	//멈춘 시간 초기화
 		state->initAction(this);
 	}
@@ -82,4 +89,6 @@ void ObjSquaral::update(float delta) {
 		//충돌 상태인 경우 pausedTime 증가
 		pausedTime += delta;
 	}
+
+	normalTime += delta;
 }
