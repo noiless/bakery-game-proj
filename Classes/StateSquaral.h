@@ -44,7 +44,6 @@ public:
 
 	virtual void initAction(ObjSquaral * obj);
 	virtual bool checkTransitionCond(ObjSquaral * obj);
-	bool checkSight(ObjSquaral * obj);
 
 };
 
@@ -60,7 +59,6 @@ public:
 
 	virtual void initAction(ObjSquaral * obj);
 	virtual bool checkTransitionCond(ObjSquaral * obj);
-	void shotAcorn(ObjSquaral * obj);
 
 };
 

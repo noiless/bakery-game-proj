@@ -13,19 +13,44 @@ StateSquaralDead* StateSquaral::squaralDead = new StateSquaralDead;
 void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 	
 	//dead 처리 가장 먼저
-
-	if (source == STATE_SQUARAL_NORMAL && dest == STATE_SQUARAL_ATTACK) {
-		
-		obj->squaralSightCircle->clear();	//시야 제거
-		obj->squaralSightCircle->drawSolidCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2, 30, 12, Color4F::RED);
-		obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
-		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_attack_down.png"));	//sprite 이미지 재설정
-		obj->state = StateSquaral::squaralAttack;
+	if (dest == STATE_SQUARAL_DEAD) {
+		obj->state = StateSquaral::squaralDead;
 		obj->state->initAction(obj);
+	}
+	
+
+	if (source == STATE_SQUARAL_NORMAL) {
+		
+		if (dest == STATE_SQUARAL_ATTACK) {
+			obj->squaralSightCircle->clear();	//시야 제거
+			obj->squaralSightCircle->drawSolidCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2, 30, 12, Color4F::RED);
+			obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
+			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_attack_down.png"));	//sprite 이미지 재설정
+			obj->state = StateSquaral::squaralAttack;
+			obj->state->initAction(obj);
+		}
+
+		else if (dest == STATE_SQUARAL_SEED) {
+
+			obj->squaralSightCircle->clear();	//시야 제거
+			obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
+			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_seed_down.png"));	//sprite 이미지 재설정
+			obj->state = StateSquaral::squaralSeed;
+			obj->state->initAction(obj);
+		}
+		
 	}
 	else if (source == STATE_SQUARAL_ATTACK && dest == STATE_SQUARAL_NORMAL) {
 		obj->squaralSightCircle->clear();
 		obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
+		obj->normalTime = 0;
+		obj->state = StateSquaral::squaralNormal;
+		obj->state->initAction(obj);
+
+	}
+	else if (source == STATE_SQUARAL_SEED && dest == STATE_SQUARAL_NORMAL) {
+		obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
+		obj->normalTime = 0;
 		obj->state = StateSquaral::squaralNormal;
 		obj->state->initAction(obj);
 	}
@@ -67,7 +92,10 @@ MoveBy* StateSquaralNormal::makeRandDir(ObjSquaral* obj) {
 
 void StateSquaralNormal::initAction(ObjSquaral * obj) {
 	
+	obj->HP = 5;
+
 	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_down.png"));	//sprite 이미지 재설정
+	obj->objImg->setOpacity(255);
 
 	//state에 맞는 speed, actionDuration 설정
 	obj->speed = 150;
@@ -97,22 +125,29 @@ void StateSquaralNormal::initAction(ObjSquaral * obj) {
 
 bool StateSquaralNormal::checkTransitionCond(ObjSquaral * obj) {
 
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_SQUARAL_NORMAL, STATE_SQUARAL_DEAD);
+		return true;
+	}
+
 	obj->drawSquaralSight();
 
-	obj->target = GameWorld::objManager->checkSightCollision(obj);
+	obj->target = GameWorld::objManager->checkSightCollision(obj);	//check sight
 
+	
 	if (obj->target != nullptr) {
 		doTransition(obj, STATE_SQUARAL_NORMAL, STATE_SQUARAL_ATTACK);
 		CCLOG("index %d", obj->target->objIndex);
 	}
 
+	//10초
+	if (obj->normalTime > 10) {
+		doTransition(obj, STATE_SQUARAL_NORMAL, STATE_SQUARAL_SEED);
+	}
+
 	return true;
 }
 
-bool StateSquaralNormal::checkSight(ObjSquaral * obj) {
-	return false;
-
-}
 
 
 //다람쥐 : 공격 상태 클래스
@@ -136,6 +171,11 @@ void StateSquaralAttack::initAction(ObjSquaral * obj) {
 
 bool StateSquaralAttack::checkTransitionCond(ObjSquaral * obj) {
 
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_SQUARAL_ATTACK, STATE_SQUARAL_DEAD);
+		return true;
+	}
+
 	float radVal = atan2f((obj->target->objImg->getPositionY() - obj->objImg->getPositionY()) , (obj->target->objImg->getPositionX() - obj->objImg->getPositionX()));
 	obj->objImg->setRotation( - CC_RADIANS_TO_DEGREES(radVal) - 90);
 
@@ -154,18 +194,81 @@ bool StateSquaralAttack::checkTransitionCond(ObjSquaral * obj) {
 
 void StateSquaralSeed::initAction(ObjSquaral * obj) {
 
+	auto callback = CallFunc::create(
+		[=]
+	{
+		//나무 심음
+		if (obj->dir == DIR_LEFT) {
+			GameWorld::objManager->getObjTreeFromPool(obj->getParent(), obj->objImg->getPosition() - Vec2(obj->objImg->getContentSize().width * 2, 0));
+		}
+		else if (obj->dir == DIR_RIGHT) {
+			GameWorld::objManager->getObjTreeFromPool(obj->getParent(), obj->objImg->getPosition() + Vec2(obj->objImg->getContentSize().width * 2, 0));
+		}
+		else if (obj->dir == DIR_UP) {
+			GameWorld::objManager->getObjTreeFromPool(obj->getParent(), obj->objImg->getPosition() + Vec2(0, obj->objImg->getContentSize().height * 2));
+		}
+		else if (obj->dir == DIR_DOWN) {
+			GameWorld::objManager->getObjTreeFromPool(obj->getParent(), obj->objImg->getPosition() - Vec2(0, obj->objImg->getContentSize().height * 2));
+		}
+		
+
+	});
+
+	//지정한 move들을 통한 sequence 지정
+	Sequence* seq = Sequence::create(DelayTime::create(3), callback, nullptr);
+
+	obj->objImg->runAction(seq);
+
 }
 
 bool StateSquaralSeed::checkTransitionCond(ObjSquaral * obj) {
-	return false;
+
+	//Dead 상태로의 조건 확인
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_SQUARAL_SEED, STATE_SQUARAL_DEAD);
+		return true;
+	}
+	else if (obj->objImg->getNumberOfRunningActions() == 0) {	//action이 완료되었을 때
+
+		doTransition(obj, STATE_SQUARAL_SEED, STATE_SQUARAL_NORMAL);
+
+		return true;
+	}
+	else {
+		return false;
+	}
+
 }
 
 
 //다람쥐 : 사망 클래스
 void StateSquaralDead::initAction(ObjSquaral * obj) {
+	obj->objImg->stopAllActions();	//수행하던 action 멈춤
+	obj->squaralSightCircle->clear();	//시야 삼각형 제거
+	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_dead_down.png"));	//sprite image 변경
+	obj->speed = 0;
+	actionDuration = 1;
 
+	obj->unscheduleUpdate(); //업데이트 중지
+
+	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
+
+	//상대 재료 포인트 하강
+	GameWorld::ui->otherBreadPointDown();
+
+	//action 설정
+	auto fadeout = FadeOut::create(actionDuration);
+
+	auto callback = CallFunc::create(
+		[=]
+	{
+		obj->deInit();
+	});
+
+	obj->objImg->runAction(Sequence::create(fadeout, callback, nullptr));
 }
 
 bool StateSquaralDead::checkTransitionCond(ObjSquaral * obj) {
+	//사망 상태로 별다른 행동을 하지 않음
 	return false;
 }
