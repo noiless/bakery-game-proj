@@ -84,16 +84,6 @@ void ObjRabbit::updateRabbitSight(){
 
 void ObjRabbit::update(float delta) {
 
-	//각 state가 가지는 특수한 조건도 transition 내에서 확인
-	//check state transition condition
-	state->checkTransitionCond(this);
-
-	if (pausedTime > state->actionDuration) {
-		objImg->stopAllActions();
-		pausedTime = 0;	//멈춘 시간 초기화
-		state->initAction(this);
-	}
-
 	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
 	//check collision
@@ -102,5 +92,14 @@ void ObjRabbit::update(float delta) {
 		pausedTime += delta;
 	}
 
+	if (pausedTime > state->actionDuration) {
+		objImg->getActionManager()->removeAllActionsFromTarget(objImg);
+		pausedTime = 0;	//멈춘 시간 초기화
+		state->initAction(this);
+	}
+
+	//각 state가 가지는 특수한 조건도 transition 내에서 확인
+	//check state transition condition
+	state->checkTransitionCond(this);
 	
 }

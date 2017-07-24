@@ -8,6 +8,7 @@ USING_NS_CC;
 ObjManager *GameWorld::objManager = new ObjManager;
 Player *GameWorld::player;
 UI * GameWorld::ui;
+//Scene* GameWorld::GameOverScene;
 
 
 Scene* GameWorld::createScene()
@@ -27,6 +28,8 @@ bool GameWorld::init()
     {
         return false;
     }
+
+	//GameOverScene = GameOver::createScene();
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -57,6 +60,11 @@ bool GameWorld::init()
 
 	//init pool's object
 	objManager->ObjInit();
+
+	StateSquaralAttack::tempSquaral = new Obj;
+	StateSquaralAttack::tempSquaral->objImg = Sprite::create("squaral_down.png");
+	StateSquaralAttack::tempSquaral->objImg->setScale(1.7);
+	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
 
 	//plant trees
 	for (int i = 0; i < 3; i++) {

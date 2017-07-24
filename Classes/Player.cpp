@@ -2,6 +2,8 @@
 #include "GameScene.h"
 #include "ObjRabbit.h"
 
+#include "OverScene.h"
+
 
 
 USING_NS_CC;
@@ -91,6 +93,7 @@ bool Player::init() {
 
 void Player::loseHP() {
 	HP--;
+	//GameWorld::ui->point
 }
 
 bool Player::setPlayerMoveLen(float actionDuration) {
@@ -123,6 +126,11 @@ bool Player::setPlayerMoveLen(float actionDuration) {
 }
 
 void Player::update(float delta) {
+
+	if (HP <= 0) {
+		auto gameOverScene = GameOver::createScene();
+		Director::getInstance()->replaceScene(gameOverScene);
+	}
 
 	//현재 움직이는 중인지 확인
 	if (setPlayerMoveLen(delta)) {

@@ -13,16 +13,15 @@ USING_NS_CC;
 
 
 //생성자 - 변수 초기화
-UI::UI(){
-	myMoney = 0;
-	otherMoney = 0;
-	myBreadPoint = 50;
-	otherBreadPoint = 50;
-	adPoint = 50;
+UI::UI() : myMoney(0), otherMoney(0), myBreadPoint(50), otherBreadPoint(50), adPoint(50), checkTime(0), myHP(20) {
+	//myMoney = 0;
+	//otherMoney = 0;
+	//myBreadPoint = 50;
+	//otherBreadPoint = 50;
+	//adPoint = 50;
 
-	checkTime = 0;
-
-	int labelFontSize = 20;
+	//checkTime = 0;
+	//myHP = 20;	//플레이어 내의 값과 같게 초기화
 
 }
 
@@ -120,7 +119,7 @@ void UI::allPointChange() {
 
 	/////////temp
 	myMoney += 500;
-	otherMoney += 1000;
+	otherMoney += 500;
 	/////////temp end
 
 	//CCLOG("point changed");

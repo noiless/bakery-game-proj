@@ -34,7 +34,9 @@ private:
 	
 
 public:
-	ObjManager();
+	ObjManager() {
+
+	}
 	
 	void ObjInit();
 
@@ -60,5 +62,7 @@ public:
 
 	//다람쥐 공격 확인
 	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
+
+	
 	
 };

@@ -8,6 +8,7 @@ private:
 	int myBreadPoint;
 	int otherBreadPoint;
 	int adPoint;
+	int myHP;
 
 	cocos2d::Size visibleSize;
 
@@ -41,6 +42,7 @@ public:
 	void myBreadPointGrow();
 	void otherBreadPointDown();
 	void myAdPointGrow();
+	void loseMyHP();
 
 	void update(float) override;
 };

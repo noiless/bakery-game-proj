@@ -13,6 +13,7 @@ ObjTree::ObjTree() : inUse(false), HP(5) {
 bool ObjTree::init(cocos2d::Vec2 initPos) {
 
 	inUse = true;
+	HP = 5;
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);
 

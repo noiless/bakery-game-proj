@@ -4,9 +4,6 @@
 USING_NS_CC;
 
 
-ObjManager::ObjManager() {
-}
-
 void ObjManager::ObjInit() {
 	//시작 후 초기화
 	for (int i = 0; i < MAX_OBJ_NUM; i++) {
@@ -14,7 +11,9 @@ void ObjManager::ObjInit() {
 		objTreeList[i] = new ObjTree;
 		ObjSquaralList[i] = new ObjSquaral;
 		ObjAcornList[i] = new AcornAttack;
+
 	}
+	
 }
 
 
@@ -68,7 +67,6 @@ void ObjManager::getObjAcornFromPool(Node * parent, ObjSquaral* caller) {
 
 	parent->addChild(newAcorn);
 }
-
 
 
 
@@ -192,6 +190,7 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 				//좌
 				if (moveLen->x < 0) {
 					obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox->size.width / 2 + 1);
+
 				}
 				//우
 				else if (moveLen->x > 0) {
@@ -232,10 +231,6 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 	//충돌한 물체 검출
 	for each (Obj* i in objAvailList)
 	{
-
-		//if (i->typecode != TYPECODE_RABBIT) {	//임시... 나중엔 객체 타입별로 분류할 것?
-		//	continue;
-		//}
 
 		//충돌시
 		if (exBox->intersectsRect(i->objImg->getBoundingBox())) {
@@ -412,7 +407,7 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 	for each (Obj* i in objAvailList)
 	{
 
-		if (i->objIndex == callerIndex) {	//발사자는 충돌 체크에서 제외
+		if (i->objIndex == callerIndex || i->typecode == TYPECODE_NONE) {	//발사자는 충돌 체크에서 제외
 			continue;
 		}
 
