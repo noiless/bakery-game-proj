@@ -77,6 +77,12 @@ AcornAttack::AcornAttack()  : Attack() {
 	this->addChild(attackImg);
 }
 
+
+AcornAttack::~AcornAttack() {
+	attackImg->removeFromParentAndCleanup(true);
+	this->removeFromParentAndCleanup(true);
+}
+
 bool AcornAttack::init(ObjSquaral* caller) {
 	attackImg->setPosition(caller->objImg->getPosition());
 	attackImg->setRotation(caller->objImg->getRotation());
@@ -110,6 +116,7 @@ void AcornAttack::update(float delta) {
 	//다른 오브젝트와 충돌확인
 
 	if (GameWorld::objManager->checkAttackCollision(callerIndex, &attackImg->getPosition(), attackImg->getContentSize().width / 2)) {
+		GameWorld::ui->loseMyHP();	
 		attackImg->getActionManager()->removeAllActionsFromTarget(attackImg);
 		inUse = false;
 		this->removeFromParent();

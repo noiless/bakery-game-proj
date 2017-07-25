@@ -39,15 +39,17 @@ private:
 
 public:
 	ObjManager() {
-
+		CCLOG("objmanager init");
 	}
 	
 	void ObjInit();
+	void Objdeinit();
 
 	void setMapRect(cocos2d::Rect mapBoundingBox);
 
 	void addObjectAvailList(Obj *obj);
 	void deleteObjectAvailList(Obj *obj);
+	void addObjectAvailListFRONT(Obj *obj);
 
 	void getObjRabbitFromPool(Node * parent, Vec2 initPos);
 	void getObjTreeFromPool(Node * parent, Vec2 initPos);

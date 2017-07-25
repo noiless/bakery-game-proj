@@ -18,6 +18,8 @@ Obj::~Obj() {
 	//HelloWorld::objManager->deleteObject(this);
 	//소멸자 말고 delete를 호출하는데(인스턴스가 해제되는곳)에서 deleteObject를 따로 호출해줘야 할거같다
 	//totalObjNum은 줄어들면 objIndex가 딴거랑 중복되게 되니까 수정해줄 필요 없음
+	objImg->removeFromParentAndCleanup(true);
+	this->removeFromParentAndCleanup(true);
 }
 
 Vec2 Obj::setMoveLen(int dir, float speed) {

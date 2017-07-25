@@ -64,7 +64,7 @@ bool GameWorld::init()
 
 	StateSquaralAttack::tempSquaral = new Obj;
 	StateSquaralAttack::tempSquaral->objImg = Sprite::create("squaral_down.png");
-	StateSquaralAttack::tempSquaral->objImg->setScale(1.7);
+	StateSquaralAttack::tempSquaral->objImg->setScale(1.4);
 	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
 
 	//plant trees
@@ -95,11 +95,16 @@ bool GameWorld::init()
 
 	objManager->getObjSquaralFromPool(this, Vec2(-100, -100));
 
+	//////////////
 	this->addChild(objManager);
+	///////////////
+
 
 	ui = new UI();
 	this->addChild(ui, 5);
 	ui->init();
+
+	CCLOG("gamescene init finish");
 
     return true;
 }

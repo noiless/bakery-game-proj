@@ -27,6 +27,8 @@ private:
 	cocos2d::DrawNode * adOtherBar;
 	cocos2d::DrawNode * adMyBar;
 
+	cocos2d::Label * HPLable;
+
 	void allPointChange();
 	void drawUI();
 

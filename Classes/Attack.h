@@ -29,6 +29,7 @@ private:
 	void update(float) override;
 public:
 	AcornAttack();
+	~AcornAttack();
 	int callerIndex;
 	int inUse;
 	virtual bool init(ObjSquaral* caller);

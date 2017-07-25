@@ -1,8 +1,6 @@
 #include "ObjManager.h"
 
-
 USING_NS_CC;
-
 
 void ObjManager::ObjInit() {
 	//시작 후 초기화
@@ -13,7 +11,25 @@ void ObjManager::ObjInit() {
 		ObjAcornList[i] = new AcornAttack;
 
 	}
-	
+}
+
+void ObjManager::Objdeinit() {
+
+	for each (Obj * i in objAvailList) {
+		CCLOG("%d delete index",i->objIndex);
+		i->objImg->getActionManager()->removeAllActions();
+		i->unscheduleUpdate();
+		i->deInit();
+	}
+
+	objAvailList.clear();
+
+	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+		delete objRabbitList[i];
+		delete objTreeList[i];
+		delete ObjSquaralList[i];
+		delete ObjAcornList[i];
+	}
 }
 
 
@@ -21,11 +37,16 @@ void ObjManager::addObjectAvailList(Obj *obj) {
 	objAvailList.push_back(obj);
 }
 
+void ObjManager::addObjectAvailListFRONT(Obj *obj) {
+	objAvailList.push_front(obj);
+}
 
 void ObjManager::deleteObjectAvailList(Obj *obj) {
 	objAvailList.remove(obj);
 	CCLOG("delete from avail list\n");
 }
+
+
 
 void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 

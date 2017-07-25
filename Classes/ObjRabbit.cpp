@@ -15,6 +15,10 @@ ObjRabbit::ObjRabbit() : inUse(false), HP(5), pausedTime(0) {
 
 }
 
+ObjRabbit::~ObjRabbit() {
+	rabbitSightTri->removeFromParentAndCleanup(true);
+}
+
 bool ObjRabbit::init(Vec2 initPos)
 {
 	//member value init
@@ -44,7 +48,7 @@ bool ObjRabbit::deInit()
 	//member value init
 	
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->removeFromParent();
+	this->removeFromParentAndCleanup(true);
 
 	return true;
 

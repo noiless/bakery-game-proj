@@ -38,8 +38,9 @@ bool GameOver::init()
 		//°ÔÀÓ ¾ÀÀ¸·Î ¾À º¯°æ
 		if (keyCode == EventKeyboard::KeyCode::KEY_Z) {
 
-			auto gamScene = GameWorld::createScene();
-			Director::getInstance()->replaceScene(gamScene);
+			auto gameScene = GameWorld::createScene();
+			Director::getInstance()->replaceScene(gameScene);
+			//
 
 		}
 

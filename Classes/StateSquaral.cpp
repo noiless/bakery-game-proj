@@ -38,7 +38,7 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 
 			//tempSquaral
 			StateSquaralAttack::tempSquaral->objImg->setPosition(obj->objImg->getPosition());
-			GameWorld::objManager->addObjectAvailList(StateSquaralAttack::tempSquaral);
+			GameWorld::objManager->addObjectAvailListFRONT(StateSquaralAttack::tempSquaral);
 
 		}
 

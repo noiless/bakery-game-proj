@@ -28,7 +28,7 @@ bool ObjTree::deInit() {
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->removeFromParent();
+	this->removeFromParentAndCleanup(true);
 
 	return true;
 }

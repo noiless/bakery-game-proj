@@ -52,6 +52,9 @@ bool UI::init() {
 	adOtherBar = DrawNode::create();
 	adMyBar = DrawNode::create();
 
+	HPLable = Label::createWithTTF("Player HP : 20", "fonts/arial.ttf", LABEL_FONT_SIZE);
+	HPLable->setAnchorPoint(Vec2(1, 0));
+
 	this->addChild(myBreadBar);
 	this->addChild(myBreadBox);	
 	this->addChild(myMoneyLabel);
@@ -63,6 +66,8 @@ bool UI::init() {
 	this->addChild(adOtherBar);
 	this->addChild(adMyBar);
 	this->addChild(adBox);
+
+	this->addChild(HPLable);
 	//UI : 매 프레임마다 새로 그려줘야 함
 
 	this->scheduleUpdate();
@@ -98,6 +103,18 @@ void UI::myAdPointGrow() {
 		adPoint += USER_CHANGE_UNIT;
 	else
 		adPoint = 100;
+}
+
+void UI::loseMyHP() {
+	myHP--;
+
+	char text[256];
+	sprintf(text, "Player HP : %d", myHP);
+
+	HPLable->setString(text);
+
+	HPLable->setPosition(cam->getPosition() + Vec2(visibleSize.width / 2, - visibleSize.height / 2));
+
 }
 
 //1초마다 포인트 관련한 처리
@@ -140,6 +157,7 @@ void UI::drawUI() {
 	myMoneyLabel->setPosition(cam->getPosition() + Vec2(visibleSize.width/2, visibleSize.height / 2));
 	otherMoneyLabel->setPosition(cam->getPosition() + Vec2(- visibleSize.width / 2, visibleSize.height / 2));
 
+	HPLable->setPosition(cam->getPosition() + Vec2(visibleSize.width / 2, -visibleSize.height / 2));	//position만 바꿔줌
 
 	//draw box, bar
 	myBreadBar->clear();
@@ -162,6 +180,8 @@ void UI::drawUI() {
 
 	adBox->clear();
 	adBox->drawRect(AD_BAR_ORIGIN, AD_BAR_ORIGIN + Vec2(BAR_WEIHT, BAR_HEIGHT), Color4F::BLACK);
+
+	HPLable->setPosition(cam->getPosition() + Vec2(visibleSize.width / 2, - visibleSize.height / 2));
 	
 }
 

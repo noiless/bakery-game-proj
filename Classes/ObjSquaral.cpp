@@ -16,10 +16,13 @@ ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(1
 	addChild(objImg);
 }
 
+ObjSquaral::~ObjSquaral() {
+	squaralSightCircle->removeFromParentAndCleanup(true);
+}
+
 
 void ObjSquaral::loseHP() {
 	HP--;
-	CCLOG("sq hp %d",HP);
 }
 
 bool ObjSquaral::init(cocos2d::Vec2 initPos) {
@@ -42,7 +45,7 @@ bool ObjSquaral::deInit() {
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->removeFromParent();
+	this->removeFromParentAndCleanup(true);
 
 	return true;
 }
