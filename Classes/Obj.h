@@ -34,6 +34,6 @@ public:
 	cocos2d::Vec2 moveLen;	//speed * delta°ª
 	cocos2d::Vec2 setMoveLen(int dir, float speed);
 
-	virtual void loseHP() = 0;
-	virtual bool deInit() = 0;
+	virtual void loseHP() {};
+	virtual bool deInit() { return true; };
 };

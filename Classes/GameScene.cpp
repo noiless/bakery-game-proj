@@ -8,6 +8,7 @@ USING_NS_CC;
 ObjManager *GameWorld::objManager = new ObjManager;
 Player *GameWorld::player;
 UI * GameWorld::ui;
+//Scene* GameWorld::GameOverScene;
 
 
 Scene* GameWorld::createScene()
@@ -27,6 +28,8 @@ bool GameWorld::init()
     {
         return false;
     }
+
+	//GameOverScene = GameOver::createScene();
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -39,6 +42,7 @@ bool GameWorld::init()
 
 	Sprite *map = Sprite::create("map.png");
 	this->addChild(map, -1);	//가장 먼저 맵을 그린다.
+	objManager->setMapRect(map->getBoundingBox());
     
     auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
     
@@ -57,6 +61,11 @@ bool GameWorld::init()
 
 	//init pool's object
 	objManager->ObjInit();
+
+	StateSquaralAttack::tempSquaral = new Obj;
+	StateSquaralAttack::tempSquaral->objImg = Sprite::create("squaral_down.png");
+	StateSquaralAttack::tempSquaral->objImg->setScale(1.4);
+	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
 
 	//plant trees
 	for (int i = 0; i < 3; i++) {
@@ -86,11 +95,16 @@ bool GameWorld::init()
 
 	objManager->getObjSquaralFromPool(this, Vec2(-100, -100));
 
+	//////////////
 	this->addChild(objManager);
+	///////////////
+
 
 	ui = new UI();
 	this->addChild(ui, 5);
 	ui->init();
+
+	CCLOG("gamescene init finish");
 
     return true;
 }

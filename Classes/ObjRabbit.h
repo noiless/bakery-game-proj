@@ -13,6 +13,7 @@ private:
 	
 public:
 	ObjRabbit();
+	~ObjRabbit();
 
 	virtual bool init(cocos2d::Vec2 initPos);
 	virtual bool deInit();

@@ -1,0 +1,5 @@
+# Ignore thumbnails created by windows
+Thumbs.db
+
+.vs/
+*.VC.db

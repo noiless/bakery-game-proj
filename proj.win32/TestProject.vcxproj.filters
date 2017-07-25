@@ -54,6 +54,9 @@
     <ClCompile Include="..\Classes\StateSquaral.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\OverScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -96,6 +99,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\StateSquaral.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\OverScene.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

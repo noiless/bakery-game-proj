@@ -2,6 +2,8 @@
 #include "GameScene.h"
 #include "ObjRabbit.h"
 
+#include "OverScene.h"
+
 
 
 USING_NS_CC;
@@ -15,7 +17,7 @@ bool Player::init() {
 	GameWorld::objManager->addObjectAvailList(this);	//availList에 추가
 
 	typecode = TYPECODE_PEOPLE;
-	HP = 10;
+	HP = 20;
 
 	isMoving[0] = false; isMoving[1] = false; isMoving[2] = false; isMoving[3] = false;
 
@@ -91,6 +93,7 @@ bool Player::init() {
 
 void Player::loseHP() {
 	HP--;
+	//GameWorld::ui->point
 }
 
 bool Player::setPlayerMoveLen(float actionDuration) {
@@ -124,29 +127,40 @@ bool Player::setPlayerMoveLen(float actionDuration) {
 
 void Player::update(float delta) {
 
-	//현재 움직이는 중인지 확인
-	if (setPlayerMoveLen(delta)) {
+	if (HP <= 0) {
+		this->unscheduleUpdate();
+		GameWorld::objManager->Objdeinit();
+		auto gameOverScene = GameOver::createScene();
+		Director::getInstance()->replaceScene(gameOverScene);
+	}
+	else {
 
-		cam = Camera::getDefaultCamera();
+		//현재 움직이는 중인지 확인
+		if (setPlayerMoveLen(delta)) {
 
-		//moveLen = speed * delta
-		exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+			cam = Camera::getDefaultCamera();
 
-		//plyer only collision start
+			//moveLen = speed * delta
+			exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+
+			//plyer only collision start
 
 			//충돌 체크
-		if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
-			//충돌하지 않으면 이동
-			objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
+			if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
+				//충돌하지 않으면 이동
+				objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
+			}
+
+			//플레이어 이동에 따라 카메라 이동
+			cam->setPosition(objImg->getPosition());
+
+			//plyer only collision end
+
 		}
-
-		//플레이어 이동에 따라 카메라 이동
-		cam->setPosition(objImg->getPosition());
-
-		//plyer only collision end
-
-
 	}
+
+
+	
 	
 	
 }

@@ -8,6 +8,7 @@ private:
 	int myBreadPoint;
 	int otherBreadPoint;
 	int adPoint;
+	int myHP;
 
 	cocos2d::Size visibleSize;
 
@@ -26,6 +27,8 @@ private:
 	cocos2d::DrawNode * adOtherBar;
 	cocos2d::DrawNode * adMyBar;
 
+	cocos2d::Label * HPLable;
+
 	void allPointChange();
 	void drawUI();
 
@@ -41,6 +44,7 @@ public:
 	void myBreadPointGrow();
 	void otherBreadPointDown();
 	void myAdPointGrow();
+	void loseMyHP();
 
 	void update(float) override;
 };

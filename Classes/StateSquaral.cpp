@@ -11,9 +11,17 @@ StateSquaralSeed* StateSquaral::squaralSeed = new StateSquaralSeed;
 StateSquaralDead* StateSquaral::squaralDead = new StateSquaralDead;
 
 void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
+
+	obj->pausedTime = 0;
+	obj->getActionManager()->resumeTarget(obj->objImg);
+	obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);	//수행하던 action 제거
 	
 	//dead 처리 가장 먼저
 	if (dest == STATE_SQUARAL_DEAD) {
+		if (source == STATE_SQUARAL_ATTACK) {
+			GameWorld::objManager->deleteObjectAvailList(StateSquaralAttack::tempSquaral);
+		}
+
 		obj->state = StateSquaral::squaralDead;
 		obj->state->initAction(obj);
 	}
@@ -24,16 +32,19 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 		if (dest == STATE_SQUARAL_ATTACK) {
 			obj->squaralSightCircle->clear();	//시야 제거
 			obj->squaralSightCircle->drawSolidCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2, 30, 12, Color4F::RED);
-			obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
 			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_attack_down.png"));	//sprite 이미지 재설정
 			obj->state = StateSquaral::squaralAttack;
 			obj->state->initAction(obj);
+
+			//tempSquaral
+			StateSquaralAttack::tempSquaral->objImg->setPosition(obj->objImg->getPosition());
+			GameWorld::objManager->addObjectAvailListFRONT(StateSquaralAttack::tempSquaral);
+
 		}
 
 		else if (dest == STATE_SQUARAL_SEED) {
 
 			obj->squaralSightCircle->clear();	//시야 제거
-			obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
 			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_seed_down.png"));	//sprite 이미지 재설정
 			obj->state = StateSquaral::squaralSeed;
 			obj->state->initAction(obj);
@@ -41,15 +52,15 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 		
 	}
 	else if (source == STATE_SQUARAL_ATTACK && dest == STATE_SQUARAL_NORMAL) {
+		GameWorld::objManager->deleteObjectAvailList(StateSquaralAttack::tempSquaral);
+
 		obj->squaralSightCircle->clear();
-		obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
 		obj->normalTime = 0;
 		obj->state = StateSquaral::squaralNormal;
 		obj->state->initAction(obj);
 
 	}
 	else if (source == STATE_SQUARAL_SEED && dest == STATE_SQUARAL_NORMAL) {
-		obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);
 		obj->normalTime = 0;
 		obj->state = StateSquaral::squaralNormal;
 		obj->state->initAction(obj);
@@ -92,8 +103,6 @@ MoveBy* StateSquaralNormal::makeRandDir(ObjSquaral* obj) {
 
 void StateSquaralNormal::initAction(ObjSquaral * obj) {
 	
-	obj->HP = 5;
-
 	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_down.png"));	//sprite 이미지 재설정
 	obj->objImg->setOpacity(255);
 
@@ -134,7 +143,6 @@ bool StateSquaralNormal::checkTransitionCond(ObjSquaral * obj) {
 
 	obj->target = GameWorld::objManager->checkSightCollision(obj);	//check sight
 
-	
 	if (obj->target != nullptr) {
 		doTransition(obj, STATE_SQUARAL_NORMAL, STATE_SQUARAL_ATTACK);
 		CCLOG("index %d", obj->target->objIndex);
@@ -152,12 +160,20 @@ bool StateSquaralNormal::checkTransitionCond(ObjSquaral * obj) {
 
 //다람쥐 : 공격 상태 클래스
 
+Obj * StateSquaralAttack::tempSquaral;
+
+StateSquaralAttack::StateSquaralAttack() {
+	squaralAttackEffect.name = "squaralAttackEffect";
+	squaralAttackEffect.maxInstances = 10;
+};
+
 void StateSquaralAttack::initAction(ObjSquaral * obj) {
 	//obj->moveLen = Vec2::ZERO;
 
 	auto callback = CallFunc::create(
 		[=]
 	{
+		experimental::AudioEngine::play2d("acorn_shot.mp3", false, 1.0f, &squaralAttackEffect);
 		GameWorld::objManager->getObjAcornFromPool(obj->getParent(), obj);
 
 	});
@@ -243,7 +259,6 @@ bool StateSquaralSeed::checkTransitionCond(ObjSquaral * obj) {
 
 //다람쥐 : 사망 클래스
 void StateSquaralDead::initAction(ObjSquaral * obj) {
-	obj->objImg->stopAllActions();	//수행하던 action 멈춤
 	obj->squaralSightCircle->clear();	//시야 삼각형 제거
 	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_dead_down.png"));	//sprite image 변경
 	obj->speed = 0;

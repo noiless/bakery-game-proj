@@ -8,10 +8,10 @@ class ObjSquaral : public Obj{
 private:
 	Rect exBox;
 	void update(float) override;
-	//cocos2d::Vector<AcornAttack> acorn;	//다람쥐가 경험치같은걸 얻는 것도 아니고 없어도 될거 같은
 
 public:
 	ObjSquaral();
+	~ObjSquaral();
 	int squaralSightRadius;
 	DrawNode * squaralSightCircle;
 

@@ -13,16 +13,15 @@ USING_NS_CC;
 
 
 //생성자 - 변수 초기화
-UI::UI(){
-	myMoney = 0;
-	otherMoney = 0;
-	myBreadPoint = 50;
-	otherBreadPoint = 50;
-	adPoint = 50;
+UI::UI() : myMoney(0), otherMoney(0), myBreadPoint(50), otherBreadPoint(50), adPoint(50), checkTime(0), myHP(20) {
+	//myMoney = 0;
+	//otherMoney = 0;
+	//myBreadPoint = 50;
+	//otherBreadPoint = 50;
+	//adPoint = 50;
 
-	checkTime = 0;
-
-	int labelFontSize = 20;
+	//checkTime = 0;
+	//myHP = 20;	//플레이어 내의 값과 같게 초기화
 
 }
 
@@ -53,6 +52,9 @@ bool UI::init() {
 	adOtherBar = DrawNode::create();
 	adMyBar = DrawNode::create();
 
+	HPLable = Label::createWithTTF("Player HP : 20", "fonts/arial.ttf", LABEL_FONT_SIZE);
+	HPLable->setAnchorPoint(Vec2(1, 0));
+
 	this->addChild(myBreadBar);
 	this->addChild(myBreadBox);	
 	this->addChild(myMoneyLabel);
@@ -64,6 +66,8 @@ bool UI::init() {
 	this->addChild(adOtherBar);
 	this->addChild(adMyBar);
 	this->addChild(adBox);
+
+	this->addChild(HPLable);
 	//UI : 매 프레임마다 새로 그려줘야 함
 
 	this->scheduleUpdate();
@@ -101,6 +105,18 @@ void UI::myAdPointGrow() {
 		adPoint = 100;
 }
 
+void UI::loseMyHP() {
+	myHP--;
+
+	char text[256];
+	sprintf(text, "Player HP : %d", myHP);
+
+	HPLable->setString(text);
+
+	HPLable->setPosition(cam->getPosition() + Vec2(visibleSize.width / 2, - visibleSize.height / 2));
+
+}
+
 //1초마다 포인트 관련한 처리
 void UI::allPointChange() {
 	if (adPoint > TIME_CHANGE_UNIT)
@@ -120,7 +136,7 @@ void UI::allPointChange() {
 
 	/////////temp
 	myMoney += 500;
-	otherMoney += 1000;
+	otherMoney += 500;
 	/////////temp end
 
 	//CCLOG("point changed");
@@ -141,6 +157,7 @@ void UI::drawUI() {
 	myMoneyLabel->setPosition(cam->getPosition() + Vec2(visibleSize.width/2, visibleSize.height / 2));
 	otherMoneyLabel->setPosition(cam->getPosition() + Vec2(- visibleSize.width / 2, visibleSize.height / 2));
 
+	HPLable->setPosition(cam->getPosition() + Vec2(visibleSize.width / 2, -visibleSize.height / 2));	//position만 바꿔줌
 
 	//draw box, bar
 	myBreadBar->clear();
@@ -163,6 +180,8 @@ void UI::drawUI() {
 
 	adBox->clear();
 	adBox->drawRect(AD_BAR_ORIGIN, AD_BAR_ORIGIN + Vec2(BAR_WEIHT, BAR_HEIGHT), Color4F::BLACK);
+
+	HPLable->setPosition(cam->getPosition() + Vec2(visibleSize.width / 2, - visibleSize.height / 2));
 	
 }
 

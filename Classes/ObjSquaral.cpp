@@ -16,16 +16,24 @@ ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(1
 	addChild(objImg);
 }
 
+ObjSquaral::~ObjSquaral() {
+	squaralSightCircle->removeFromParentAndCleanup(true);
+}
+
 
 void ObjSquaral::loseHP() {
 	HP--;
 }
 
 bool ObjSquaral::init(cocos2d::Vec2 initPos) {
+	HP = 5;
 	objImg->setPosition(initPos);
 	inUse = true;
+	normalTime = 0;
+
 	state = dynamic_cast<StateSquaral*> (StateSquaral::squaralNormal);
 	state->initAction(this);
+
 
 	this->scheduleUpdate();
 
@@ -37,7 +45,7 @@ bool ObjSquaral::deInit() {
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->removeFromParent();
+	this->removeFromParentAndCleanup(true);
 
 	return true;
 }
@@ -75,6 +83,17 @@ void ObjSquaral::drawSquaralSight() {
 
 void ObjSquaral::update(float delta) {
 	
+	if (state == StateSquaral::squaralNormal) {
+		exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+
+		if (!GameWorld::objManager->checkMoveCollision(this, &exBox, &(moveLen * delta))) {
+			//충돌 상태인 경우 pausedTime 증가
+			pausedTime += delta;
+		}
+	}
+
+	normalTime += delta;
+
 	state->checkTransitionCond(this);
 
 	if (pausedTime > state->actionDuration) {
@@ -82,13 +101,4 @@ void ObjSquaral::update(float delta) {
 		pausedTime = 0;	//멈춘 시간 초기화
 		state->initAction(this);
 	}
-
-	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
-
-	if (!GameWorld::objManager->checkMoveCollision(this, &exBox, &(moveLen * delta))) {
-		//충돌 상태인 경우 pausedTime 증가
-		pausedTime += delta;
-	}
-
-	normalTime += delta;
 }

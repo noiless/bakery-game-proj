@@ -25,6 +25,8 @@ public:
 	static Player *player;
 	static UI *ui;
 
+	//static cocos2d::Scene* GameOverScene;
+
 };
 
 
