@@ -31,7 +31,7 @@ void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 
 	ObjRabbit* newRabbit = getFreeObjRabbit();
 
-	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");	//max num * 2로 하고 오브젝트 풀 내에 들어갈 오브젝트들 더 제작
+	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
 
 	newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
@@ -123,6 +123,15 @@ AcornAttack* ObjManager::getFreeAcornAttack() {
 	return nullptr;
 }
 
+void ObjManager::setMapRect(cocos2d::Rect mapBoundingBox) {
+	mapRect.setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y, mapBoundingBox.size.width, mapBoundingBox.size.height);
+	mapBoundaryRect[0].setRect(mapBoundingBox.origin.x - 100, mapBoundingBox.origin.y, 100, mapBoundingBox.size.height);	//좌
+	mapBoundaryRect[1].setRect(mapBoundingBox.origin.x + mapBoundingBox.size.width, mapBoundingBox.origin.y, 100, mapBoundingBox.size.height);//우
+	mapBoundaryRect[2].setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y + mapBoundingBox.size.height, mapBoundingBox.size.width, 100);//상
+	mapBoundaryRect[3].setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y - 100, mapBoundingBox.size.width, 100);//하
+
+}
+
 Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
 
 	int randDir;
@@ -161,6 +170,17 @@ Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
 	return *pos;
 }
 
+bool ObjManager::mapBoundaryCheck(cocos2d::Rect* exBox) {
+
+	if (exBox->intersectsRect(mapBoundaryRect[0])
+		|| exBox->intersectsRect(mapBoundaryRect[1])
+		|| exBox->intersectsRect(mapBoundaryRect[2])
+		|| exBox->intersectsRect(mapBoundaryRect[3]))
+		return true;
+	else
+		return false;
+}
+
 
 //호출한 오브젝트 obj에 대해 다른 오브젝트와 충돌했는지 확인한다.
 //이동에 대해서 -> 충돌했을시 오브젝트를 인접한 위치로 옮겨줌
@@ -175,45 +195,82 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 	
 	//움직였을 시의 예상 boundingbox를 받아서 그걸로 움직일 수 있는지 검사
 
-	for each (Obj* i in objAvailList)
-	{
-		//충돌시
-		if ((obj->objIndex != i->objIndex) && exBox->intersectsRect(i->objImg->getBoundingBox())) {
 
-			//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
+	//맵 밖으로 나가는가?
+	if (mapBoundaryCheck(exBox)) {
+		if (obj->pausedTime == 0) {
+			obj->getActionManager()->pauseTarget(obj->objImg);
 
-			//첫 충돌 체크
-			if (obj->pausedTime == 0) {
-				obj->getActionManager()->pauseTarget(obj->objImg);
-
-				//x축으로 움직이고 있었을 때
-				//좌
-				if (moveLen->x < 0) {
-					obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox->size.width / 2 + 1);
-
-				}
-				//우
-				else if (moveLen->x > 0) {
-					obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox->size.width / 2 - 1);
-
-				}
-				//y축으로 움직이고 있었을 때
-				//상
-				else if (moveLen->y>0) {
-					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox->size.height / 2 - 1);
-
-				}
-				//하
-				else if (moveLen->y<0) {
-
-					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox->size.height / 2 + 1);
-				}
+			//x축으로 움직이고 있었을 때
+			//좌
+			if (moveLen->x < 0) {
+				obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox->size.width / 2 + 1);
 
 			}
+			//우
+			else if (moveLen->x > 0) {
+				obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox->size.width / 2 - 1);
 
-			return false;
+			}
+			//y축으로 움직이고 있었을 때
+			//상
+			else if (moveLen->y>0) {
+				obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox->size.height / 2 - 1);
+
+			}
+			//하
+			else if (moveLen->y<0) {
+
+				obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox->size.height / 2 + 1);
+			}
+
+		}
+
+		return false;
+	}
+	else {
+		for each (Obj* i in objAvailList)
+		{
+			//충돌시
+			if ((obj->objIndex != i->objIndex) && exBox->intersectsRect(i->objImg->getBoundingBox())) {
+
+				//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
+
+				//첫 충돌 체크
+				if (obj->pausedTime == 0) {
+					obj->getActionManager()->pauseTarget(obj->objImg);
+
+					//x축으로 움직이고 있었을 때
+					//좌
+					if (moveLen->x < 0) {
+						obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox->size.width / 2 + 1);
+
+					}
+					//우
+					else if (moveLen->x > 0) {
+						obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox->size.width / 2 - 1);
+
+					}
+					//y축으로 움직이고 있었을 때
+					//상
+					else if (moveLen->y>0) {
+						obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox->size.height / 2 - 1);
+
+					}
+					//하
+					else if (moveLen->y<0) {
+
+						obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox->size.height / 2 + 1);
+					}
+
+				}
+
+				return false;
+			}
 		}
 	}
+
+
 
 	//충돌하지 않았으면 계속 움직임
 	obj->getActionManager()->resumeTarget(obj->objImg);

@@ -42,6 +42,7 @@ bool GameWorld::init()
 
 	Sprite *map = Sprite::create("map.png");
 	this->addChild(map, -1);	//가장 먼저 맵을 그린다.
+	objManager->setMapRect(map->getBoundingBox());
     
     auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
     

@@ -23,6 +23,9 @@ private:
 	cocos2d::Vector<Obj*> playerCollisionList;	//
 	cocos2d::Vector<Obj*> acornCollisionList;
 
+	cocos2d::Rect mapRect;	//쓸일이 있을까...?
+	cocos2d::Rect mapBoundaryRect[4];
+
 	list<Obj*> objAvailList;	//현재 작동중인 오브젝트들의 리스트
 
 	ObjRabbit* getFreeObjRabbit();
@@ -31,6 +34,7 @@ private:
 	AcornAttack* getFreeAcornAttack();
 
 	Vec2 createColCheck(Vec2* pos, const cocos2d::Size* size);
+	bool mapBoundaryCheck(cocos2d::Rect* exBox);
 	
 
 public:
@@ -39,6 +43,8 @@ public:
 	}
 	
 	void ObjInit();
+
+	void setMapRect(cocos2d::Rect mapBoundingBox);
 
 	void addObjectAvailList(Obj *obj);
 	void deleteObjectAvailList(Obj *obj);
@@ -63,6 +69,7 @@ public:
 	//다람쥐 공격 확인
 	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
 
+	
 	
 	
 };
