@@ -93,7 +93,6 @@ bool Player::init() {
 
 void Player::loseHP() {
 	HP--;
-	//GameWorld::ui->point
 }
 
 bool Player::setPlayerMoveLen(float actionDuration) {
@@ -158,9 +157,5 @@ void Player::update(float delta) {
 
 		}
 	}
-
-
-	
-	
 	
 }

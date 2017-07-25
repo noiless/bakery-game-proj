@@ -149,6 +149,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\Attack.cpp" />
     <ClCompile Include="..\Classes\GameScene.cpp" />
+    <ClCompile Include="..\Classes\ObjGuest.cpp" />
     <ClCompile Include="..\Classes\ObjRabbit.cpp" />
     <ClCompile Include="..\Classes\Obj.cpp" />
     <ClCompile Include="..\Classes\ObjManager.cpp" />
@@ -156,6 +157,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\ObjTree.cpp" />
     <ClCompile Include="..\Classes\OverScene.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
+    <ClCompile Include="..\Classes\StateGuest.cpp" />
     <ClCompile Include="..\Classes\StateRabbit.cpp" />
     <ClCompile Include="..\Classes\StateSquaral.cpp" />
     <ClCompile Include="..\Classes\StateTree.cpp" />
@@ -166,6 +168,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\Attack.h" />
     <ClInclude Include="..\Classes\GameScene.h" />
+    <ClInclude Include="..\Classes\ObjGuest.h" />
     <ClInclude Include="..\Classes\ObjRabbit.h" />
     <ClInclude Include="..\Classes\Obj.h" />
     <ClInclude Include="..\Classes\ObjManager.h" />
@@ -173,6 +176,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\ObjTree.h" />
     <ClInclude Include="..\Classes\OverScene.h" />
     <ClInclude Include="..\Classes\Player.h" />
+    <ClInclude Include="..\Classes\StateGuest.h" />
     <ClInclude Include="..\Classes\StateRabbit.h" />
     <ClInclude Include="..\Classes\StateSquaral.h" />
     <ClInclude Include="..\Classes\StateTree.h" />
