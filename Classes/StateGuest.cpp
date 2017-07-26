@@ -46,10 +46,10 @@ void StateGuestNormal::initAction(ObjGuest * obj) {
 
 	//state에 맞는 speed, actionDuration 설정
 	
-	actionDuration = 5;
+	actionDuration = 7;
 	obj->speed = (abs(obj->getPositionY()) + 1800) / actionDuration;
 
-	MoveTo *move1 = MoveTo::create(actionDuration, Vec2(0, 1600));
+	MoveTo *move1 = MoveTo::create(actionDuration, Vec2(0, 1500));
 	obj->moveLen = obj->setMoveLen(DIR_UP, obj->speed);	//이동 방향, 속도에 따른 moveLen 초기화
 	obj->objImg->setRotation(180);
 
@@ -73,24 +73,24 @@ void StateGuestSelectShop::initAction(ObjGuest * obj) {
 
 	//스피드랑 moveLen이 안바뀌어서 충돌체크 이사ㅓㅇ함
 
-	MoveBy *move1;
+	MoveTo *move1;
 
 	//dir에 따른 회전, 이동 위치 결정
 
 	//좌
 	if (obj->dir == DIR_LEFT) {
 		obj->objImg->setRotation(90);
-		move1 = MoveBy::create(actionDuration, Vec2(-300,0));
+		move1 = MoveTo::create(actionDuration, Vec2(-300, 1500));
 	}
 	//우
 	else if (obj->dir == DIR_RIGHT) {
 		obj->objImg->setRotation(270);
-		move1 = MoveBy::create(actionDuration, Vec2(300,0));
+		move1 = MoveTo::create(actionDuration, Vec2(300, 1500));
 	}
 	//상
 	else if (obj->dir == DIR_UP) {
 		obj->objImg->setRotation(180);
-		move1 = MoveBy::create(actionDuration, Vec2(0,150));
+		move1 = MoveTo::create(actionDuration, Vec2(0,1800));
 	}
 
 	obj->objImg->runAction(move1);

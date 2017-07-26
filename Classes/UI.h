@@ -37,6 +37,7 @@ public:
 	cocos2d::Camera* cam;
 
 	UI();
+	~UI();
 	virtual bool init();
 
 	void myBreadSold();

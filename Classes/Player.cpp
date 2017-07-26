@@ -127,6 +127,7 @@ void Player::update(float delta) {
 
 	if (HP <= 0) {
 		this->unscheduleUpdate();
+		GameWorld::ui->~UI();
 		GameWorld::objManager->Objdeinit();
 		auto gameOverScene = GameOver::createScene();
 		Director::getInstance()->replaceScene(gameOverScene);

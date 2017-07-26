@@ -17,6 +17,28 @@ UI::UI() : myMoney(0), otherMoney(0), myBreadPoint(50), otherBreadPoint(50), adP
 
 }
 
+UI::~UI() {
+	//내 빵 게이지
+	this->unscheduleUpdate();
+	this->removeFromParentAndCleanup(true);
+
+	delete myBreadBox;
+	delete myBreadBar;
+	delete myMoneyLabel;
+
+	//상대 빵 게이지
+	delete otherBreadBox;
+	delete otherBreadBar;
+	delete otherMoneyLabel;
+
+	//홍보 게이지
+	delete adBox;
+	delete adOtherBar;
+	delete adMyBar;
+
+	delete HPLable;
+}
+
 bool UI::init() {
 	
 	visibleSize = Director::getInstance()->getVisibleSize();
@@ -75,7 +97,10 @@ int UI::selectShop() {
 	if (ranVal <= adPoint) {
 		return 1;	//DIR_RIGHT
 	}
-	else if (ranVal <= (100 - adPoint)) {
+
+	ranVal = rand() % 100;	//랜덤값 재계산
+	
+	if (ranVal <= (100 - adPoint)) {
 		return 0;	//DIR_LEFT
 	}
 	else {

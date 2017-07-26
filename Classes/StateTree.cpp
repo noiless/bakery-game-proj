@@ -42,7 +42,7 @@ void StateTreeNormal::initAction(ObjTree * obj) {
 //class StateTreeDead
 
 StateTreeDead::StateTreeDead() {
-
+	experimental::AudioEngine::play2d("sound/sound_tree_dead.mp3", false, 0, &treeDeadEffect);
 }
 
 void StateTreeDead::initAction(ObjTree * obj) {
