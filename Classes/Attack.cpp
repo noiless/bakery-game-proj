@@ -4,7 +4,7 @@
 Attack::Attack(Sprite* userSpr) {
 	showing = false;	//기본
 	success = false;
-	attackImg = Sprite::create("attack.png");
+	attackImg = Sprite::create("img/attack.png");
 	attackImg->setAnchorPoint(Vec2(0.5, 1));
 	attackImg->setPosition(userSpr->getContentSize() / 2);	//원점
 	attackImg->setPositionY(attackImg->getPosition().y - userSpr->getContentSize().height / 2 - 1);
@@ -72,7 +72,7 @@ void Attack::update(float) {
 /////class AcornAttack
 
 AcornAttack::AcornAttack()  : Attack() {
-	attackImg = Sprite::create("acorn.png");
+	attackImg = Sprite::create("img/acorn.png");
 	inUse = false;
 	this->addChild(attackImg);
 }
@@ -116,7 +116,6 @@ void AcornAttack::update(float delta) {
 	//다른 오브젝트와 충돌확인
 
 	if (GameWorld::objManager->checkAttackCollision(callerIndex, &attackImg->getPosition(), attackImg->getContentSize().width / 2)) {
-		GameWorld::ui->loseMyHP();	
 		attackImg->getActionManager()->removeAllActionsFromTarget(attackImg);
 		inUse = false;
 		this->removeFromParent();

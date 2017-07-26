@@ -3,9 +3,9 @@
 
 USING_NS_CC;
 
-ObjRabbit::ObjRabbit() : inUse(false), HP(5), pausedTime(0) {
+ObjRabbit::ObjRabbit() : inUse(false), HP(2), pausedTime(0) {
 	typecode = TYPECODE_RABBIT;
-	objImg = Sprite::create("rabbit_normal_down.png");
+	objImg = Sprite::create("img/rabbit_normal_down.png");
 
 	rabbitSightTri = DrawNode::create();
 	rabbitSightTri->setOpacity(64);	//opacity 0~255
@@ -24,7 +24,7 @@ bool ObjRabbit::init(Vec2 initPos)
 	//member value init
 	inUse = true;	//오브젝트를 사용 중인 것으로 변경
 
-	HP = 5;
+	HP = 2;
 
 	//re set sprite position
 	objImg->setPosition(initPos);

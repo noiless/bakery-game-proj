@@ -7,7 +7,7 @@
 ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(150) {
 	typecode = TYPECODE_SQUARAL;
 	normalTime = 0;
-	objImg = Sprite::create("squaral_down.png");
+	objImg = Sprite::create("img/squaral_down.png");
 
 	squaralSightCircle = DrawNode::create();
 	squaralSightCircle->setOpacity(64);	//opacity 0~255

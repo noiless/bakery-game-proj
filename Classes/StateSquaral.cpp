@@ -32,7 +32,7 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 		if (dest == STATE_SQUARAL_ATTACK) {
 			obj->squaralSightCircle->clear();	//시야 제거
 			obj->squaralSightCircle->drawSolidCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2, 30, 12, Color4F::RED);
-			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_attack_down.png"));	//sprite 이미지 재설정
+			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/squaral_attack_down.png"));	//sprite 이미지 재설정
 			obj->state = StateSquaral::squaralAttack;
 			obj->state->initAction(obj);
 
@@ -45,7 +45,7 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 		else if (dest == STATE_SQUARAL_SEED) {
 
 			obj->squaralSightCircle->clear();	//시야 제거
-			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_seed_down.png"));	//sprite 이미지 재설정
+			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/squaral_seed_down.png"));	//sprite 이미지 재설정
 			obj->state = StateSquaral::squaralSeed;
 			obj->state->initAction(obj);
 		}
@@ -103,7 +103,7 @@ MoveBy* StateSquaralNormal::makeRandDir(ObjSquaral* obj) {
 
 void StateSquaralNormal::initAction(ObjSquaral * obj) {
 	
-	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_down.png"));	//sprite 이미지 재설정
+	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/squaral_down.png"));	//sprite 이미지 재설정
 	obj->objImg->setOpacity(255);
 
 	//state에 맞는 speed, actionDuration 설정
@@ -173,7 +173,7 @@ void StateSquaralAttack::initAction(ObjSquaral * obj) {
 	auto callback = CallFunc::create(
 		[=]
 	{
-		experimental::AudioEngine::play2d("acorn_shot.mp3", false, 1.0f, &squaralAttackEffect);
+		experimental::AudioEngine::play2d("sound/acorn_shot.mp3", false, 1.0f, &squaralAttackEffect);
 		GameWorld::objManager->getObjAcornFromPool(obj->getParent(), obj);
 
 	});
@@ -260,7 +260,7 @@ bool StateSquaralSeed::checkTransitionCond(ObjSquaral * obj) {
 //다람쥐 : 사망 클래스
 void StateSquaralDead::initAction(ObjSquaral * obj) {
 	obj->squaralSightCircle->clear();	//시야 삼각형 제거
-	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("squaral_dead_down.png"));	//sprite image 변경
+	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/squaral_dead_down.png"));	//sprite image 변경
 	obj->speed = 0;
 	actionDuration = 1;
 

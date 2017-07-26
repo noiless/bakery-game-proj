@@ -1,9 +1,7 @@
 #include "Player.h"
 #include "GameScene.h"
 #include "ObjRabbit.h"
-
 #include "OverScene.h"
-
 
 
 USING_NS_CC;
@@ -23,7 +21,7 @@ bool Player::init() {
 
 	moveLen = Vec2(0, 0);
 
-	objImg = Sprite::create("player_down.png");
+	objImg = Sprite::create("img/player_down.png");
 
 	attack = new Attack(objImg);
 
@@ -55,7 +53,7 @@ bool Player::init() {
 		//화살표와 별개로 X입력 받음
 		if (keyCode == EventKeyboard::KeyCode::KEY_X) {
 			if (!attack->showing) {
-				experimental::AudioEngine::play2d("sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
+				experimental::AudioEngine::play2d("sound/sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
 				attack->init(objImg);
 			}
 		}
@@ -93,6 +91,7 @@ bool Player::init() {
 
 void Player::loseHP() {
 	HP--;
+	GameWorld::ui->loseMyHP();
 }
 
 bool Player::setPlayerMoveLen(float actionDuration) {

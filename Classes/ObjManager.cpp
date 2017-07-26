@@ -1,15 +1,33 @@
 #include "ObjManager.h"
+#include <Obj.h>
+#include <ObjRabbit.h>
+#include <ObjTree.h>
+#include <ObjSquaral.h>
+#include <ObjGuest.h>
+#include <Attack.h>
 
 USING_NS_CC;
 
 void ObjManager::ObjInit() {
 	//시작 후 초기화
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
 		objRabbitList[i] = new ObjRabbit;
-		objTreeList[i] = new ObjTree;
-		ObjSquaralList[i] = new ObjSquaral;
-		ObjAcornList[i] = new AcornAttack;
+	}
 
+	for (int i = 0; i < MAX_TREE_NUM; i++) {
+		objTreeList[i] = new ObjTree;
+	}
+
+	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
+		objSquaralList[i] = new ObjSquaral;
+	}
+
+	for (int i = 0; i < MAX_ACORN_NUM; i++) {
+		objAcornList[i] = new AcornAttack;
+	}
+
+	for (int i = 0; i < MAX_GUEST_NUM; i++) {
+		objGuestList[i] = new ObjGuest;
 	}
 }
 
@@ -23,13 +41,13 @@ void ObjManager::Objdeinit() {
 	}
 
 	objAvailList.clear();
-
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
-		delete objRabbitList[i];
-		delete objTreeList[i];
-		delete ObjSquaralList[i];
-		delete ObjAcornList[i];
-	}
+	
+	//for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	//	delete objRabbitList[i];
+	//	delete objTreeList[i];
+	//	delete ObjSquaralList[i];
+	//	delete ObjAcornList[i];
+	//}
 }
 
 
@@ -74,7 +92,7 @@ void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
 
 	CCASSERT((newSquaral != nullptr), "NEED LARGER OBJECT POOL : Squaral");
 
-	newSquaral->init(createColCheck(&initPos, &(ObjSquaralList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
+	newSquaral->init(createColCheck(&initPos, &(objSquaralList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
 	parent->addChild(newSquaral);
 }
@@ -89,11 +107,26 @@ void ObjManager::getObjAcornFromPool(Node * parent, ObjSquaral* caller) {
 	parent->addChild(newAcorn);
 }
 
+//항상 정해진 위치에 리젠함
+bool ObjManager::getObjGuestFromPool(Node * parent) {
+	ObjGuest* newGuest = getFreeGuest();
+
+	if (newGuest == nullptr) {
+		return false;	//생성에 실패하면 빈 게스트 자리가 생길 때까지 delay를 주고 wait함
+	}
+	else {
+		newGuest->init(Vec2(0, -1800));
+
+		parent->addChild(newGuest);
+
+		return true;
+	}
+}
 
 
 ObjRabbit* ObjManager::getFreeObjRabbit() {
 
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
 		if (!objRabbitList[i]->inUse) {
 			addObjectAvailList(dynamic_cast<Obj*> (objRabbitList[i]));	//사용할 오브젝트를 availList에 넣어줌
@@ -106,7 +139,7 @@ ObjRabbit* ObjManager::getFreeObjRabbit() {
 }
 
 ObjTree* ObjManager::getFreeObjTree() {
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_TREE_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
 		if (!objTreeList[i]->inUse) {
 			addObjectAvailList(dynamic_cast<Obj*> (objTreeList[i]));	//사용할 오브젝트를 availList에 넣어줌
@@ -119,11 +152,24 @@ ObjTree* ObjManager::getFreeObjTree() {
 }
 
 ObjSquaral* ObjManager::getFreeObjSquaral() {
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
-		if (!ObjSquaralList[i]->inUse) {
-			addObjectAvailList(dynamic_cast<Obj*> (ObjSquaralList[i]));	//사용할 오브젝트를 availList에 넣어줌
-			return ObjSquaralList[i];
+		if (!objSquaralList[i]->inUse) {
+			addObjectAvailList(dynamic_cast<Obj*> (objSquaralList[i]));	//사용할 오브젝트를 availList에 넣어줌
+			return objSquaralList[i];
+		}
+	}
+
+	//모든 오브젝트가 사용중이면 nullptr 반환
+	return nullptr;
+}
+
+ObjGuest* ObjManager::getFreeGuest() {
+	for (int i = 0; i < MAX_GUEST_NUM; i++) {
+		//사용중이지 않은 오브젝트를 찾아 반환
+		if (!objGuestList[i]->inUse) {
+			addObjectAvailList(dynamic_cast<Obj*> (objGuestList[i]));	//사용할 오브젝트를 availList에 넣어줌
+			return objGuestList[i];
 		}
 	}
 
@@ -132,17 +178,20 @@ ObjSquaral* ObjManager::getFreeObjSquaral() {
 }
 
 AcornAttack* ObjManager::getFreeAcornAttack() {
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_ACORN_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
-		if (!ObjAcornList[i]->inUse) {
+		if (!objAcornList[i]->inUse) {
 			//availList에 추가하지 않음			
-			return ObjAcornList[i];
+			return objAcornList[i];
 		}
 	}
 
 	//모든 오브젝트가 사용중이면 nullptr 반환
 	return nullptr;
 }
+
+
+
 
 void ObjManager::setMapRect(cocos2d::Rect mapBoundingBox) {
 	mapRect.setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y, mapBoundingBox.size.width, mapBoundingBox.size.height);
@@ -191,6 +240,7 @@ Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
 	return *pos;
 }
 
+//맵 외부로 나가지 않게
 bool ObjManager::mapBoundaryCheck(cocos2d::Rect* exBox) {
 
 	if (exBox->intersectsRect(mapBoundaryRect[0])

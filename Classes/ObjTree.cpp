@@ -5,7 +5,7 @@ USING_NS_CC;
 
 ObjTree::ObjTree() : inUse(false), HP(5) {
 	typecode = TYPECODE_TREE;
-	objImg = Sprite::create("tree_down.png");
+	objImg = Sprite::create("img/tree_down.png");
 
 	this->addChild(objImg);
 }

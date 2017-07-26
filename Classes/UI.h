@@ -45,6 +45,8 @@ public:
 	void otherBreadPointDown();
 	void myAdPointGrow();
 	void loseMyHP();
+	int selectShop();
+	bool buyBread(bool myStore);
 
 	void update(float) override;
 };

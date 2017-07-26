@@ -12,7 +12,7 @@ class StateTree {
 public:
 	StateTree() {
 		treeDeadEffect.name = "treeDeadEffect";
-		treeDeadEffect.maxInstances = 5;
+		treeDeadEffect.maxInstances = 10;
 	}
 	virtual void initAction(ObjTree * obj) = 0;
 

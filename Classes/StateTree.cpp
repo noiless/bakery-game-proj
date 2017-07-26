@@ -53,7 +53,7 @@ void StateTreeDead::initAction(ObjTree * obj) {
 	obj->objImg->stopAllActions();	//기존의 액션 중지
 
 	//사운드 재생
-	experimental::AudioEngine::play2d("sound_tree_dead.mp3", false, 0.3, &treeDeadEffect);
+	experimental::AudioEngine::play2d("sound/sound_tree_dead.mp3", false, 0.3, &treeDeadEffect);
 
 	//action 설정
 	auto fadeout = FadeOut::create(2);

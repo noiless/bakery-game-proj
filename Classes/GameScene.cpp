@@ -8,12 +8,25 @@ USING_NS_CC;
 ObjManager *GameWorld::objManager = new ObjManager;
 Player *GameWorld::player;
 UI * GameWorld::ui;
-//Scene* GameWorld::GameOverScene;
+bool GameWorld::initiated = false;
+
 
 
 Scene* GameWorld::createScene()
 {
+	
     return GameWorld::create();
+
+}
+
+void GameWorld::gameLoad() {
+	//init pool's object
+	objManager->ObjInit();
+
+	StateSquaralAttack::tempSquaral = new Obj;
+	StateSquaralAttack::tempSquaral->objImg = Sprite::create("img/squaral_down.png");
+	StateSquaralAttack::tempSquaral->objImg->setScale(1.4);
+	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
 
 }
 
@@ -29,43 +42,18 @@ bool GameWorld::init()
         return false;
     }
 
-	//GameOverScene = GameOver::createScene();
+
+	if (!initiated) {
+		gameLoad();
+		initiated = true;
+	}
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-
-	Sprite *map = Sprite::create("map.png");
+	Sprite *map = Sprite::create("img/map.png");
 	this->addChild(map, -1);	//가장 먼저 맵을 그린다.
 	objManager->setMapRect(map->getBoundingBox());
-    
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    
-    // position the label on the center of the screen
-    label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - label->getContentSize().height));
-
-    // add the label as a child to this layer
-    this->addChild(label, 1);
-
-    // add "HelloWorld" splash screen"
-    sprite1 = Sprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    sprite1->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
-	//init pool's object
-	objManager->ObjInit();
-
-	StateSquaralAttack::tempSquaral = new Obj;
-	StateSquaralAttack::tempSquaral->objImg = Sprite::create("squaral_down.png");
-	StateSquaralAttack::tempSquaral->objImg->setScale(1.4);
-	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
 
 	//plant trees
 	for (int i = 0; i < 3; i++) {
@@ -82,11 +70,17 @@ bool GameWorld::init()
 	auto eventListener = EventListenerKeyboard::create();
 
 	eventListener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event* event) {
-		//토끼 생성
+		//다람쥐 생성
 		if (keyCode == EventKeyboard::KeyCode::KEY_Z) {
 
 			objManager->getObjSquaralFromPool(this, Vec2(0,0));
 			
+		}
+
+		if (keyCode == EventKeyboard::KeyCode::KEY_C) {
+
+			CCLOG("player position %f, %f", player->objImg->getPosition().x, player->objImg->getPosition().y);
+
 		}
 
 	};
@@ -101,8 +95,26 @@ bool GameWorld::init()
 
 
 	ui = new UI();
-	this->addChild(ui, 5);
 	ui->init();
+	this->addChild(ui, 5);
+
+
+	//////////// 5초마다 게스트 생성
+	auto callback = CallFunc::create(
+		[=]
+	{
+		objManager->getObjGuestFromPool(this);
+
+	});
+
+	Sequence * seq = Sequence::create(DelayTime::create(5), callback, nullptr);
+
+	this->runAction(RepeatForever::create(seq));
+	/////////////
+
+	//init random dir
+	srand(time(NULL));	//random seed 설정
+	
 
 	CCLOG("gamescene init finish");
 
