@@ -115,7 +115,7 @@ bool ObjManager::getObjGuestFromPool(Node * parent) {
 		return false;	//생성에 실패하면 빈 게스트 자리가 생길 때까지 delay를 주고 wait함
 	}
 	else {
-		newGuest->init(Vec2(0, -1800));
+		newGuest->init(Vec2(0, -1800));	//>>초기 손님 리젠 위치<<
 
 		parent->addChild(newGuest);
 
@@ -190,6 +190,41 @@ AcornAttack* ObjManager::getFreeAcornAttack() {
 	return nullptr;
 }
 
+
+bool ObjManager::isObjColAvail(Obj * obj) {
+	for each (Obj* i in objAvailList)
+	{
+		if (i->objIndex == obj->objIndex)
+			return true;
+	}
+
+	return false;
+}
+
+void ObjManager::addBlood(Node* parent, const Vec2 initPos) {
+	//blood 추가 및 위치, 액션 설정
+	Sprite* newBlood = Sprite::create("img/guest_blood.png");
+	newBlood->setPosition(initPos);
+
+	bloodNum++;
+
+	//newBlood->removeFromParent
+
+	//액션
+	CallFunc *action1 = CallFunc::create([=] {
+		newBlood->removeFromParent();
+		bloodNum--;
+	});
+	Sequence* seq = Sequence::create(DelayTime::create(30), action1, nullptr);
+	newBlood->runAction(seq);
+
+	parent->addChild(newBlood, -1);
+
+}
+
+int ObjManager::getNumBood() {
+	return bloodNum;
+}
 
 
 

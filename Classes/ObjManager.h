@@ -46,11 +46,14 @@ private:
 
 	Vec2 createColCheck(Vec2* pos, const cocos2d::Size* size);
 	bool mapBoundaryCheck(cocos2d::Rect* exBox);
+
+	int bloodNum;
 	
 
 public:
 	ObjManager() {
 		CCLOG("objmanager init");
+		bloodNum = 0;
 	}
 	
 	void ObjInit();
@@ -62,11 +65,17 @@ public:
 	void deleteObjectAvailList(Obj *obj);
 	void addObjectAvailListFRONT(Obj *obj);
 
+	
+	void addBlood(Node* parent, const Vec2 initPos);
+	int getNumBood();
+
 	void getObjRabbitFromPool(Node * parent, Vec2 initPos);
 	void getObjTreeFromPool(Node * parent, Vec2 initPos);
 	void getObjSquaralFromPool(Node * parent, Vec2 initPos);
 	bool getObjGuestFromPool(Node * parent);
 	void getObjAcornFromPool(Node * parent, ObjSquaral* caller);
+
+	bool isObjColAvail(Obj * obj);
 
 	bool checkMoveCollision(Obj *obj, cocos2d::Rect* exBox, cocos2d::Vec2* moveLen);
 	bool checkAttackCollision(cocos2d::Rect* exBox);

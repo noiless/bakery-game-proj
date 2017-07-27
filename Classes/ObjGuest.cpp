@@ -58,6 +58,9 @@ void ObjGuest::update(float delta) {
 		//충돌 상태인 경우 pausedTime 증가
 		pausedTime += delta;
 	}
+	else {
+		pausedTime = 0;
+	}
 
 	//if (pausedTime > state->actionDuration) {
 	//	objImg->getActionManager()->removeAllActionsFromTarget(objImg);	//얘는 일직선 진행이라 이거 말고 딴거로 해야함

@@ -197,8 +197,9 @@ bool StateSquaralAttack::checkTransitionCond(ObjSquaral * obj) {
 
 	obj->moveLen = Vec2::ZERO;
 
-	//타겟이 시야 범위에서 벗어났을때 노말 상태로 전이
-	if (!obj->target->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2)) {
+	//타겟이 시야 범위에서 벗어났을때 / 타겟이 availList에서 벗어났을때(소멸 상태) 노말 상태로 전이
+	if (!obj->target->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2)
+		|| !GameWorld::objManager->isObjColAvail(obj->target)) {
 		doTransition(obj, STATE_SQUARAL_ATTACK, STATE_SQUARAL_NORMAL);
 	}
 

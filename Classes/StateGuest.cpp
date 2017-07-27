@@ -12,9 +12,18 @@ StateGuestGoHome* StateGuest::guestGoHome = new StateGuestGoHome;
 StateGuestDead* StateGuest::guestDead = new StateGuestDead;
 
 void StateGuest::doTransition(ObjGuest* obj, int source, int dest) {
+
+	obj->pausedTime = 0;
+	obj->getActionManager()->resumeTarget(obj->objImg);
+	obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);	//수행하던 action 제거
 	
 	//dead, gohome 먼저 체크
-	if (dest == STATE_GUEST_GOHOME) {
+	if (dest == STATE_GUEST_DEAD) {
+		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/guest_dead_down.png"));	//sprite 이미지 재설정
+		obj->state = StateGuest::guestDead;
+		obj->state->initAction(obj);
+	}
+	else if (dest == STATE_GUEST_GOHOME) {
 		obj->state = StateGuest::guestGoHome;
 		obj->state->initAction(obj);
 	}
@@ -49,7 +58,7 @@ void StateGuestNormal::initAction(ObjGuest * obj) {
 	actionDuration = 7;
 	obj->speed = (abs(obj->getPositionY()) + 1800) / actionDuration;
 
-	MoveTo *move1 = MoveTo::create(actionDuration, Vec2(0, 1500));
+	MoveTo *move1 = MoveTo::create(actionDuration, Vec2(0, 1500));	//가게 선택 위치까지 이동
 	obj->moveLen = obj->setMoveLen(DIR_UP, obj->speed);	//이동 방향, 속도에 따른 moveLen 초기화
 	obj->objImg->setRotation(180);
 
@@ -57,7 +66,11 @@ void StateGuestNormal::initAction(ObjGuest * obj) {
 }
 
 bool StateGuestNormal::checkTransitionCond(ObjGuest * obj) {
-	if (obj->objImg->getNumberOfRunningActions() == 0) {
+
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_GUEST_NORMAL, STATE_GUEST_DEAD);
+	}
+	else if (obj->objImg->getNumberOfRunningActions() == 0) {
 		doTransition(obj, STATE_GUEST_NORMAL, STATE_GUEST_SELECTSHOP);
 	}
 
@@ -67,11 +80,13 @@ bool StateGuestNormal::checkTransitionCond(ObjGuest * obj) {
 
 ////StateGuestSelectShop
 
+//속도랑 위치 하드코딩했음
 void StateGuestSelectShop::initAction(ObjGuest * obj) {
 
 	actionDuration = 3;
 
-	//스피드랑 moveLen이 안바뀌어서 충돌체크 이사ㅓㅇ함
+	obj->speed = 100;
+	
 
 	MoveTo *move1;
 
@@ -92,12 +107,16 @@ void StateGuestSelectShop::initAction(ObjGuest * obj) {
 		obj->objImg->setRotation(180);
 		move1 = MoveTo::create(actionDuration, Vec2(0,1800));
 	}
-
+	obj->moveLen = obj->setMoveLen(obj->dir, obj->speed);
 	obj->objImg->runAction(move1);
 }
 
 bool StateGuestSelectShop::checkTransitionCond(ObjGuest * obj) {
-	if (obj->objImg->getNumberOfRunningActions() == 0) {
+
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_GUEST_SELECTSHOP, STATE_GUEST_DEAD);
+	}
+	else if (obj->objImg->getNumberOfRunningActions() == 0) {
 		if (obj->dir == DIR_UP) {
 			doTransition(obj, STATE_GUEST_SELECTSHOP, STATE_GUEST_GOHOME);
 		}
@@ -120,7 +139,10 @@ void StateGuestBuyBread::initAction(ObjGuest * obj) {
 }
 
 bool StateGuestBuyBread::checkTransitionCond(ObjGuest * obj) {
-	if (obj->objImg->getNumberOfRunningActions() == 0) {
+	if (obj->HP <= 0) {
+		doTransition(obj, STATE_GUEST_BUYBREAD, STATE_GUEST_DEAD);
+	}
+	else if (obj->objImg->getNumberOfRunningActions() == 0) {
 		doTransition(obj, STATE_GUEST_BUYBREAD, STATE_GUEST_GOHOME);
 	}
 
@@ -159,7 +181,26 @@ bool StateGuestGoHome::checkTransitionCond(ObjGuest * obj) {
 ////StateGuestDead
 
 void StateGuestDead::initAction(ObjGuest * obj) {
+	obj->unscheduleUpdate(); //업데이트 중지
 
+	actionDuration = 1;
+
+	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
+
+	//리젠율 관련 설정
+	GameWorld::objManager->addBlood(obj->getParent(), obj->objImg->getPosition());
+
+
+	//action 설정
+	auto fadeout = FadeOut::create(actionDuration);
+
+	auto callback = CallFunc::create(
+		[=]
+	{
+		obj->deInit();
+	});
+
+	obj->objImg->runAction(Sequence::create(fadeout, callback, nullptr));
 }
 
 bool StateGuestDead::checkTransitionCond(ObjGuest * obj) {

@@ -100,16 +100,9 @@ bool GameWorld::init()
 
 
 	//////////// 5초마다 게스트 생성
-	auto callback = CallFunc::create(
-		[=]
-	{
-		objManager->getObjGuestFromPool(this);
+	setGuestInitAction();
 
-	});
 
-	Sequence * seq = Sequence::create(DelayTime::create(5), callback, nullptr);
-
-	this->runAction(RepeatForever::create(seq));
 	/////////////
 
 	//init random dir
@@ -122,3 +115,16 @@ bool GameWorld::init()
 }
 
 
+void GameWorld::setGuestInitAction() {
+	auto callback = CallFunc::create(
+		[this]
+	{
+		objManager->getObjGuestFromPool(this);
+		setGuestInitAction();
+
+	});
+
+	Sequence * seq = Sequence::create(DelayTime::create(5 + objManager->getNumBood()), callback, nullptr);
+
+	this->runAction(seq);
+}
