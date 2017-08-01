@@ -28,6 +28,9 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 	
 
 	if (source == STATE_SQUARAL_NORMAL) {
+
+		//normal에서 다른 상태로 상태 전이할때 updateList에서 제거
+		GameWorld::objManager->deleteUpdateList(obj);
 		
 		if (dest == STATE_SQUARAL_ATTACK) {
 			obj->squaralSightCircle->clear();	//시야 제거
@@ -52,6 +55,9 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 		
 	}
 	else if (source == STATE_SQUARAL_ATTACK && dest == STATE_SQUARAL_NORMAL) {
+		//normal로 전이될 때 updateList에 추가
+		GameWorld::objManager->addUpdateList(obj);
+
 		GameWorld::objManager->deleteObjectAvailList(StateSquaralAttack::tempSquaral);
 
 		obj->squaralSightCircle->clear();
@@ -61,6 +67,9 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 
 	}
 	else if (source == STATE_SQUARAL_SEED && dest == STATE_SQUARAL_NORMAL) {
+		//normal로 전이될 때 updateList에 추가
+		GameWorld::objManager->addUpdateList(obj);
+
 		obj->normalTime = 0;
 		obj->state = StateSquaral::squaralNormal;
 		obj->state->initAction(obj);

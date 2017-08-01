@@ -9,7 +9,6 @@ class ObjRabbit : public Obj {
 private:
 	
 	void update(float) override;
-	Rect exBox;
 	
 public:
 	ObjRabbit();
@@ -24,12 +23,10 @@ public:
 	int HP;
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
-	float pausedTime;
 
 	cocos2d::Vec2 rabbitSight[3];
 	cocos2d::DrawNode* rabbitSightTri;
 
 	StateRabbit* state;
-	Vec2 moveLen;
 
 };

@@ -3,7 +3,7 @@
 
 USING_NS_CC;
 
-ObjRabbit::ObjRabbit() : inUse(false), HP(2), pausedTime(0) {
+ObjRabbit::ObjRabbit() : inUse(false), HP(2) {
 	typecode = TYPECODE_RABBIT;
 	objImg = Sprite::create("img/rabbit_normal_down.png");
 
@@ -25,6 +25,8 @@ bool ObjRabbit::init(Vec2 initPos)
 	inUse = true;	//오브젝트를 사용 중인 것으로 변경
 
 	HP = 2;
+	
+	pausedTime = 0;
 
 	//re set sprite position
 	objImg->setPosition(initPos);
@@ -88,16 +90,10 @@ void ObjRabbit::updateRabbitSight(){
 
 void ObjRabbit::update(float delta) {
 
-	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
-
-	//check collision
-	if (!GameWorld::objManager->checkMoveCollision(this, &exBox, &(moveLen * delta))) {
-		//충돌 상태인 경우 pausedTime 증가
-		pausedTime += delta;
-	}
-
+	//일정 시간 이상 멈춰있었을 시 액션 초기화
 	if (pausedTime > state->actionDuration) {
 		objImg->getActionManager()->removeAllActionsFromTarget(objImg);
+		objImg->getActionManager()->resumeTarget(objImg);
 		pausedTime = 0;	//멈춘 시간 초기화
 		state->initAction(this);
 	}

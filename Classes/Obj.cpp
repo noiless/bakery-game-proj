@@ -8,6 +8,7 @@ int Obj::totalObjNum = 0;
 //»ý¼ºÀÚ
 Obj::Obj(){
 	typecode = TYPECODE_NONE;
+	pausedTime = 0;
 	objIndex = totalObjNum;
 	totalObjNum++;
 }

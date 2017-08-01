@@ -12,7 +12,9 @@ bool Player::deInit() {
 
 bool Player::init() {
 
-	GameWorld::objManager->addObjectAvailList(this);	//availList에 추가
+	GameWorld::objManager->addObjectAvailListFRONT(this);	//availList에 추가...
+	//addObjectAvailList를 이용하지 않기 때문에updateList에는 추가되지 않아 독자적으로 충돌체크를 실행함
+
 
 	typecode = TYPECODE_PEOPLE;
 	HP = 20;
@@ -142,7 +144,6 @@ void Player::update(float delta) {
 			//moveLen = speed * delta
 			exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
-			//plyer only collision start
 
 			//충돌 체크
 			if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
@@ -153,7 +154,6 @@ void Player::update(float delta) {
 			//플레이어 이동에 따라 카메라 이동
 			cam->setPosition(objImg->getPosition());
 
-			//plyer only collision end
 
 		}
 	}

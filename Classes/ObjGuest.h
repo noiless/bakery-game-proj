@@ -10,7 +10,6 @@ USING_NS_CC;
 class ObjGuest : public Obj {
 private:
 	void update(float) override;
-	Rect exBox;
 
 public:
 	ObjGuest();
@@ -24,9 +23,8 @@ public:
 	int HP;
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
-	float pausedTime;
 
 	StateGuest* state;
 
-	Vec2 moveLen;
+	//Vec2 moveLen;
 };

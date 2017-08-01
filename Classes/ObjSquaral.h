@@ -6,7 +6,6 @@
 
 class ObjSquaral : public Obj{
 private:
-	Rect exBox;
 	void update(float) override;
 
 public:
@@ -30,5 +29,4 @@ public:
 	virtual bool deInit();
 
 	StateSquaral * state;
-	Vec2 moveLen;
 };

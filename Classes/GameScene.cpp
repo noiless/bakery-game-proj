@@ -91,6 +91,7 @@ bool GameWorld::init()
 
 	//////////////
 	this->addChild(objManager);
+	objManager->scheduleUpdate(); //update ½ÇÇà
 	///////////////
 
 

@@ -36,7 +36,8 @@ private:
 	cocos2d::Rect mapRect;	//쓸일이 있을까...?
 	cocos2d::Rect mapBoundaryRect[4];
 
-	list<Obj*> objAvailList;	//현재 작동중인 오브젝트들의 리스트
+	list<Obj*> objAvailList;	//현재 작동중인 충돌 가능한 오브젝트들의 리스트
+	list<Obj*> objUpdateList;	//현재 작동중인 이동하는(충돌체크를 실행하는) 오브젝트들의 리스트 (토끼/다람쥐/손님)
 
 	ObjRabbit* getFreeObjRabbit();
 	ObjTree* getFreeObjTree();
@@ -48,6 +49,8 @@ private:
 	bool mapBoundaryCheck(cocos2d::Rect* exBox);
 
 	int bloodNum;
+
+	void update(float) override;
 	
 
 public:
@@ -64,6 +67,9 @@ public:
 	void addObjectAvailList(Obj *obj);
 	void deleteObjectAvailList(Obj *obj);
 	void addObjectAvailListFRONT(Obj *obj);
+
+	void addUpdateList(Obj* obj);
+	void deleteUpdateList(Obj *obj);
 
 	
 	void addBlood(Node* parent, const Vec2 initPos);

@@ -4,7 +4,7 @@
 USING_NS_CC;
 
 
-ObjGuest::ObjGuest() : inUse(false), HP(5), pausedTime(0) {
+ObjGuest::ObjGuest() : inUse(false), HP(5) {
 	typecode = TYPECODE_PEOPLE;
 	objImg = Sprite::create("img/guest_down.png");
 	addChild(objImg);
@@ -24,6 +24,8 @@ bool ObjGuest::init(Vec2 initPos) {
 	//re set sprite position
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);	//opacity 초기화
+
+	pausedTime = 0;
 
 	//init action
 	//첫 state는 normal
@@ -51,16 +53,6 @@ void ObjGuest::loseHP() {
 }
 
 void ObjGuest::update(float delta) {
-	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
-
-	//check collision
-	if (!GameWorld::objManager->checkMoveCollision(this, &exBox, &(moveLen * delta))) {
-		//충돌 상태인 경우 pausedTime 증가
-		pausedTime += delta;
-	}
-	else {
-		pausedTime = 0;
-	}
 
 	//if (pausedTime > state->actionDuration) {
 	//	objImg->getActionManager()->removeAllActionsFromTarget(objImg);	//얘는 일직선 진행이라 이거 말고 딴거로 해야함
