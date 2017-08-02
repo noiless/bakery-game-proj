@@ -28,6 +28,7 @@ public:
 	int typecode = TYPECODE_NONE;	//각 클래스가 가지는 타입
 	int HP = 5;	//각 오브젝트의 체력
 	int dir;	//현재의 방향
+	int qnodeIndex[4];	//소속된 qtree node index
 	float pausedTime = 0;
 
 	cocos2d::Sprite *objImg;

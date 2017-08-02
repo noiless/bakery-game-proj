@@ -13,7 +13,6 @@ USING_NS_CC;
 
 using namespace std;
 
-
 class Player;
 class Obj;
 class ObjRabbit;
@@ -21,6 +20,7 @@ class ObjTree;
 class ObjSquaral;
 class ObjGuest;
 class AcornAttack;
+class QTree;
 
 class ObjManager : public cocos2d::Node {	//._.
 private:
@@ -51,7 +51,8 @@ private:
 	int bloodNum;
 
 	void update(float) override;
-	
+
+	QTree* qtree;
 
 public:
 	ObjManager() {

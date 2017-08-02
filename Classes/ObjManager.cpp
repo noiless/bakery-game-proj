@@ -5,6 +5,7 @@
 #include <ObjSquaral.h>
 #include <ObjGuest.h>
 #include <Attack.h>
+#include <QTree.h>
 
 USING_NS_CC;
 
@@ -53,6 +54,7 @@ void ObjManager::Objdeinit() {
 
 void ObjManager::addObjectAvailList(Obj *obj) {
 	objAvailList.push_back(obj);
+	qtree->insert(obj);
 
 	//충돌체크 가능한 오브젝트군일 경우 updateList에 추가해줌
 	if (obj->typecode == TYPECODE_RABBIT || obj->typecode == TYPECODE_SQUARAL || obj->typecode == TYPECODE_PEOPLE) {
@@ -63,11 +65,16 @@ void ObjManager::addObjectAvailList(Obj *obj) {
 
 void ObjManager::addObjectAvailListFRONT(Obj *obj) {
 	objAvailList.push_front(obj);
+	qtree->insert(obj);
 }
 
 void ObjManager::deleteObjectAvailList(Obj *obj) {
 	objAvailList.remove(obj);
 	objUpdateList.remove(obj);
+
+	//QTree에서도 삭제
+	qtree->removeObjFromAllNode(obj);
+
 	CCLOG("delete from avail list\n");
 }
 
@@ -99,6 +106,8 @@ void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
 	CCASSERT((newTree != nullptr), "NEED LARGER OBJECT POOL : Tree");
 
 	newTree->init(createColCheck(&initPos, &(objTreeList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
+
+	//qtree->insert(newTree);	//img의 초기화가 끝나고 넣어줘야 한다....
 
 	parent->addChild(newTree);
 }
@@ -224,8 +233,6 @@ void ObjManager::addBlood(Node* parent, const Vec2 initPos) {
 
 	bloodNum++;
 
-	//newBlood->removeFromParent
-
 	//액션
 	CallFunc *action1 = CallFunc::create([=] {
 		newBlood->removeFromParent();
@@ -251,8 +258,11 @@ void ObjManager::setMapRect(cocos2d::Rect mapBoundingBox) {
 	mapBoundaryRect[2].setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y + mapBoundingBox.size.height, mapBoundingBox.size.width, 100);//상
 	mapBoundaryRect[3].setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y - 100, mapBoundingBox.size.width, 100);//하
 
+	QTree::init(mapBoundingBox);
+	qtree = new QTree(mapBoundingBox);	//init qtree
 }
 
+//이거 진짜로 안충돌할때까지 돌리는거 추가해야됨;
 Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
 
 	int randDir;
@@ -306,66 +316,86 @@ bool ObjManager::mapBoundaryCheck(cocos2d::Rect* exBox) {
 
 
 //플레이어만 사용
+//노드 내에서만 체크하는걸로 바꿔야함
 bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLen) {
-
-	CCASSERT(!(moveLen->x != 0 && moveLen->y != 0), "moveLen : x or y val should be 0");
 	
+	CCASSERT(!(moveLen->x != 0 && moveLen->y != 0), "moveLen : x or y val should be 0");
+
+
 	//움직였을 시의 예상 boundingbox를 받아서 그걸로 움직일 수 있는지 검사
 
-	//맵 밖으로 나가는가?
-	if (mapBoundaryCheck(exBox)) {
+	QTree * tempPtr;
 
-		//x축으로 움직이고 있었을 때
-		//좌
-		if (moveLen->x < 0) {
-			obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox->size.width / 2 + 1);
-		}
-		//우
-		else if (moveLen->x > 0) {
-			obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox->size.width / 2 - 1);
-		}
-		//y축으로 움직이고 있었을 때
-		//상
-		else if (moveLen->y>0) {
-			obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox->size.height / 2 - 1);
-		}
-		//하
-		else if (moveLen->y<0) {
-			obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox->size.height / 2 + 1);
-		}
+	//각 노드 별로 탐색
+	for (int i = 0; i < 4; i++) {
 
-		return false;
-	}
-	else {
+		tempPtr = qtree->searchNode(obj->qnodeIndex[i]);
 
-		for each (Obj* i in objAvailList){
+		if (tempPtr != nullptr) {
 
-			//충돌시
-			if ((obj->objIndex != i->objIndex) && exBox->intersectsRect(i->objImg->getBoundingBox())) {
-
+			//맵 밖으로 나가는가?
+			if (tempPtr->isOutside && mapBoundaryCheck(exBox)) {
 				//x축으로 움직이고 있었을 때
 				//좌
 				if (moveLen->x < 0) {
-					obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox->size.width / 2 + 1);
+					obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox->size.width / 2 + 1);
 				}
 				//우
 				else if (moveLen->x > 0) {
-					obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox->size.width / 2 - 1);
+					obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox->size.width / 2 - 1);
 				}
 				//y축으로 움직이고 있었을 때
 				//상
 				else if (moveLen->y>0) {
-					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox->size.height / 2 - 1);
+					obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox->size.height / 2 - 1);
 				}
 				//하
 				else if (moveLen->y<0) {
-					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox->size.height / 2 + 1);
+					obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox->size.height / 2 + 1);
 				}
+
+				qtree->renewObjNode(obj);
 
 				return false;
 			}
+
+			for each (Obj* i in objAvailList) {
+
+				//충돌시
+				if ((obj->objIndex != i->objIndex) && exBox->intersectsRect(i->objImg->getBoundingBox())) {
+
+					//x축으로 움직이고 있었을 때
+					//좌
+					if (moveLen->x < 0) {
+						obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox->size.width / 2 + 1);
+					}
+					//우
+					else if (moveLen->x > 0) {
+						obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox->size.width / 2 - 1);
+					}
+					//y축으로 움직이고 있었을 때
+					//상
+					else if (moveLen->y>0) {
+						obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox->size.height / 2 - 1);
+					}
+					//하
+					else if (moveLen->y<0) {
+						obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox->size.height / 2 + 1);
+					}
+
+					qtree->renewObjNode(obj);
+
+					return false;
+				}
+			}
+
 		}
+
+
 	}
+
+	qtree->renewObjNode(obj);
+
 
 	return true;
 }
@@ -374,115 +404,138 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 void ObjManager::update(float delta) {
 
 	bool doCntn = false;
+	QTree* qtreePtr;
 
 	//각 오브젝트마다 exBox
 	Rect exBox;
 
 	//각 오브젝트마다 충돌 체크
-	 for each (Obj* obj in objUpdateList) {
-
-		doCntn = false;
+	for each (Obj* obj in objUpdateList) {
 
 		exBox.setRect(obj->objImg->getBoundingBox().origin.x + obj->moveLen.x * delta, obj->objImg->getBoundingBox().origin.y + obj->moveLen.y * delta, obj->objImg->getBoundingBox().size.width, obj->objImg->getBoundingBox().size.height);
 
-		//움직였을 시의 예상 boundingbox를 통해 이동 가능한지 검사
+		//속한 노드들을 차례로 가져옴
+		for (int i = 0; i < 4; i++) {
+			qtreePtr = qtree->searchNode(obj->qnodeIndex[i]);
 
-		//맵 밖으로 나가는가?
-		if (mapBoundaryCheck(&exBox)) {
+			//탐색한 노드가 null이 아닐때 내부의 원소들과 충돌 체크
+			if (qtreePtr != nullptr) {
 
-			//첫 충돌 체크
-			if (obj->pausedTime == 0) {
-				obj->getActionManager()->pauseTarget(obj->objImg);
+				//외곽 노드이면 맵 밖으로 나가는지 확인
+				if (qtreePtr->isOutside) {
+					if (mapBoundaryCheck(&exBox)) {
 
-				//x축으로 움직이고 있었을 때
-				//좌
-				if (obj->moveLen.x < 0) {
-					obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox.size.width / 2 + 1);
+						//첫 충돌 체크
+						if (obj->pausedTime == 0) {
+							obj->getActionManager()->pauseTarget(obj->objImg);
 
-				}
-				//우
-				else if (obj->moveLen.x > 0) {
-					obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox.size.width / 2 - 1);
+							//x축으로 움직이고 있었을 때
+							//좌
+							if (obj->moveLen.x < 0) {
+								obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox.size.width / 2 + 1);
 
-				}
-				//y축으로 움직이고 있었을 때
-				//상
-				else if (obj->moveLen.y>0) {
-					obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox.size.height / 2 - 1);
+							}
+							//우
+							else if (obj->moveLen.x > 0) {
+								obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox.size.width / 2 - 1);
 
-				}
-				//하
-				else if (obj->moveLen.y<0) {
+							}
+							//y축으로 움직이고 있었을 때
+							//상
+							else if (obj->moveLen.y > 0) {
+								obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox.size.height / 2 - 1);
 
-					obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox.size.height / 2 + 1);
-				}
+							}
+							//하
+							else if (obj->moveLen.y < 0) {
 
-			}
+								obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox.size.height / 2 + 1);
+							}
 
-			////
-			obj->pausedTime += delta;
-
-			continue;	//continuing outer loop
-		}
-		else {
-			for each (Obj* i in objAvailList)
-			{
-				//충돌시
-				if ((obj->objIndex != i->objIndex) && exBox.intersectsRect(i->objImg->getBoundingBox())) {
-
-					//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
-
-					//첫 충돌 체크
-					if (obj->pausedTime == 0) {
-
-						obj->getActionManager()->pauseTarget(obj->objImg); //오브젝트 정지
-
-						//x축으로 움직이고 있었을 때
-						//좌
-						if (obj->moveLen.x < 0) {
-							obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox.size.width / 2 + 1);
+							//충돌 후 멈추므로 첫 충돌 체크에서 renew해줌
+							//qtree->renewObjNode(obj);
 
 						}
-						//우
-						else if (obj->moveLen.x > 0) {
-							obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox.size.width / 2 - 1);
+
+						////
+						obj->pausedTime += delta;
+
+						continue;	//continuing outer loop
+					}
+				} //맵 확인 end
+
+				//속한 노드 내에서 충돌 체크
+				for each (Obj* i in qtreePtr->element) {
+
+					//충돌시
+					if ((obj->objIndex != i->objIndex) && exBox.intersectsRect(i->objImg->getBoundingBox())) {
+
+						//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
+
+						//첫 충돌 체크
+						if (obj->pausedTime == 0) {
+
+							obj->getActionManager()->pauseTarget(obj->objImg); //오브젝트 정지
+
+							//x축으로 움직이고 있었을 때
+							//좌
+							if (obj->moveLen.x < 0) {
+								obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox.size.width / 2 + 1);
+
+							}
+							//우
+							else if (obj->moveLen.x > 0) {
+								obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox.size.width / 2 - 1);
+
+							}
+							//y축으로 움직이고 있었을 때
+							//상
+							else if (obj->moveLen.y > 0) {
+								obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox.size.height / 2 - 1);
+
+							}
+							//하
+							else if (obj->moveLen.y < 0) {
+								obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox.size.height / 2 + 1);
+							}
+
+							//충돌 후 멈추므로 첫 충돌 체크에서 renew해줌
+							//qtree->renewObjNode(obj);
 
 						}
-						//y축으로 움직이고 있었을 때
-						//상
-						else if (obj->moveLen.y>0) {
-							obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox.size.height / 2 - 1);
 
-						}
-						//하
-						else if (obj->moveLen.y<0) {
-							obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox.size.height / 2 + 1);
-						}
+						//충돌 상태면 doCntn을 true로 해줌
+						obj->pausedTime += delta;
+						doCntn = true;
 
 					}
 
-					////
-					obj->pausedTime += delta;
-					doCntn = true;
-				}
-			}
-		}
+					if (doCntn) {
+						break;
+					}
 
-		if (doCntn) {
-			continue;
+				}
+				////element col check
+
+			}
+
+			if (doCntn) {
+				break;;
+			}
+
 		}
+		////each node col check
+
+
+		//오브젝트 obj - 충돌하지 않았으면 계속 움직임
 		
-		//충돌하지 않았으면 계속 움직임
 		obj->getActionManager()->resumeTarget(obj->objImg);
 		obj->pausedTime = 0;
 
+		qtree->renewObjNode(obj);	//이동에 따른 노드 갱신
+		
+
 	}
-
-
-
-
-	
-
 }
 
 
@@ -499,7 +552,6 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 
 			playerCollisionList.pushBack(i);
 			hit = true;
-			CCLOG("%d collision",i->objIndex);
 			
 		}
 	}
@@ -545,7 +597,6 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 			if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
 				&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index])) 
 			{
-				CCLOG("1 %d %d", index, i->objIndex);
 				return true;
 			}
 				
@@ -555,7 +606,6 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 		for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
 			if (i->objImg->getBoundingBox().containsPoint(tri[index])) 
 			{
-				CCLOG("2 %d %d", index, i->objIndex);
 				return true;
 			}
 				

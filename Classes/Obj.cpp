@@ -11,6 +11,9 @@ Obj::Obj(){
 	pausedTime = 0;
 	objIndex = totalObjNum;
 	totalObjNum++;
+	
+	for (int i = 0; i < 4; i++)
+		qnodeIndex[i] = -1;	//-1로 초기화
 }
 
 

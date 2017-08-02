@@ -157,6 +157,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\ObjTree.cpp" />
     <ClCompile Include="..\Classes\OverScene.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
+    <ClCompile Include="..\Classes\QTree.cpp" />
     <ClCompile Include="..\Classes\StateGuest.cpp" />
     <ClCompile Include="..\Classes\StateRabbit.cpp" />
     <ClCompile Include="..\Classes\StateSquaral.cpp" />
@@ -176,6 +177,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\ObjTree.h" />
     <ClInclude Include="..\Classes\OverScene.h" />
     <ClInclude Include="..\Classes\Player.h" />
+    <ClInclude Include="..\Classes\QTree.h" />
     <ClInclude Include="..\Classes\StateGuest.h" />
     <ClInclude Include="..\Classes\StateRabbit.h" />
     <ClInclude Include="..\Classes\StateSquaral.h" />
