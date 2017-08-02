@@ -3,9 +3,9 @@
 
 USING_NS_CC;
 
-ObjRabbit::ObjRabbit() : inUse(false), HP(5), pausedTime(0) {
+ObjRabbit::ObjRabbit() : inUse(false), HP(2) {
 	typecode = TYPECODE_RABBIT;
-	objImg = Sprite::create("rabbit_normal_down.png");
+	objImg = Sprite::create("img/rabbit_normal_down.png");
 
 	rabbitSightTri = DrawNode::create();
 	rabbitSightTri->setOpacity(64);	//opacity 0~255
@@ -15,12 +15,18 @@ ObjRabbit::ObjRabbit() : inUse(false), HP(5), pausedTime(0) {
 
 }
 
+ObjRabbit::~ObjRabbit() {
+	rabbitSightTri->removeFromParentAndCleanup(true);
+}
+
 bool ObjRabbit::init(Vec2 initPos)
 {
 	//member value init
 	inUse = true;	//오브젝트를 사용 중인 것으로 변경
 
-	HP = 5;
+	HP = 2;
+	
+	pausedTime = 0;
 
 	//re set sprite position
 	objImg->setPosition(initPos);
@@ -44,7 +50,7 @@ bool ObjRabbit::deInit()
 	//member value init
 	
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->removeFromParent();
+	this->removeFromParentAndCleanup(true);
 
 	return true;
 
@@ -84,23 +90,16 @@ void ObjRabbit::updateRabbitSight(){
 
 void ObjRabbit::update(float delta) {
 
-	//각 state가 가지는 특수한 조건도 transition 내에서 확인
-	//check state transition condition
-	state->checkTransitionCond(this);
-
+	//일정 시간 이상 멈춰있었을 시 액션 초기화
 	if (pausedTime > state->actionDuration) {
-		objImg->stopAllActions();
+		objImg->getActionManager()->removeAllActionsFromTarget(objImg);
+		objImg->getActionManager()->resumeTarget(objImg);
 		pausedTime = 0;	//멈춘 시간 초기화
 		state->initAction(this);
 	}
 
-	exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x * delta, objImg->getBoundingBox().origin.y + moveLen.y * delta, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
-
-	//check collision
-	if (!GameWorld::objManager->checkMoveCollision(this, &exBox, &(moveLen * delta))) {
-		//충돌 상태인 경우 pausedTime 증가
-		pausedTime += delta;
-	}
-
+	//각 state가 가지는 특수한 조건도 transition 내에서 확인
+	//check state transition condition
+	state->checkTransitionCond(this);
 	
 }

@@ -11,6 +11,9 @@
 
 class GameWorld : public cocos2d::Scene
 {
+private:
+	void gameLoad();
+	void setGuestInitAction();
 public:
     static cocos2d::Scene* createScene();
 
@@ -19,7 +22,7 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(GameWorld);
 
-	cocos2d::Sprite* sprite1;	//나중에 안쓰일것
+	static bool initiated;
 
 	static ObjManager *objManager;
 	static Player *player;

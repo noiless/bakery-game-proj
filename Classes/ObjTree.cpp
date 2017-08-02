@@ -5,7 +5,7 @@ USING_NS_CC;
 
 ObjTree::ObjTree() : inUse(false), HP(5) {
 	typecode = TYPECODE_TREE;
-	objImg = Sprite::create("tree_down.png");
+	objImg = Sprite::create("img/tree_down.png");
 
 	this->addChild(objImg);
 }
@@ -13,6 +13,7 @@ ObjTree::ObjTree() : inUse(false), HP(5) {
 bool ObjTree::init(cocos2d::Vec2 initPos) {
 
 	inUse = true;
+	HP = 5;
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);
 
@@ -27,7 +28,7 @@ bool ObjTree::deInit() {
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
-	this->removeFromParent();
+	this->removeFromParentAndCleanup(true);
 
 	return true;
 }

@@ -8,6 +8,7 @@ private:
 	int myBreadPoint;
 	int otherBreadPoint;
 	int adPoint;
+	int myHP;
 
 	cocos2d::Size visibleSize;
 
@@ -26,6 +27,8 @@ private:
 	cocos2d::DrawNode * adOtherBar;
 	cocos2d::DrawNode * adMyBar;
 
+	cocos2d::Label * HPLable;
+
 	void allPointChange();
 	void drawUI();
 
@@ -34,6 +37,7 @@ public:
 	cocos2d::Camera* cam;
 
 	UI();
+	~UI();
 	virtual bool init();
 
 	void myBreadSold();
@@ -41,6 +45,9 @@ public:
 	void myBreadPointGrow();
 	void otherBreadPointDown();
 	void myAdPointGrow();
+	void loseMyHP();
+	int selectShop();
+	bool buyBread(bool myStore);
 
 	void update(float) override;
 };

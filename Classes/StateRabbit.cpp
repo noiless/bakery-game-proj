@@ -12,19 +12,22 @@ StateRabbitDead *StateRabbit::rabbitDead = new StateRabbitDead;
 
 void StateRabbit::doTransition(ObjRabbit* obj, int source, int dest) {
 
+	obj->pausedTime = 0;
+	obj->getActionManager()->resumeTarget(obj->objImg);
+	obj->getActionManager()->removeAllActionsFromTarget(obj->objImg);	//수행하던 action 제거
+
 	//source에 상관 없이 사망 처리
 	if (dest == STATE_RABBIT_DEAD) {
-
 		obj->state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitDead);
 		obj->state->initAction(obj);
 	}
 	else if (source == STATE_RABBIT_NORMAL && dest == STATE_RABBIT_RUN) {
 		// NORMAL->RUN 전이
 
-		experimental::AudioEngine::play2d("sound_rabbit_dead.mp3", false, 1.0f, &rabbitDeadEffect);
+		experimental::AudioEngine::play2d("sound/sound_rabbit_dead.mp3", false, 1.0f, &rabbitDeadEffect);
 		obj->rabbitSightTri->clear();	//시야 삼각형 제거
-		obj->objImg->getActionManager()->removeActionByTag(0, obj->objImg);	//액션 제거
-		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_run_down.png"));	//sprite 이미지 재설정
+		//obj->objImg->getActionManager()->removeActionByTag(0, obj->objImg);	//액션 제거
+		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/rabbit_run_down.png"));	//sprite 이미지 재설정
 		obj->state = StateRabbit::rabbitRun;	//rabbitRun으로의 상태 전이
 		obj->state->initAction(obj);
 		
@@ -32,7 +35,7 @@ void StateRabbit::doTransition(ObjRabbit* obj, int source, int dest) {
 	else if (source == STATE_RABBIT_RUN && dest == STATE_RABBIT_NORMAL) {
 		//RUN->NORMAL 전이
 
-		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_normal_down.png"));	//sprite image 변경
+		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/rabbit_normal_down.png"));	//sprite image 변경
 		obj->state = StateRabbit::rabbitNormal;	//rabbitNormal으로의 상태 전이
 		obj->state->initAction(obj);
 
@@ -54,14 +57,11 @@ bool StateRabbitNormal::checkSight(ObjRabbit * obj) {
 //state init
 void StateRabbitNormal::initAction(ObjRabbit* obj) {
 
-	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_normal_down.png"));	//sprite 이미지 재설정
+	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/rabbit_normal_down.png"));	//sprite 이미지 재설정
 
 	//state에 맞는 speed, actionDuration 설정
 	obj->speed = 100;
 	actionDuration = 2;
-
-	//init random dir
-	srand(time(NULL) + obj->objIndex);	//random seed 설정
 
 	//move1 : 랜덤한 방향으로 2초간 이동	
 	MoveBy *move1 = StateRabbitNormal::makeRandDir(obj);
@@ -206,19 +206,16 @@ bool StateRabbitRun::checkTransitionCond(ObjRabbit * obj) {
 
 ////StateRabbitDead Func
 void StateRabbitDead::initAction(ObjRabbit * obj) {
-	obj->objImg->stopAllActions();	//수행하던 action 멈춤
+	obj->unscheduleUpdate(); //업데이트 중지
+	
 	obj->rabbitSightTri->clear();	//시야 삼각형 제거
-	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("rabbit_dead_down.png"));	//sprite image 변경
-	obj->speed = 0;
+	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/rabbit_dead_down.png"));	//sprite image 변경
 	actionDuration = 1;
 	
-	obj->unscheduleUpdate(); //업데이트 중지
-
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
 
 	//유저 재료 포인트 상승
 	GameWorld::ui->myBreadPointGrow();
-
 	//action 설정
 	auto fadeout = FadeOut::create(actionDuration);
 
@@ -229,7 +226,7 @@ void StateRabbitDead::initAction(ObjRabbit * obj) {
 	});
 
 	obj->objImg->runAction(Sequence::create(fadeout, callback, nullptr));
-
+	
 }
 
 bool StateRabbitDead::checkTransitionCond(ObjRabbit * obj) {

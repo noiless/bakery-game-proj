@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "GameScene.h"
 #include "ObjRabbit.h"
-
+#include "OverScene.h"
 
 
 USING_NS_CC;
@@ -12,16 +12,18 @@ bool Player::deInit() {
 
 bool Player::init() {
 
-	GameWorld::objManager->addObjectAvailList(this);	//availList에 추가
+	GameWorld::objManager->addObjectAvailListFRONT(this);	//availList에 추가...
+	//addObjectAvailList를 이용하지 않기 때문에updateList에는 추가되지 않아 독자적으로 충돌체크를 실행함
+
 
 	typecode = TYPECODE_PEOPLE;
-	HP = 10;
+	HP = 20;
 
 	isMoving[0] = false; isMoving[1] = false; isMoving[2] = false; isMoving[3] = false;
 
 	moveLen = Vec2(0, 0);
 
-	objImg = Sprite::create("player_down.png");
+	objImg = Sprite::create("img/player_down.png");
 
 	attack = new Attack(objImg);
 
@@ -53,7 +55,7 @@ bool Player::init() {
 		//화살표와 별개로 X입력 받음
 		if (keyCode == EventKeyboard::KeyCode::KEY_X) {
 			if (!attack->showing) {
-				experimental::AudioEngine::play2d("sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
+				experimental::AudioEngine::play2d("sound/sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
 				attack->init(objImg);
 			}
 		}
@@ -91,6 +93,7 @@ bool Player::init() {
 
 void Player::loseHP() {
 	HP--;
+	GameWorld::ui->loseMyHP();
 }
 
 bool Player::setPlayerMoveLen(float actionDuration) {
@@ -124,29 +127,35 @@ bool Player::setPlayerMoveLen(float actionDuration) {
 
 void Player::update(float delta) {
 
-	//현재 움직이는 중인지 확인
-	if (setPlayerMoveLen(delta)) {
+	if (HP <= 0) {
+		this->unscheduleUpdate();
+		GameWorld::ui->~UI();
+		GameWorld::objManager->Objdeinit();
+		auto gameOverScene = GameOver::createScene();
+		Director::getInstance()->replaceScene(gameOverScene);
+	}
+	else {
 
-		cam = Camera::getDefaultCamera();
+		//현재 움직이는 중인지 확인
+		if (setPlayerMoveLen(delta)) {
 
-		//moveLen = speed * delta
-		exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+			cam = Camera::getDefaultCamera();
 
-		//plyer only collision start
+			//moveLen = speed * delta
+			exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
+
 
 			//충돌 체크
-		if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
-			//충돌하지 않으면 이동
-			objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
+			if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
+				//충돌하지 않으면 이동
+				objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
+			}
+
+			//플레이어 이동에 따라 카메라 이동
+			cam->setPosition(objImg->getPosition());
+
+
 		}
-
-		//플레이어 이동에 따라 카메라 이동
-		cam->setPosition(objImg->getPosition());
-
-		//plyer only collision end
-
-
 	}
-	
 	
 }

@@ -2,6 +2,7 @@
 #include "cocos2d.h"
 #include "AudioEngine.h"
 
+class Obj;
 class ObjSquaral;
 class StateSquaralNormal;
 class StateSquaralAttack;
@@ -16,16 +17,12 @@ class StateSquaral
 {
 public:
 	StateSquaral() {
-		//rabbitDeadEffect.name = "rabbitDeadEffect";
-		//rabbitDeadEffect.maxInstances = 10;
 	}
 	virtual void initAction(ObjSquaral * obj) = 0;
 	virtual bool checkTransitionCond(ObjSquaral * obj) = 0;
 	void doTransition(ObjSquaral* obj, int source, int dest);
 
 	int actionDuration = 1;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
-
-	//experimental::AudioProfile rabbitDeadEffect;	///효과음
 
 	static StateSquaralNormal* squaralNormal;
 	static StateSquaralAttack* squaralAttack;
@@ -54,11 +51,13 @@ private:
 	float imgDir;
 	int looking;
 public:
-	StateSquaralAttack() {
-	};
+	StateSquaralAttack();
+	experimental::AudioProfile squaralAttackEffect;	///효과음
 
+	static Obj * tempSquaral;
 	virtual void initAction(ObjSquaral * obj);
 	virtual bool checkTransitionCond(ObjSquaral * obj);
+
 
 };
 
@@ -67,6 +66,7 @@ class StateSquaralSeed : public StateSquaral
 {
 public:
 	StateSquaralSeed() {
+
 	}
 
 	virtual void initAction(ObjSquaral * obj);

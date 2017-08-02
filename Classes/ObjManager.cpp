@@ -1,38 +1,92 @@
 #include "ObjManager.h"
-
+#include <Obj.h>
+#include <ObjRabbit.h>
+#include <ObjTree.h>
+#include <ObjSquaral.h>
+#include <ObjGuest.h>
+#include <Attack.h>
 
 USING_NS_CC;
 
-
-ObjManager::ObjManager() {
-}
-
 void ObjManager::ObjInit() {
 	//시작 후 초기화
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
 		objRabbitList[i] = new ObjRabbit;
-		objTreeList[i] = new ObjTree;
-		ObjSquaralList[i] = new ObjSquaral;
-		ObjAcornList[i] = new AcornAttack;
 	}
+
+	for (int i = 0; i < MAX_TREE_NUM; i++) {
+		objTreeList[i] = new ObjTree;
+	}
+
+	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
+		objSquaralList[i] = new ObjSquaral;
+	}
+
+	for (int i = 0; i < MAX_ACORN_NUM; i++) {
+		objAcornList[i] = new AcornAttack;
+	}
+
+	for (int i = 0; i < MAX_GUEST_NUM; i++) {
+		objGuestList[i] = new ObjGuest;
+	}
+}
+
+void ObjManager::Objdeinit() {
+
+	for each (Obj * i in objAvailList) {
+		CCLOG("%d delete index",i->objIndex);
+		i->objImg->getActionManager()->removeAllActions();
+		i->unscheduleUpdate();
+		i->deInit();
+	}
+
+	objAvailList.clear();
+	
+	//for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	//	delete objRabbitList[i];
+	//	delete objTreeList[i];
+	//	delete ObjSquaralList[i];
+	//	delete ObjAcornList[i];
+	//}
 }
 
 
 void ObjManager::addObjectAvailList(Obj *obj) {
 	objAvailList.push_back(obj);
+
+	//충돌체크 가능한 오브젝트군일 경우 updateList에 추가해줌
+	if (obj->typecode == TYPECODE_RABBIT || obj->typecode == TYPECODE_SQUARAL || obj->typecode == TYPECODE_PEOPLE) {
+		objUpdateList.push_back(obj);
+	}
+
 }
 
+void ObjManager::addObjectAvailListFRONT(Obj *obj) {
+	objAvailList.push_front(obj);
+}
 
 void ObjManager::deleteObjectAvailList(Obj *obj) {
 	objAvailList.remove(obj);
+	objUpdateList.remove(obj);
 	CCLOG("delete from avail list\n");
 }
+
+void ObjManager::addUpdateList(Obj* obj) {
+	objUpdateList.push_back(obj);
+}
+
+
+void ObjManager::deleteUpdateList(Obj *obj) {
+	objUpdateList.remove(obj);
+}
+
+
 
 void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 
 	ObjRabbit* newRabbit = getFreeObjRabbit();
 
-	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");	//max num * 2로 하고 오브젝트 풀 내에 들어갈 오브젝트들 더 제작
+	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
 
 	newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
@@ -54,7 +108,7 @@ void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
 
 	CCASSERT((newSquaral != nullptr), "NEED LARGER OBJECT POOL : Squaral");
 
-	newSquaral->init(createColCheck(&initPos, &(ObjSquaralList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
+	newSquaral->init(createColCheck(&initPos, &(objSquaralList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
 	parent->addChild(newSquaral);
 }
@@ -69,12 +123,26 @@ void ObjManager::getObjAcornFromPool(Node * parent, ObjSquaral* caller) {
 	parent->addChild(newAcorn);
 }
 
+//항상 정해진 위치에 리젠함
+bool ObjManager::getObjGuestFromPool(Node * parent) {
+	ObjGuest* newGuest = getFreeGuest();
 
+	if (newGuest == nullptr) {
+		return false;	//생성에 실패하면 빈 게스트 자리가 생길 때까지 delay를 주고 wait함
+	}
+	else {
+		newGuest->init(Vec2(0, -1800));	//>>초기 손님 리젠 위치<<
+
+		parent->addChild(newGuest);
+
+		return true;
+	}
+}
 
 
 ObjRabbit* ObjManager::getFreeObjRabbit() {
 
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
 		if (!objRabbitList[i]->inUse) {
 			addObjectAvailList(dynamic_cast<Obj*> (objRabbitList[i]));	//사용할 오브젝트를 availList에 넣어줌
@@ -87,7 +155,7 @@ ObjRabbit* ObjManager::getFreeObjRabbit() {
 }
 
 ObjTree* ObjManager::getFreeObjTree() {
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_TREE_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
 		if (!objTreeList[i]->inUse) {
 			addObjectAvailList(dynamic_cast<Obj*> (objTreeList[i]));	//사용할 오브젝트를 availList에 넣어줌
@@ -100,11 +168,24 @@ ObjTree* ObjManager::getFreeObjTree() {
 }
 
 ObjSquaral* ObjManager::getFreeObjSquaral() {
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
-		if (!ObjSquaralList[i]->inUse) {
-			addObjectAvailList(dynamic_cast<Obj*> (ObjSquaralList[i]));	//사용할 오브젝트를 availList에 넣어줌
-			return ObjSquaralList[i];
+		if (!objSquaralList[i]->inUse) {
+			addObjectAvailList(dynamic_cast<Obj*> (objSquaralList[i]));	//사용할 오브젝트를 availList에 넣어줌
+			return objSquaralList[i];
+		}
+	}
+
+	//모든 오브젝트가 사용중이면 nullptr 반환
+	return nullptr;
+}
+
+ObjGuest* ObjManager::getFreeGuest() {
+	for (int i = 0; i < MAX_GUEST_NUM; i++) {
+		//사용중이지 않은 오브젝트를 찾아 반환
+		if (!objGuestList[i]->inUse) {
+			addObjectAvailList(dynamic_cast<Obj*> (objGuestList[i]));	//사용할 오브젝트를 availList에 넣어줌
+			return objGuestList[i];
 		}
 	}
 
@@ -113,16 +194,63 @@ ObjSquaral* ObjManager::getFreeObjSquaral() {
 }
 
 AcornAttack* ObjManager::getFreeAcornAttack() {
-	for (int i = 0; i < MAX_OBJ_NUM; i++) {
+	for (int i = 0; i < MAX_ACORN_NUM; i++) {
 		//사용중이지 않은 오브젝트를 찾아 반환
-		if (!ObjAcornList[i]->inUse) {
+		if (!objAcornList[i]->inUse) {
 			//availList에 추가하지 않음			
-			return ObjAcornList[i];
+			return objAcornList[i];
 		}
 	}
 
 	//모든 오브젝트가 사용중이면 nullptr 반환
 	return nullptr;
+}
+
+
+bool ObjManager::isObjColAvail(Obj * obj) {
+	for each (Obj* i in objAvailList)
+	{
+		if (i->objIndex == obj->objIndex)
+			return true;
+	}
+
+	return false;
+}
+
+void ObjManager::addBlood(Node* parent, const Vec2 initPos) {
+	//blood 추가 및 위치, 액션 설정
+	Sprite* newBlood = Sprite::create("img/guest_blood.png");
+	newBlood->setPosition(initPos);
+
+	bloodNum++;
+
+	//newBlood->removeFromParent
+
+	//액션
+	CallFunc *action1 = CallFunc::create([=] {
+		newBlood->removeFromParent();
+		bloodNum--;
+	});
+	Sequence* seq = Sequence::create(DelayTime::create(30), action1, nullptr);
+	newBlood->runAction(seq);
+
+	parent->addChild(newBlood, -1);
+
+}
+
+int ObjManager::getNumBood() {
+	return bloodNum;
+}
+
+
+
+void ObjManager::setMapRect(cocos2d::Rect mapBoundingBox) {
+	mapRect.setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y, mapBoundingBox.size.width, mapBoundingBox.size.height);
+	mapBoundaryRect[0].setRect(mapBoundingBox.origin.x - 100, mapBoundingBox.origin.y, 100, mapBoundingBox.size.height);	//좌
+	mapBoundaryRect[1].setRect(mapBoundingBox.origin.x + mapBoundingBox.size.width, mapBoundingBox.origin.y, 100, mapBoundingBox.size.height);//우
+	mapBoundaryRect[2].setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y + mapBoundingBox.size.height, mapBoundingBox.size.width, 100);//상
+	mapBoundaryRect[3].setRect(mapBoundingBox.origin.x, mapBoundingBox.origin.y - 100, mapBoundingBox.size.width, 100);//하
+
 }
 
 Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
@@ -163,30 +291,57 @@ Vec2 ObjManager::createColCheck(Vec2* pos, const Size* size) {
 	return *pos;
 }
 
+//맵 외부로 나가지 않게
+bool ObjManager::mapBoundaryCheck(cocos2d::Rect* exBox) {
 
-//호출한 오브젝트 obj에 대해 다른 오브젝트와 충돌했는지 확인한다.
-//이동에 대해서 -> 충돌했을시 오브젝트를 인접한 위치로 옮겨줌
-//그 외 충돌시에 일어나는거에 대해서는(사냥같은거...) 오버로드 해야될거 같다ㅇ0ㅇ
-//이동시 : 항상 하나의 방향으로만 이동한다고 가정 Vec2의 값에서 x, y 중 하나는 0의 값을 가진다.
-//player용으로 따로 나눠놓고 충돌된 오브젝트가 필요했던게 오브젝트들 자연스럽게 붙이려고 그런거였는데 이걸 안하고 밑의 moveLen 안받는걸로 해도
-//제대로 충돌도 동작하고 붙지도 않는데 살짝 떠서 충돌하는게 있다ㅇ0ㅇ...
-//아래걸로 해도 될거 같긴 한데 좀 어색한 느낌임.. 완전 플레이어 용으로 할거면 나중에 함수 이름 바꿔줄래
+	if (exBox->intersectsRect(mapBoundaryRect[0])
+		|| exBox->intersectsRect(mapBoundaryRect[1])
+		|| exBox->intersectsRect(mapBoundaryRect[2])
+		|| exBox->intersectsRect(mapBoundaryRect[3]))
+		return true;
+	else
+		return false;
+}
+
+
+
+//플레이어만 사용
 bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLen) {
 
 	CCASSERT(!(moveLen->x != 0 && moveLen->y != 0), "moveLen : x or y val should be 0");
 	
 	//움직였을 시의 예상 boundingbox를 받아서 그걸로 움직일 수 있는지 검사
 
-	for each (Obj* i in objAvailList)
-	{
-		//충돌시
-		if ((obj->objIndex != i->objIndex) && exBox->intersectsRect(i->objImg->getBoundingBox())) {
+	//맵 밖으로 나가는가?
+	if (mapBoundaryCheck(exBox)) {
 
-			//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
+		//x축으로 움직이고 있었을 때
+		//좌
+		if (moveLen->x < 0) {
+			obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox->size.width / 2 + 1);
+		}
+		//우
+		else if (moveLen->x > 0) {
+			obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox->size.width / 2 - 1);
+		}
+		//y축으로 움직이고 있었을 때
+		//상
+		else if (moveLen->y>0) {
+			obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox->size.height / 2 - 1);
+		}
+		//하
+		else if (moveLen->y<0) {
+			obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox->size.height / 2 + 1);
+		}
 
-			//첫 충돌 체크
-			if (obj->pausedTime == 0) {
-				obj->getActionManager()->pauseTarget(obj->objImg);
+		return false;
+	}
+	else {
+
+		for each (Obj* i in objAvailList){
+
+			//충돌시
+			if ((obj->objIndex != i->objIndex) && exBox->intersectsRect(i->objImg->getBoundingBox())) {
 
 				//x축으로 움직이고 있었을 때
 				//좌
@@ -196,31 +351,137 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 				//우
 				else if (moveLen->x > 0) {
 					obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox->size.width / 2 - 1);
-
 				}
 				//y축으로 움직이고 있었을 때
 				//상
 				else if (moveLen->y>0) {
 					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox->size.height / 2 - 1);
-
 				}
 				//하
 				else if (moveLen->y<0) {
-
 					obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox->size.height / 2 + 1);
+				}
+
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+void ObjManager::update(float delta) {
+
+	bool doCntn = false;
+
+	//각 오브젝트마다 exBox
+	Rect exBox;
+
+	//각 오브젝트마다 충돌 체크
+	 for each (Obj* obj in objUpdateList) {
+
+		doCntn = false;
+
+		exBox.setRect(obj->objImg->getBoundingBox().origin.x + obj->moveLen.x * delta, obj->objImg->getBoundingBox().origin.y + obj->moveLen.y * delta, obj->objImg->getBoundingBox().size.width, obj->objImg->getBoundingBox().size.height);
+
+		//움직였을 시의 예상 boundingbox를 통해 이동 가능한지 검사
+
+		//맵 밖으로 나가는가?
+		if (mapBoundaryCheck(&exBox)) {
+
+			//첫 충돌 체크
+			if (obj->pausedTime == 0) {
+				obj->getActionManager()->pauseTarget(obj->objImg);
+
+				//x축으로 움직이고 있었을 때
+				//좌
+				if (obj->moveLen.x < 0) {
+					obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox.size.width / 2 + 1);
+
+				}
+				//우
+				else if (obj->moveLen.x > 0) {
+					obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox.size.width / 2 - 1);
+
+				}
+				//y축으로 움직이고 있었을 때
+				//상
+				else if (obj->moveLen.y>0) {
+					obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox.size.height / 2 - 1);
+
+				}
+				//하
+				else if (obj->moveLen.y<0) {
+
+					obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox.size.height / 2 + 1);
 				}
 
 			}
 
-			return false;
+			////
+			obj->pausedTime += delta;
+
+			continue;	//continuing outer loop
 		}
+		else {
+			for each (Obj* i in objAvailList)
+			{
+				//충돌시
+				if ((obj->objIndex != i->objIndex) && exBox.intersectsRect(i->objImg->getBoundingBox())) {
+
+					//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
+
+					//첫 충돌 체크
+					if (obj->pausedTime == 0) {
+
+						obj->getActionManager()->pauseTarget(obj->objImg); //오브젝트 정지
+
+						//x축으로 움직이고 있었을 때
+						//좌
+						if (obj->moveLen.x < 0) {
+							obj->objImg->setPositionX(i->objImg->getBoundingBox().getMaxX() + exBox.size.width / 2 + 1);
+
+						}
+						//우
+						else if (obj->moveLen.x > 0) {
+							obj->objImg->setPositionX(i->objImg->getBoundingBox().getMinX() - exBox.size.width / 2 - 1);
+
+						}
+						//y축으로 움직이고 있었을 때
+						//상
+						else if (obj->moveLen.y>0) {
+							obj->objImg->setPositionY(i->objImg->getBoundingBox().getMinY() - exBox.size.height / 2 - 1);
+
+						}
+						//하
+						else if (obj->moveLen.y<0) {
+							obj->objImg->setPositionY(i->objImg->getBoundingBox().getMaxY() + exBox.size.height / 2 + 1);
+						}
+
+					}
+
+					////
+					obj->pausedTime += delta;
+					doCntn = true;
+				}
+			}
+		}
+
+		if (doCntn) {
+			continue;
+		}
+		
+		//충돌하지 않았으면 계속 움직임
+		obj->getActionManager()->resumeTarget(obj->objImg);
+		obj->pausedTime = 0;
+
 	}
 
-	//충돌하지 않았으면 계속 움직임
-	obj->getActionManager()->resumeTarget(obj->objImg);
-	obj->pausedTime = 0;
 
-	return true;
+
+
+	
 
 }
 
@@ -232,10 +493,6 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 	//충돌한 물체 검출
 	for each (Obj* i in objAvailList)
 	{
-
-		//if (i->typecode != TYPECODE_RABBIT) {	//임시... 나중엔 객체 타입별로 분류할 것?
-		//	continue;
-		//}
 
 		//충돌시
 		if (exBox->intersectsRect(i->objImg->getBoundingBox())) {
@@ -412,7 +669,7 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 	for each (Obj* i in objAvailList)
 	{
 
-		if (i->objIndex == callerIndex) {	//발사자는 충돌 체크에서 제외
+		if (i->objIndex == callerIndex || i->typecode == TYPECODE_NONE) {	//발사자는 충돌 체크에서 제외
 			continue;
 		}
 

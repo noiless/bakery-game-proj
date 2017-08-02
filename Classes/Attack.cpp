@@ -4,7 +4,7 @@
 Attack::Attack(Sprite* userSpr) {
 	showing = false;	//기본
 	success = false;
-	attackImg = Sprite::create("attack.png");
+	attackImg = Sprite::create("img/attack.png");
 	attackImg->setAnchorPoint(Vec2(0.5, 1));
 	attackImg->setPosition(userSpr->getContentSize() / 2);	//원점
 	attackImg->setPositionY(attackImg->getPosition().y - userSpr->getContentSize().height / 2 - 1);
@@ -26,8 +26,8 @@ bool Attack::init(Node* caller){
 	{
 		showing = false;	//보이지 않게 변경
 		success = false;
-		this->unscheduleUpdate();
 		this->removeFromParent();
+		this->unscheduleUpdate();		
 
 	});
 
@@ -72,9 +72,15 @@ void Attack::update(float) {
 /////class AcornAttack
 
 AcornAttack::AcornAttack()  : Attack() {
-	attackImg = Sprite::create("acorn.png");
+	attackImg = Sprite::create("img/acorn.png");
 	inUse = false;
 	this->addChild(attackImg);
+}
+
+
+AcornAttack::~AcornAttack() {
+	attackImg->removeFromParentAndCleanup(true);
+	this->removeFromParentAndCleanup(true);
 }
 
 bool AcornAttack::init(ObjSquaral* caller) {
@@ -86,8 +92,6 @@ bool AcornAttack::init(ObjSquaral* caller) {
 
 	this->scheduleUpdate();
 
-	//caller->addChild(this);
-
 	callerIndex = caller->objIndex;
 
 	MoveBy* move1 = MoveBy::create(0.5, Vec2(caller->squaralSightRadius * 2 * cos(CC_DEGREES_TO_RADIANS(attackImg->getRotation() + 90)), caller->squaralSightRadius * 2 * sin(- CC_DEGREES_TO_RADIANS(attackImg->getRotation() + 90))));
@@ -96,9 +100,9 @@ bool AcornAttack::init(ObjSquaral* caller) {
 		[=]()
 	{
 		inUse = false;
-		this->unscheduleUpdate();
 		this->removeFromParent();
-
+		this->unscheduleUpdate();
+		
 	});
 
 	this->attackImg->runAction(Sequence::create(move1, callback, nullptr));
@@ -114,7 +118,7 @@ void AcornAttack::update(float delta) {
 	if (GameWorld::objManager->checkAttackCollision(callerIndex, &attackImg->getPosition(), attackImg->getContentSize().width / 2)) {
 		attackImg->getActionManager()->removeAllActionsFromTarget(attackImg);
 		inUse = false;
-		this->unscheduleUpdate();
 		this->removeFromParent();
+		this->unscheduleUpdate();
 	}
 }
