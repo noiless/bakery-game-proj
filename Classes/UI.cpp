@@ -240,7 +240,7 @@ void UI::drawUI() {
 void UI::update(float delta) {
 
 	//2초마다 포인트 변동 - 지난 시간만큼 게이지 하락/상승
-	if (checkTime > 2) {
+	if (checkTime > 5) {
 		checkTime = 0;
 		allPointChange();
 	}

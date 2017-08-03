@@ -34,7 +34,7 @@ void ObjManager::ObjInit() {
 void ObjManager::Objdeinit() {
 
 	for each (Obj * i in objAvailList) {
-		CCLOG("%d delete index",i->objIndex);
+		//CCLOG("%d delete index",i->objIndex);
 		i->objImg->getActionManager()->removeAllActions();
 		i->unscheduleUpdate();
 		i->deInit();
@@ -68,7 +68,7 @@ void ObjManager::addObjectAvailListFRONT(Obj *obj) {
 void ObjManager::deleteObjectAvailList(Obj *obj) {
 	objAvailList.remove(obj);
 	objUpdateList.remove(obj);
-	CCLOG("delete from avail list\n");
+	//CCLOG("delete from avail list\n");
 }
 
 void ObjManager::addUpdateList(Obj* obj) {
@@ -86,11 +86,15 @@ void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 
 	ObjRabbit* newRabbit = getFreeObjRabbit();
 
-	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
+	//CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
 
-	newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
+	if (newRabbit != nullptr) {
+		newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
-	parent->addChild(newRabbit);
+		parent->addChild(newRabbit);
+	}
+
+	
 }
 
 void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
@@ -478,11 +482,6 @@ void ObjManager::update(float delta) {
 
 	}
 
-
-
-
-	
-
 }
 
 
@@ -499,7 +498,7 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 
 			playerCollisionList.pushBack(i);
 			hit = true;
-			CCLOG("%d collision",i->objIndex);
+			//CCLOG("%d collision",i->objIndex);
 			
 		}
 	}
@@ -545,7 +544,6 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 			if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
 				&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index])) 
 			{
-				CCLOG("1 %d %d", index, i->objIndex);
 				return true;
 			}
 				
@@ -555,7 +553,6 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 		for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
 			if (i->objImg->getBoundingBox().containsPoint(tri[index])) 
 			{
-				CCLOG("2 %d %d", index, i->objIndex);
 				return true;
 			}
 				

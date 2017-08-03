@@ -24,6 +24,9 @@ public:
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
 
+	Size detourSize;
+	int detourSequence = -1;
+
 	StateGuest* state;
 
 	//Vec2 moveLen;
