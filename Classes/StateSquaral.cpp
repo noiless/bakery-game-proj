@@ -154,7 +154,6 @@ bool StateSquaralNormal::checkTransitionCond(ObjSquaral * obj) {
 
 	if (obj->target != nullptr) {
 		doTransition(obj, STATE_SQUARAL_NORMAL, STATE_SQUARAL_ATTACK);
-		CCLOG("index %d", obj->target->objIndex);
 	}
 
 	//10√ 

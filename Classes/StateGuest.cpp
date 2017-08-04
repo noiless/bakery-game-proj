@@ -69,6 +69,8 @@ void StateGuest::doTransition(ObjGuest* obj, int source, int dest) {
 
 void StateGuestNormal::initAction(ObjGuest * obj) {
 
+	obj->dir = DIR_UP;
+
 	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/guest_down.png"));	//sprite 이미지 재설정
 	obj->objImg->setOpacity(255);
 
@@ -236,7 +238,7 @@ bool StateGuestDetourNormal::checkTransitionCond(ObjGuest * obj) {
 		doTransition(obj, STATE_GUEST_DETOURNORMAL, STATE_GUEST_DEAD);
 	}
 	//우회 도중에 정지시 진행중이던 액션 태그에 따라 초기화... 얘도 일정 시간 이상 멈출시
-	else if (obj->pausedTime > 0) {
+	else if (obj->pausedTime > 0.5) {
 		doTransition(obj, STATE_GUEST_DETOURNORMAL, STATE_GUEST_DETOURNORMAL);
 	}
 

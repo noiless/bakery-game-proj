@@ -6,11 +6,15 @@ USING_NS_CC;
 int Obj::totalObjNum = 0;
 
 //생성자
-Obj::Obj(){
+Obj::Obj() {
 	typecode = TYPECODE_NONE;
 	pausedTime = 0;
 	objIndex = totalObjNum;
 	totalObjNum++;
+
+	for (int i = 0; i < 4; i++) {
+		qnodeIndex[i] = -1;	//-1로 초기화
+	}
 }
 
 

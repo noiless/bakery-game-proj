@@ -79,13 +79,13 @@ bool GameWorld::init()
 
 
 	//plant trees
-	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
+	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
 
-	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
+	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
 
-	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
+	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
 
-	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
+	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
 
 
 	//플레이어 생성
@@ -114,10 +114,10 @@ bool GameWorld::init()
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
-	objManager->getObjSquaralFromPool(this, Vec2(-100, -100));
+	//objManager->getObjSquaralFromPool(this, Vec2(-100, -100));
 
 	//////////////
-	this->addChild(objManager);
+	this->addChild(objManager, 10);
 	objManager->scheduleUpdate(); //update 실행
 	///////////////
 

@@ -13,7 +13,6 @@ USING_NS_CC;
 
 using namespace std;
 
-
 class Player;
 class Obj;
 class ObjRabbit;
@@ -21,6 +20,7 @@ class ObjTree;
 class ObjSquaral;
 class ObjGuest;
 class AcornAttack;
+class QTree;
 
 class ObjManager : public cocos2d::Node {	//._.
 private:
@@ -51,14 +51,15 @@ private:
 	int bloodNum;
 
 	void update(float) override;
-	
+
+	QTree* qtree;
 
 public:
 	ObjManager() {
 		CCLOG("objmanager init");
 		bloodNum = 0;
 	}
-	
+
 	void ObjInit();
 	void Objdeinit();
 
@@ -71,7 +72,7 @@ public:
 	void addUpdateList(Obj* obj);
 	void deleteUpdateList(Obj *obj);
 
-	
+
 	void addBlood(Node* parent, const Vec2 initPos);
 	int getNumBood();
 
@@ -98,7 +99,7 @@ public:
 	//다람쥐 공격 확인
 	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
 
-	
-	
-	
+
+
+
 };

@@ -42,7 +42,7 @@ bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 }
 
 bool ObjSquaral::deInit() {
-	CCLOG("deinit squaral..");
+	//CCLOG("deinit squaral..");
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경

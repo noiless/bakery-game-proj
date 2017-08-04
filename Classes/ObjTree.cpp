@@ -24,7 +24,7 @@ bool ObjTree::init(cocos2d::Vec2 initPos) {
 }
 
 bool ObjTree::deInit() {
-	CCLOG("deinit tree");
+	//CCLOG("deinit tree");
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경

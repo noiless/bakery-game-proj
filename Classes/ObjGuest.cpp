@@ -39,7 +39,7 @@ bool ObjGuest::init(Vec2 initPos) {
 
 bool ObjGuest::deInit() {
 
-	CCLOG("deinit guest");
+	//CCLOG("deinit guest");
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
@@ -53,12 +53,6 @@ void ObjGuest::loseHP() {
 }
 
 void ObjGuest::update(float delta) {
-
-	//if (pausedTime > state->actionDuration) {
-	//	objImg->getActionManager()->removeAllActionsFromTarget(objImg);	//얘는 일직선 진행이라 이거 말고 딴거로 해야함
-	//	pausedTime = 0;	//멈춘 시간 초기화
-	//	state->initAction(this);
-	//}
 
 	//각 state가 가지는 특수한 조건도 transition 내에서 확인
 	//check state transition condition
