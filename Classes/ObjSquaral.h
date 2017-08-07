@@ -4,6 +4,7 @@
 #include "Obj.h"
 #include "Attack.h"
 
+
 class ObjSquaral : public Obj{
 private:
 	void update(float) override;

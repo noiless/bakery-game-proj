@@ -58,7 +58,7 @@ QTree::QTree(int parentLevel, cocos2d::Rect parentBound, int childIndex, int par
 }
 
 QTree::~QTree() {
-	delete[]child;
+	clear();
 }
 
 void QTree::clear() {
@@ -189,6 +189,9 @@ QTree* QTree::searchNode(int nodeIndex) {
 }
 
 void QTree::remove(Obj* obj) {
+
+	//CCLOG("nodeindex %d",nodeIndex);
+
 	element.remove(obj);
 	for (int i = 0; i < 4; i++) {
 		//remove 후 오브젝트의 qnodeindex 초기화
@@ -202,6 +205,11 @@ void QTree::remove(Obj* obj) {
 
 void QTree::removeObjFromAllNode(Obj* obj) {
 	QTree* tempPtr;
+
+	CCLOG("%d %d %d %d", obj->qnodeIndex[0], obj->qnodeIndex[1], obj->qnodeIndex[2], obj->qnodeIndex[3]);
+	CCLOG("%d %d", obj->objIndex, obj->typecode);
+
+
 	for (int i = 0; i < 4; i++) {
 		tempPtr = searchNode(obj->qnodeIndex[i]);
 		if (tempPtr != nullptr)
@@ -284,6 +292,28 @@ void QTree::exFindNode(QTree* nowNode, cocos2d::Rect* exbound, int* indexList) {
 				break;
 			}
 		}
+	}
+
+}
+
+
+void QTree::removeNodes(QTree* nowNode) {
+
+	//자식이 있을때
+	if (nowNode->haveChild) {
+
+		//자식 노드 모두 삭제 후 현재 노드의 haveChild값 변경
+		for (int i = 0; i < 4; i++) {
+			removeNodes(nowNode->child[i]);
+		}
+
+		nowNode->haveChild = false;
+		nowNode->~QTree();
+
+	}
+	//leaf node일때
+	else {
+		nowNode->~QTree();	//해제
 	}
 
 }

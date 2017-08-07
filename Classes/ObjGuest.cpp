@@ -1,4 +1,5 @@
 #include "ObjGuest.h"
+#include "StateGuest.h"
 #include "GameScene.h"
 
 USING_NS_CC;
@@ -26,6 +27,8 @@ bool ObjGuest::init(Vec2 initPos) {
 	objImg->setOpacity(255);	//opacity 초기화
 
 	pausedTime = 0;
+
+	qnodeIndexInit();
 
 	//init action
 	//첫 state는 normal

@@ -1,4 +1,5 @@
 #include "ObjRabbit.h"
+#include "StateRabbit.h"
 #include "GameScene.h"
 
 USING_NS_CC;
@@ -27,6 +28,8 @@ bool ObjRabbit::init(Vec2 initPos)
 	HP = 2;
 	
 	pausedTime = 0;
+
+	qnodeIndexInit();
 
 	//re set sprite position
 	objImg->setPosition(initPos);

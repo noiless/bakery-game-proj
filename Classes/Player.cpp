@@ -1,8 +1,6 @@
 #include "Player.h"
 #include "GameScene.h"
 #include "ObjRabbit.h"
-#include "OverScene.h"
-
 
 USING_NS_CC;
 
@@ -15,6 +13,7 @@ bool Player::init() {
 	GameWorld::objManager->addObjectAvailListFRONT(this);	//availList에 추가...
 	//addObjectAvailList를 이용하지 않기 때문에updateList에는 추가되지 않아 독자적으로 충돌체크를 실행함
 
+	qnodeIndexInit();
 
 	typecode = TYPECODE_PEOPLE;
 	HP = 20;
@@ -128,11 +127,17 @@ bool Player::setPlayerMoveLen(float actionDuration) {
 void Player::update(float delta) {
 
 	if (HP <= 0) {
-		this->unscheduleUpdate();
-		GameWorld::ui->~UI();
-		GameWorld::objManager->Objdeinit();
-		auto gameOverScene = GameOver::createScene();
-		Director::getInstance()->replaceScene(gameOverScene);
+
+		unscheduleAllCallbacks();
+		unscheduleAllSelectors();
+
+		GameWorld::gameEnd();
+
+		//this->unscheduleUpdate();
+		//GameWorld::ui->~UI();
+		//GameWorld::objManager->Objdeinit();
+		//auto gameOverScene = GameOver::createScene();
+		//Director::getInstance()->replaceScene(gameOverScene);
 	}
 	else {
 

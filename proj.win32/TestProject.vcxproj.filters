@@ -60,10 +60,16 @@
     <ClCompile Include="..\Classes\ObjGuest.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\StateGuest.cpp">
+    <ClCompile Include="..\Classes\QTree.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\QTree.cpp">
+    <ClCompile Include="..\Classes\ObjEnemy.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\StateEnemy.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\StateGuest.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,10 +122,16 @@
     <ClInclude Include="..\Classes\ObjGuest.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\StateGuest.h">
+    <ClInclude Include="..\Classes\QTree.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\QTree.h">
+    <ClInclude Include="..\Classes\ObjEnemy.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\StateEnemy.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\StateGuest.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

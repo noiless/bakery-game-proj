@@ -12,9 +12,7 @@ Obj::Obj() {
 	objIndex = totalObjNum;
 	totalObjNum++;
 
-	for (int i = 0; i < 4; i++) {
-		qnodeIndex[i] = -1;	//-1로 초기화
-	}
+	qnodeIndexInit();
 }
 
 
@@ -49,4 +47,11 @@ Vec2 Obj::setMoveLen(int dir, float speed) {
 		CCLOG("...");
 		return Vec2(0, 0);
 	}
+}
+
+
+
+
+void Obj::qnodeIndexInit() {
+	qnodeIndex[0] = -1; qnodeIndex[1] = -1; qnodeIndex[2] = -1; qnodeIndex[3] = -1;
 }

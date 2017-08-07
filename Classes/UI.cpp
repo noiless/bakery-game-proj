@@ -162,6 +162,7 @@ void UI::myAdPointGrow() {
 		adPoint = 100;
 }
 
+//Player::loseHP()에서 호출
 void UI::loseMyHP() {
 	myHP--;
 

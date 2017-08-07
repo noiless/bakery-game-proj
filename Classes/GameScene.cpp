@@ -1,5 +1,9 @@
 #include "GameScene.h"
 #include "AudioEngine.h"
+#include "OverScene.h"
+
+#include "Obj.h"
+
 
 #include<iostream>
 
@@ -7,6 +11,7 @@ USING_NS_CC;
 
 ObjManager *GameWorld::objManager = new ObjManager;
 Player *GameWorld::player;
+ObjEnemy *GameWorld::enemy;	//적도 하나만 존재
 UI * GameWorld::ui;
 bool GameWorld::initiated = false;
 
@@ -79,19 +84,22 @@ bool GameWorld::init()
 
 
 	//plant trees
-	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
+	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
 
-	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
+	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
 
-	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
+	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
 
-	//objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
+	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4));
 
 
 	//플레이어 생성
 	player = new Player;
 	player->objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(player, 3);
+
+	enemy = new ObjEnemy;
+	this->addChild(enemy);
 
 
 	auto eventListener = EventListenerKeyboard::create();
@@ -155,4 +163,12 @@ void GameWorld::setGuestInitAction() {
 	Sequence * seq = Sequence::create(DelayTime::create(5 + objManager->getNumBood()), callback, nullptr);
 
 	this->runAction(seq);
+}
+
+void GameWorld::gameEnd() {
+	
+	ui->~UI();
+	objManager->Objdeinit();
+	auto gameOverScene = GameOver::createScene();
+	Director::getInstance()->replaceScene(gameOverScene);
 }

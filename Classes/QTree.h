@@ -58,4 +58,6 @@ public:
 	//부모노드 기억...?
 	//노드인덱스...??
 
+	static void removeNodes(QTree* nowNode);
+
 };

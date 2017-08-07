@@ -34,6 +34,8 @@ void ObjManager::ObjInit() {
 
 void ObjManager::Objdeinit() {
 
+	unscheduleUpdate();
+
 	for each (Obj * i in objAvailList) {
 		i->objImg->getActionManager()->removeAllActions();
 		i->unscheduleUpdate();
@@ -48,6 +50,11 @@ void ObjManager::Objdeinit() {
 	//	delete ObjSquaralList[i];
 	//	delete ObjAcornList[i];
 	//}
+
+	QTree::removeNodes(qtree);
+
+	objAvailList.clear();
+	objUpdateList.clear();
 }
 
 
@@ -572,7 +579,6 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 
 	Vec2* tri = obj->rabbitSight;
-
 
 	//1
 	float slope1 = (tri[0].y - tri[1].y) / (tri[0].x - tri[1].x);

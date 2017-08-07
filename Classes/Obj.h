@@ -19,6 +19,10 @@ class Obj : public cocos2d::Node {
 private:
 	static int totalObjNum;
 
+protected:
+	void qnodeIndexInit();
+
+
 public:
 	Obj();
 	~Obj();

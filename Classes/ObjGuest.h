@@ -2,9 +2,11 @@
 #include "cocos2d.h"
 #include "GameScene.h"
 #include "Obj.h"
-#include "StateGuest.h"
+
 
 USING_NS_CC;
+
+class StateGuest;
 
 
 class ObjGuest : public Obj {

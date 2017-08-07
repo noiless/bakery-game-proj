@@ -1,7 +1,9 @@
 #pragma once
 #include "cocos2d.h"
 #include "Obj.h"
-#include "StateRabbit.h"
+
+
+class StateRabbit;
 
 class StateRabbit;
 

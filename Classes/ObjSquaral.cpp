@@ -32,6 +32,8 @@ bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 	normalTime = 0;
 	pausedTime = 0;
 
+	qnodeIndexInit();
+
 	state = dynamic_cast<StateSquaral*> (StateSquaral::squaralNormal);
 	state->initAction(this);
 

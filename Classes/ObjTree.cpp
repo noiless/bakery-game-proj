@@ -17,6 +17,8 @@ bool ObjTree::init(cocos2d::Vec2 initPos) {
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);
 
+	qnodeIndexInit();
+
 	state = dynamic_cast<StateTree*> (StateTree::treeNormal);
 	state->initAction(this);
 
