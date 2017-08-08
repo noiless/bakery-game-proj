@@ -3,58 +3,31 @@
 #include "GameScene.h"
 #include "Raycasting.h"
 
+USING_NS_CC;
+
+
 ObjEnemy::ObjEnemy() : HP(20) {
 	typecode = TYPECODE_PEOPLE;	//사람군
 
-	//////////////////
-	//Updatelist에 안넣었음ㅁ!!! 나중에 액션 만들고 moveLen까지 붙여준 다음에 수정
-	GameWorld::objManager->addObjectAvailListFRONT(this);
-	///////////////
-
+	GameWorld::objManager->addObjectAvailList(this);
+	
 	objImg = Sprite::create("img/enemy_normal_down.png");	//초기 스프라이트
-	this->addChild(objImg);
 
+	eye[0] = new Raycasting(this, 100, 0);
+	eye[1] = new Raycasting(this, 100, 45);
+	eye[2] = new Raycasting(this, 100, -45);
+	this->addChild(eye[0]);
+	this->addChild(eye[1]);
+	this->addChild(eye[2]);
+
+	this->addChild(objImg);
+	
 	//위치 : 임시
 	init(Vec2(100,100));
 
-	eye = new Raycasting;
-	eye->caller = this;
-	eye->setPosition(objImg->getPosition());
-
-	eye->startPoint = objImg->getPosition();
-
-	objImg->addChild(eye);
-	CCLOG("eye %f %f", eye->startPoint.x, eye->startPoint.y);
-
-	//DrawNode* ddd = DrawNode::create();
-	//ddd->drawPoint(eye->convertToWorldSpace(eye->getPosition()), 10, Color4F::BLACK);
-	//this->addChild(ddd);
-
-
-	//임시
-	dir = DIR_UP;
-
-	if (dir == DIR_LEFT) {
-		objImg->setRotation(90);
-		eye->callerRot = 90;
-
-
-	}
-	else if (dir == DIR_RIGHT) {
-		objImg->setRotation(270);
-		eye->callerRot = 270;
-
-	}
-	else if (dir == DIR_UP) {
-		objImg->setRotation(180);
-		eye->callerRot = 180;
-
-	}
-	else if (dir == DIR_DOWN) {
-		eye->callerRot = 0;
-
-	}
-
+	eye[0]->init();
+	eye[1]->init();
+	eye[2]->init();
 }
 
 ObjEnemy::~ObjEnemy() {
@@ -82,10 +55,11 @@ bool ObjEnemy::init(cocos2d::Vec2 initPos) {
 	stateHP = dynamic_cast<StateHPEnemy*> (StateHPEnemy::HPEnemyNormal);
 	stateHP->initAction(this);
 
-
 	qnodeIndexInit();
 
 	this->scheduleUpdate();
+
+	//임시
 
 	return true;
 
@@ -104,8 +78,25 @@ void ObjEnemy::loseHP() {
 
 }
 
+void ObjEnemy::updateEye() {
+	
+	for (int i = 0; i < 3; i++) {
+		eye[i]->startPoint = objImg->getPosition();
+
+		eye[i]->lineSight->clear();
+		eye[i]->lineSight->drawLine(eye[i]->startPoint - eye[i]->anchorDiff, eye[i]->startPoint + eye[i]->d * eye[i]->dir - eye[i]->anchorDiff, Color4F::GRAY);
+
+		eye[i]->doRaycast();
+	}
+
+	//이렇게 되면 그냥 레이캐스트도 여기;서 하라고 시키는게 나을거같은데
+}
+
 
 void ObjEnemy::update(float delta) {
+
+	updateEye();
+
 
 
 }

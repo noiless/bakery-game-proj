@@ -543,6 +543,7 @@ void ObjManager::update(float delta) {
 		//충돌하지 않았을 때 아까 찾은 exbox의 node를 오브젝트의 노드로 대입
 		qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
 		obj->getActionManager()->resumeTarget(obj->objImg);
+		obj->pausedTime = 0;	//pauseTime 초기화
 
 	}
 	////update loop end
@@ -754,8 +755,10 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 
 
 //raycasting
-//얘도 부른애랑 충돌하면 안돼서 결국 오브젝트 필요핝데ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
 Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
+
+	bool intersectionUpdate = false;
+	Obj* intersectedObj;
 
 	float t1x;
 	float t1y;
@@ -766,6 +769,8 @@ Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
 	float Tfar;
 
 	Vec2 invDir = Vec2(1.0f / dir.x, 1.0f / dir.y);
+
+	Vec2 intersection = startPoint + dir * d * 2;	//startpoint까지의 길이가 d보다 크도록 초기화
 
 
 	for each (Obj* element in objAvailList) {
@@ -794,25 +799,31 @@ Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
 
 		//여기까지 살아남았으면 교점이 존재함		
 		//교점까지의 거리가 d보다 커도 안됨
-		if ((Tnear * dir).x*(Tnear * dir).x + (Tnear * dir).y*(Tnear * dir).y > d*d) {
+		if ((startPoint + Tnear * dir).distance(startPoint) > d){
 			continue;
 		}
 
 		////기존에 존재하던 다른 오브젝트와의 교점과 비교해 더 가까운 것을 선택
-		////안만ㅇ들었음
+		if (intersection.distance(startPoint) > (startPoint + Tnear * dir).distance(startPoint)) {
+			intersection = Tnear * dir;
+			intersectedObj = element;
 
-
-		//교점
-		DrawNode* dddd = DrawNode::create();
-		dddd->drawPoint((startPoint + Tnear * dir), 5, Color4F::BLACK);
-		this->addChild(dddd);
+			//교점
+			DrawNode* dddd = DrawNode::create();
+			dddd->drawPoint((startPoint + Tnear * dir), 5, Color4F::BLACK);
+			this->addChild(dddd);
+		}
 
 
 	}
 
-	//전부 continue 됐을 경우 교점 없음 - 돌아감
-	return nullptr;
-
+	if (intersectionUpdate) {
+		return intersectedObj;
+	}
+	else {
+		//전부 continue 됐을 경우 교점 없음 - 돌아감
+		return nullptr;
+	}
 
 
 }

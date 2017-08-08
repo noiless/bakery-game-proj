@@ -1,8 +1,12 @@
 #pragma once
+#include "cocos2d.h"
 
 class ObjEnemy;
 
 class StateEnemyNormal;
+class StateEnemyDetour;
+class StateEnemyAttack;
+class StateEnemyEscape;
 class StateEnemyDead;
 class ObjEnemy;
 
@@ -11,22 +15,29 @@ class StateHPEnemyHurt;
 class StateHPEnemyDeadly;
 
 
-enum { STATE_ENEMY_NORMAL, STATE_ENEMY_DEAD };
+enum { STATE_ENEMY_NORMAL, STATE_ENEMY_DETOUR, STATE_ENEMY_ATTACK, STATE_ENEMY_ESCAPE, STATE_ENEMY_DEAD };
 
 class StateEnemy {
 public:
+
+	float actionDuration;
 	virtual void initAction(ObjEnemy * obj) = 0;
 	virtual bool checkTransitionCond(ObjEnemy * obj) = 0;
 	void doTransition(ObjEnemy* obj, int source, int dest);
 
-	int actionDuration;	
 
 	static StateEnemyNormal* enemyNormal;
+	static StateEnemyDetour* enemyDetour;
+	static StateEnemyAttack* enemyAttack;
+	static StateEnemyEscape* enemyEscape;
 	static StateEnemyDead* enemyDead;
 
 };
 
 class StateEnemyNormal : public StateEnemy {
+private:
+	cocos2d::MoveBy* makeRandDir(ObjEnemy* obj);
+
 public:
 	StateEnemyNormal() {
 		
@@ -37,8 +48,44 @@ public:
 
 };
 
+class StateEnemyDetour : public StateEnemy {
+public:
+	StateEnemyDetour() {
+
+	};
+
+	virtual void initAction(ObjEnemy * obj);
+	virtual bool checkTransitionCond(ObjEnemy * obj);
+
+};
+
+
+class StateEnemyAttack : public StateEnemy {
+public:
+	StateEnemyAttack() {
+
+	};
+
+	virtual void initAction(ObjEnemy * obj);
+	virtual bool checkTransitionCond(ObjEnemy * obj);
+
+};
+
+
+class StateEnemyEscape : public StateEnemy {
+public:
+	StateEnemyEscape() {
+
+	};
+
+	virtual void initAction(ObjEnemy * obj);
+	virtual bool checkTransitionCond(ObjEnemy * obj);
+
+};
+
 
 ////적이 죽으면 게임 오버됨
+//피;ㄹ요 없을것같아.... HP 처리를 HPState에서 따로 해줘서
 class StateEnemyDead : public StateEnemy {
 public:
 	StateEnemyDead() {

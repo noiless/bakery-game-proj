@@ -30,6 +30,8 @@ public:
 
 	StateHPEnemy* stateHP;	//enemy의 HP에 따른 Sprite만 변경함
 
-	Raycasting* eye;	//일단 하나만...
+	Raycasting* eye[3];
+
+	void updateEye();
 
 };

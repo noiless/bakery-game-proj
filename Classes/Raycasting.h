@@ -15,7 +15,7 @@ public:
 		lineSight = DrawNode::create();
 		this->addChild(lineSight);
 
-		rot = -45;
+		rot = 0;
 
 		scheduleUpdate();
 
@@ -23,25 +23,25 @@ public:
 
 	~Raycasting();
 
-	Raycasting(int d, int rot);
+	Raycasting(ObjEnemy* caller, int d, int rot);
+
+	bool init();
 
 	Vec2 startPoint;
-	//Vec2 dir;	//dir vector, //초기 위치에서의 보고있는 방향으로의 방향벡터
-	int callerRot;
-
+	
 	int rot;
 
 	float d;	//distance
 
-	//DrawNode* linesight;
+	Vec2 dir;	//rot, callerRot을 통해 구한 정규화된 방향벡터
 
 	Obj* doRaycast();
 
 	ObjEnemy* caller;	//tq
 
-	DrawNode* lineSight = DrawNode::create();
+	DrawNode* lineSight;
 
+	Vec2 anchorDiff;
 
-	//얘도 임시...
-	void update(float) override;
+	void setDir(int callerRot);
 };
