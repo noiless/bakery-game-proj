@@ -50,8 +50,6 @@ Vec2 Obj::setMoveLen(int dir, float speed) {
 }
 
 
-
-
 void Obj::qnodeIndexInit() {
 	qnodeIndex[0] = -1; qnodeIndex[1] = -1; qnodeIndex[2] = -1; qnodeIndex[3] = -1;
 }

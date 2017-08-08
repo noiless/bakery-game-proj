@@ -750,3 +750,69 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 
 	return hit;
 }
+
+
+
+//raycasting
+//얘도 부른애랑 충돌하면 안돼서 결국 오브젝트 필요핝데ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
+Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
+
+	float t1x;
+	float t1y;
+	float t2x;
+	float t2y;
+
+	float Tnear;
+	float Tfar;
+
+	Vec2 invDir = Vec2(1.0f / dir.x, 1.0f / dir.y);
+
+
+	for each (Obj* element in objAvailList) {
+
+		//이러면 안된다
+		if (element->objIndex == 294) {
+			continue;
+		}
+
+		t1x = (element->objImg->getBoundingBox().getMinX() - startPoint.x) * invDir.x;
+		t2x = (element->objImg->getBoundingBox().getMaxX() - startPoint.x) * invDir.x;
+
+		Tnear = min(t1x, t2x);
+		Tfar = max(t1x, t2x);
+
+		t1y = (element->objImg->getBoundingBox().getMinY() - startPoint.y) * invDir.y;
+		t2y = (element->objImg->getBoundingBox().getMaxY() - startPoint.y) * invDir.y;
+
+		Tnear = max(Tnear, min(t1y, t2y));
+		Tfar = min(Tfar, max(t1y, t2y));
+
+
+		if (Tfar < 0 || Tfar < Tnear) {
+			continue;
+		}
+
+		//여기까지 살아남았으면 교점이 존재함		
+		//교점까지의 거리가 d보다 커도 안됨
+		if ((Tnear * dir).x*(Tnear * dir).x + (Tnear * dir).y*(Tnear * dir).y > d*d) {
+			continue;
+		}
+
+		////기존에 존재하던 다른 오브젝트와의 교점과 비교해 더 가까운 것을 선택
+		////안만ㅇ들었음
+
+
+		//교점
+		DrawNode* dddd = DrawNode::create();
+		dddd->drawPoint((startPoint + Tnear * dir), 5, Color4F::BLACK);
+		this->addChild(dddd);
+
+
+	}
+
+	//전부 continue 됐을 경우 교점 없음 - 돌아감
+	return nullptr;
+
+
+
+}

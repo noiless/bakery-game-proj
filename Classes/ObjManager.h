@@ -100,7 +100,8 @@ public:
 	//다람쥐 공격 확인
 	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
 
-
+	//raycast 확인
+	Obj* doRaycast(cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
 
 
 };

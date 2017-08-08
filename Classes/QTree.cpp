@@ -206,10 +206,6 @@ void QTree::remove(Obj* obj) {
 void QTree::removeObjFromAllNode(Obj* obj) {
 	QTree* tempPtr;
 
-	CCLOG("%d %d %d %d", obj->qnodeIndex[0], obj->qnodeIndex[1], obj->qnodeIndex[2], obj->qnodeIndex[3]);
-	CCLOG("%d %d", obj->objIndex, obj->typecode);
-
-
 	for (int i = 0; i < 4; i++) {
 		tempPtr = searchNode(obj->qnodeIndex[i]);
 		if (tempPtr != nullptr)

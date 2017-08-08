@@ -40,7 +40,7 @@ void Attack::update(float) {
 
 	if (!success) {
 		//newOrigin
-		Vec2 p = attackImg->convertToWorldSpace(Vec2(attackImg->getBoundingBox().origin.x, attackImg->getBoundingBox().origin.y) - anchorDiff);
+		Vec2 p = attackImg->convertToWorldSpace(attackImg->getBoundingBox().origin - anchorDiff);
 
 		switch (callerDir) {
 		case DIR_LEFT:

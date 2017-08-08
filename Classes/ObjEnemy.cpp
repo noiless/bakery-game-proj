@@ -1,17 +1,59 @@
 #include "ObjEnemy.h"
+#include "StateEnemy.h"
 #include "GameScene.h"
-
+#include "Raycasting.h"
 
 ObjEnemy::ObjEnemy() : HP(20) {
 	typecode = TYPECODE_PEOPLE;	//사람군
 
-	GameWorld::objManager->addObjectAvailList(this);
+	//////////////////
+	//Updatelist에 안넣었음ㅁ!!! 나중에 액션 만들고 moveLen까지 붙여준 다음에 수정
+	GameWorld::objManager->addObjectAvailListFRONT(this);
+	///////////////
 
 	objImg = Sprite::create("img/enemy_normal_down.png");	//초기 스프라이트
 	this->addChild(objImg);
 
-	init(Vec2::ZERO);
+	//위치 : 임시
+	init(Vec2(100,100));
 
+	eye = new Raycasting;
+	eye->caller = this;
+	eye->setPosition(objImg->getPosition());
+
+	eye->startPoint = objImg->getPosition();
+
+	objImg->addChild(eye);
+	CCLOG("eye %f %f", eye->startPoint.x, eye->startPoint.y);
+
+	//DrawNode* ddd = DrawNode::create();
+	//ddd->drawPoint(eye->convertToWorldSpace(eye->getPosition()), 10, Color4F::BLACK);
+	//this->addChild(ddd);
+
+
+	//임시
+	dir = DIR_UP;
+
+	if (dir == DIR_LEFT) {
+		objImg->setRotation(90);
+		eye->callerRot = 90;
+
+
+	}
+	else if (dir == DIR_RIGHT) {
+		objImg->setRotation(270);
+		eye->callerRot = 270;
+
+	}
+	else if (dir == DIR_UP) {
+		objImg->setRotation(180);
+		eye->callerRot = 180;
+
+	}
+	else if (dir == DIR_DOWN) {
+		eye->callerRot = 0;
+
+	}
 
 }
 
@@ -36,10 +78,14 @@ bool ObjEnemy::init(cocos2d::Vec2 initPos) {
 	state = dynamic_cast<StateEnemy*> (StateEnemy::enemyNormal);
 	state->initAction(this);
 
-	qnodeIndexInit();
-	CCLOG("%d %d %d %d 11111~~",qnodeIndex[0], qnodeIndex[1], qnodeIndex[2], qnodeIndex[3]);
 
-	//this->scheduleUpdate();
+	stateHP = dynamic_cast<StateHPEnemy*> (StateHPEnemy::HPEnemyNormal);
+	stateHP->initAction(this);
+
+
+	qnodeIndexInit();
+
+	this->scheduleUpdate();
 
 	return true;
 
@@ -52,13 +98,14 @@ bool ObjEnemy::deInit() {
 void ObjEnemy::loseHP() {
 
 	HP--;
-	//StateSprEnemy에 현재의 HP를 알림
 
-	CCLOG("hp %d",HP);
+	//StateSprEnemy에 현재의 HP를 알림
+	stateHP->changeHP(HP, this);
 
 }
 
 
 void ObjEnemy::update(float delta) {
+
 
 }

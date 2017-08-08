@@ -3,7 +3,11 @@
 #include "cocos2d.h"
 #include "GameScene.h"
 #include "Obj.h"
-#include "StateEnemy.h"
+
+
+class StateEnemy;
+class StateHPEnemy;
+class Raycasting;
 
 USING_NS_CC;
 
@@ -24,8 +28,8 @@ public:
 
 	StateEnemy* state;
 
-	//StateHPEnemy* stateHP;	//enemy의 HP에 따른 Sprite만 변경함
+	StateHPEnemy* stateHP;	//enemy의 HP에 따른 Sprite만 변경함
 
-	//raycast eye
+	Raycasting* eye;	//일단 하나만...
 
 };
