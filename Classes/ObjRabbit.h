@@ -9,7 +9,6 @@ class StateRabbit;
 
 class ObjRabbit : public Obj {
 private:
-	
 	void update(float) override;
 	
 public:
@@ -19,7 +18,8 @@ public:
 	virtual bool init(cocos2d::Vec2 initPos);
 	virtual bool deInit();
 	
-	virtual void loseHP();
+	virtual void loseHPByPlayer();
+	virtual void loseHPByOther(int damage);
 	void updateRabbitSight();
 	int speed;
 	int HP;

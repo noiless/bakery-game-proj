@@ -9,6 +9,12 @@
 
 USING_NS_CC;
 
+ObjManager::ObjManager() {
+	CCLOG("objmanager init");
+	intersectedObj = new ColObj;
+	bloodNum = 0;
+}
+
 void ObjManager::ObjInit() {
 	//시작 후 초기화
 	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
@@ -30,6 +36,8 @@ void ObjManager::ObjInit() {
 	for (int i = 0; i < MAX_GUEST_NUM; i++) {
 		objGuestList[i] = new ObjGuest;
 	}
+
+
 }
 
 void ObjManager::Objdeinit() {
@@ -550,8 +558,9 @@ void ObjManager::update(float delta) {
 }
 
 
+//isPlayer가 true일때 플레이어 어택이 호출
+bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox, bool isPlayer) {
 
-bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 	bool hit = false;
 
 	//충돌한 물체 검출
@@ -569,7 +578,13 @@ bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox) {
 
 	//각 충돌한 물체에 대한 처리
 	for each (Obj* i in playerCollisionList) {
-		i->loseHP();	//<-한꺼번에 나중에 처리
+		//<-한꺼번에 나중에 처리
+		if (isPlayer) {
+			i->loseHPByPlayer();
+		}
+		else {
+			i->loseHPByOther(1);
+		}
 	}
 	playerCollisionList.clear();
 
@@ -745,7 +760,7 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 	//각 충돌한 물체에 대한 처리
 	for each (Obj* i in acornCollisionList) {
 		if (i->typecode == TYPECODE_PEOPLE)
-			i->loseHP();	//<-한꺼번에 나중에 처리
+			i->loseHPByOther(1);	//<-한꺼번에 나중에 처리
 	}
 	acornCollisionList.clear();
 
@@ -755,28 +770,26 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 
 
 //raycasting
-Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
+ColObj* ObjManager::doRaycast(int callerIndex, Vec2 startPoint, Vec2 dir, float d) {
 
 	bool intersectionUpdate = false;
-	Obj* intersectedObj;
-
+	
 	float t1x;
 	float t1y;
 	float t2x;
 	float t2y;
 
-	float Tnear;
-	float Tfar;
+	float Tnear = mapRect.getMinX();
+	float Tfar = mapRect.getMaxX();
 
 	Vec2 invDir = Vec2(1.0f / dir.x, 1.0f / dir.y);
 
-	Vec2 intersection = startPoint + dir * d * 2;	//startpoint까지의 길이가 d보다 크도록 초기화
+	intersectedObj->intersectDistance = d*2;	//d보다 크도록 초기화
 
 
 	for each (Obj* element in objAvailList) {
 
-		//이러면 안된다
-		if (element->objIndex == 294) {
+		if (element->objIndex == callerIndex) {
 			continue;
 		}
 
@@ -792,7 +805,6 @@ Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
 		Tnear = max(Tnear, min(t1y, t2y));
 		Tfar = min(Tfar, max(t1y, t2y));
 
-
 		if (Tfar < 0 || Tfar < Tnear) {
 			continue;
 		}
@@ -804,14 +816,17 @@ Obj* ObjManager::doRaycast(Vec2 startPoint, Vec2 dir, float d) {
 		}
 
 		////기존에 존재하던 다른 오브젝트와의 교점과 비교해 더 가까운 것을 선택
-		if (intersection.distance(startPoint) > (startPoint + Tnear * dir).distance(startPoint)) {
-			intersection = Tnear * dir;
-			intersectedObj = element;
+		if (intersectedObj->intersectDistance > (startPoint + Tnear * dir).distance(startPoint)) {
+			intersectionUpdate = true;
+
+			intersectedObj->obj = element;
+			intersectedObj->intersectPoint = startPoint + Tnear * dir;
+			intersectedObj->intersectDistance = intersectedObj->intersectPoint.distance(startPoint);
 
 			//교점
-			DrawNode* dddd = DrawNode::create();
-			dddd->drawPoint((startPoint + Tnear * dir), 5, Color4F::BLACK);
-			this->addChild(dddd);
+			//DrawNode* dddd = DrawNode::create();
+			//dddd->drawPoint(intersectedObj->intersectPoint, 5, Color4F::BLACK);
+			//this->addChild(dddd);
 		}
 
 

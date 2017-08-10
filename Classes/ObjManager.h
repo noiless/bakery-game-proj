@@ -22,6 +22,7 @@ class ObjGuest;
 class ObjEnemy;
 class AcornAttack;
 class QTree;
+struct ColObj;
 
 class ObjManager : public cocos2d::Node {	//._.
 private:
@@ -45,6 +46,7 @@ private:
 	ObjSquaral* getFreeObjSquaral();
 	ObjGuest* getFreeGuest();
 	AcornAttack* getFreeAcornAttack();
+	ColObj* intersectedObj;
 
 	Vec2 createColCheck(Vec2* pos, const cocos2d::Size* size);
 	bool mapBoundaryCheck(cocos2d::Rect* exBox);
@@ -56,11 +58,7 @@ private:
 	QTree* qtree;
 
 public:
-	ObjManager() {
-		CCLOG("objmanager init");
-		bloodNum = 0;
-	}
-
+	ObjManager();
 	void ObjInit();
 	void Objdeinit();
 
@@ -86,7 +84,7 @@ public:
 	bool isObjColAvail(Obj * obj);
 
 	bool checkMoveCollision(Obj *obj, cocos2d::Rect* exBox, cocos2d::Vec2* moveLen);
-	bool checkAttackCollision(cocos2d::Rect* exBox);
+	bool checkAttackCollision(cocos2d::Rect* exBox, bool isPlayer);
 
 	//토끼 시야
 	bool checkSightCollision(ObjRabbit * obj);
@@ -101,7 +99,7 @@ public:
 	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
 
 	//raycast 확인
-	Obj* doRaycast(cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
+	ColObj* doRaycast(int callerIndex, cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
 
 
 };

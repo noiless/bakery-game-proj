@@ -1,6 +1,7 @@
 #include "ObjGuest.h"
 #include "StateGuest.h"
 #include "GameScene.h"
+#include "Raycasting.h"
 
 USING_NS_CC;
 
@@ -9,6 +10,7 @@ ObjGuest::ObjGuest() : inUse(false), HP(5), detourSequence(-1) {
 	typecode = TYPECODE_PEOPLE;
 	objImg = Sprite::create("img/guest_down.png");
 	addChild(objImg);
+	eye = new Raycasting(this, 100, 0);
 }
 
 
@@ -51,9 +53,16 @@ bool ObjGuest::deInit() {
 	return true;
 }
 
-void ObjGuest::loseHP() {
+
+void ObjGuest::loseHPByPlayer() {
+	deadByPlayer = true;
 	HP--;
 }
+void ObjGuest::loseHPByOther(int damage) {
+	deadByPlayer = false;
+	HP -= damage;
+}
+
 
 void ObjGuest::update(float delta) {
 

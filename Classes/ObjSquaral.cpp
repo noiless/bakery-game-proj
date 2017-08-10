@@ -20,10 +20,16 @@ ObjSquaral::~ObjSquaral() {
 	squaralSightCircle->removeFromParentAndCleanup(true);
 }
 
-
-void ObjSquaral::loseHP() {
+void ObjSquaral::loseHPByPlayer() {
 	HP--;
+	deadByPlayer = true;
 }
+
+void ObjSquaral::loseHPByOther(int damage) {
+	HP -= damage;
+	deadByPlayer = false;
+}
+
 
 bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 	HP = 5;

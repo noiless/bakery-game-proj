@@ -35,9 +35,21 @@ bool ObjTree::deInit() {
 	return true;
 }
 
-void ObjTree::loseHP() {
+void ObjTree::loseHPByPlayer() {
 	HP--;
 	if (HP <= 0) {
+		deadByPlayer = true;
+		//state 변경 후 action 초기화
+		state = dynamic_cast<StateTree*> (StateTree::treeDead);
+		state->initAction(this);
+
+	}
+}
+
+void ObjTree::loseHPByOther(int damage) {
+	HP -= damage;
+	if (HP <= 0) {
+		deadByPlayer = false;
 		//state 변경 후 action 초기화
 		state = dynamic_cast<StateTree*> (StateTree::treeDead);
 		state->initAction(this);

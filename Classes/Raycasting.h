@@ -2,7 +2,7 @@
 #include "cocos2d.h"
 
 class Obj;
-class ObjEnemy;
+struct ColObj;
 
 USING_NS_CC;
 
@@ -16,14 +16,11 @@ public:
 		this->addChild(lineSight);
 
 		rot = 0;
-
-		scheduleUpdate();
-
 	};
 
 	~Raycasting();
 
-	Raycasting(ObjEnemy* caller, int d, int rot);
+	Raycasting(Obj* caller, int d, int rot);
 
 	bool init();
 
@@ -35,9 +32,9 @@ public:
 
 	Vec2 dir;	//rot, callerRot을 통해 구한 정규화된 방향벡터
 
-	Obj* doRaycast();
+	ColObj* doRaycast();
 
-	ObjEnemy* caller;	//tq
+	Obj* caller;	//tq
 
 	DrawNode* lineSight;
 

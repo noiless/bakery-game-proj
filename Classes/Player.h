@@ -25,9 +25,10 @@ public:
 	Player() {
 		init();
 	}
-	virtual void loseHP();
 
-	
+	virtual void loseHPByPlayer();
+	virtual void loseHPByOther(int damage);
+
 	int dir;
 	int speed = 500;
 	

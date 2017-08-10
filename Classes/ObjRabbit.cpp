@@ -60,10 +60,16 @@ bool ObjRabbit::deInit()
 }
 
 
-void ObjRabbit::loseHP() {
+void ObjRabbit::loseHPByPlayer() {
 	HP--;
-	CCLOG("%d HP %d",objIndex,HP);
+	deadByPlayer = true;
 }
+
+void ObjRabbit::loseHPByOther(int damage) {
+	HP -= damage;
+	deadByPlayer = false;
+}
+
 
 
 void ObjRabbit::updateRabbitSight(){

@@ -90,10 +90,16 @@ bool Player::init() {
 	return true;
 }
 
-void Player::loseHP() {
+void Player::loseHPByPlayer() {
 	HP--;
-	GameWorld::ui->loseMyHP();
+	GameWorld::ui->loseMyHP(1);
 }
+
+void Player::loseHPByOther(int damage) {
+	HP -= damage;
+	GameWorld::ui->loseMyHP(damage);
+}
+
 
 bool Player::setPlayerMoveLen(float actionDuration) {
 	//аб

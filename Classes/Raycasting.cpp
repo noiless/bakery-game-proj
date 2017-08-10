@@ -9,7 +9,7 @@ Raycasting::~Raycasting() {
 }
 
 //인자를 통해 시야거리, 회전각 초기화
-Raycasting::Raycasting(ObjEnemy* caller, int d, int rot) {
+Raycasting::Raycasting(Obj* caller, int d, int rot) {
 	this->caller = caller;
 	this->d = d; //거리 설정
 	this->rot = rot;
@@ -18,8 +18,6 @@ Raycasting::Raycasting(ObjEnemy* caller, int d, int rot) {
 	lineSight = DrawNode::create();
 	this->addChild(lineSight);
 
-	//update 시작
-	scheduleUpdate();
 }
 
 bool Raycasting::init() {
@@ -36,10 +34,10 @@ void Raycasting::setDir(int callerRot) {
 
 	dir = Vec2(sin(CC_DEGREES_TO_RADIANS(callerRot + rot + 180)), cos(CC_DEGREES_TO_RADIANS(callerRot + rot + 180)));
 
-	if (dir.x < 0.0001f && dir.x > -0.0001f) {
+	if (dir.x < 0.05f && dir.x > -0.05f) {
 		dir.x = 0;
 	}
-	if (dir.y < 0.0001f && dir.y > -0.0001f) {
+	if (dir.y < 0.05f && dir.y > -0.05f) {
 		dir.y = 0;
 	}
 
@@ -48,12 +46,7 @@ void Raycasting::setDir(int callerRot) {
 }
 
 //충돌시 출동한 오브젝트 반환
-Obj* Raycasting::doRaycast() {
+ColObj* Raycasting::doRaycast() {
 
-	if (GameWorld::objManager->doRaycast(startPoint, dir, d) == nullptr) {
-		return nullptr;
-	}
-
-	//임시;
-	return nullptr;
+	return GameWorld::objManager->doRaycast(caller->objIndex, startPoint, dir, d);
 }

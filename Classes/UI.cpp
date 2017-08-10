@@ -148,12 +148,29 @@ void UI::myBreadPointGrow() {
 		myBreadPoint = 100;
 }
 
+void UI::myBreadPointDown() {
+	if (myBreadPoint > USER_CHANGE_UNIT)
+		myBreadPoint -= USER_CHANGE_UNIT;
+	else
+		myBreadPoint = 0;
+}
+
+void UI::otherBreadPointGrow() {
+	if (otherBreadPoint < (100 - USER_CHANGE_UNIT))
+		otherBreadPoint += USER_CHANGE_UNIT;
+	else
+		otherBreadPoint = 100;
+
+}
+
 void UI::otherBreadPointDown() {
 	if (otherBreadPoint > USER_CHANGE_UNIT)
 		otherBreadPoint -= USER_CHANGE_UNIT;
 	else
 		otherBreadPoint = 0;
 }
+
+
 
 void UI::myAdPointGrow() {
 	if (adPoint < (100 - USER_CHANGE_UNIT))
@@ -162,9 +179,16 @@ void UI::myAdPointGrow() {
 		adPoint = 100;
 }
 
+void UI::myAdPointDown() {
+	if (adPoint > USER_CHANGE_UNIT)
+		adPoint -= USER_CHANGE_UNIT;
+	else
+		adPoint = 0;
+}
+
 //Player::loseHP()에서 호출
-void UI::loseMyHP() {
-	myHP--;
+void UI::loseMyHP(int damage) {
+	myHP -= damage;
 
 	char text[256];
 	sprintf(text, "Player HP : %d", myHP);

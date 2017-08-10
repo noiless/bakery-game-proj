@@ -27,6 +27,8 @@ public:
 	Obj();
 	~Obj();
 
+	bool deadByPlayer;
+
 	int objIndex;	//각 Obj의 인스턴스들이 가지는 인스턴스의 고유 번호
 	int speed;
 	int typecode = TYPECODE_NONE;	//각 클래스가 가지는 타입
@@ -39,6 +41,7 @@ public:
 	cocos2d::Vec2 moveLen;	//speed * delta값
 	cocos2d::Vec2 setMoveLen(int dir, float speed);
 
-	virtual void loseHP() {};
+	virtual void loseHPByPlayer() {};
+	virtual void loseHPByOther(int damage) {};
 	virtual bool deInit() { return true; };
 };

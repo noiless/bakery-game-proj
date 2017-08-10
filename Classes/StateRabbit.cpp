@@ -214,8 +214,12 @@ void StateRabbitDead::initAction(ObjRabbit * obj) {
 	
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
 
-	//유저 재료 포인트 상승
-	GameWorld::ui->myBreadPointGrow();
+	if (obj->deadByPlayer) {
+		GameWorld::ui->myBreadPointGrow();
+	}
+	else{
+		GameWorld::ui->myBreadPointDown();
+	}
 	//action 설정
 	auto fadeout = FadeOut::create(actionDuration);
 

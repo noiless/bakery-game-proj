@@ -1,7 +1,9 @@
 #pragma once
 #include <cocos2d.h>
-#include "ObjSquaral.h"
 #include <Obj.h>
+
+class ObjSquaral;
+class ObjEnemy;
 
 USING_NS_CC;
 
@@ -33,4 +35,15 @@ public:
 	int callerIndex;
 	int inUse;
 	virtual bool init(ObjSquaral* caller);
+};
+
+class EnemyAttack : public Attack {
+private:
+	void update(float) override;
+	int callerDir;
+public:
+	EnemyAttack(Sprite* enemySpr);
+	~EnemyAttack();
+	virtual bool init(ObjEnemy* caller);
+
 };

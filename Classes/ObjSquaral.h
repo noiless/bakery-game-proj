@@ -22,7 +22,8 @@ public:
 
 	float normalTime;	//생성자, transCondition에서 초기화
 
-	virtual void loseHP();
+	virtual void loseHPByPlayer();
+	virtual void loseHPByOther(int damage);
 	int speed;
 	int HP;
 

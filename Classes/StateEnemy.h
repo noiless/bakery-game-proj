@@ -61,13 +61,17 @@ public:
 
 
 class StateEnemyAttack : public StateEnemy {
+private:
+	cocos2d::Vec2 targetPos;
 public:
 	StateEnemyAttack() {
-
+		attackDuration = 0;
 	};
 
+	float attackDuration;
 	virtual void initAction(ObjEnemy * obj);
 	virtual bool checkTransitionCond(ObjEnemy * obj);
+	void setMoveData(ObjEnemy* obj, cocos2d::Vec2 actionVector);
 
 };
 

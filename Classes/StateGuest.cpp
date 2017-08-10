@@ -1,5 +1,6 @@
 #include "StateGuest.h"
 #include "ObjGuest.h"
+#include "Raycasting.h"
 #include "GameScene.h"
 
 
@@ -114,8 +115,18 @@ void StateGuestDetourNormal::initAction(ObjGuest * obj) {
 	actionDuration = 1;
 
 	//우회해야 할 오브젝트 확인, 그 boundbox size 저장
-	//오브젝트 확인은 레이캐스팅님이 해주실거야ㅇㅅ"ㅇ
-	obj->detourSize = Vec2(100,100);	//임시....
+	
+	//obj->eye->startPoint = obj->objImg->getPosition();
+	//obj->eye->setDir(obj->dir);
+	//
+
+	//DrawNode* asddd = DrawNode::create();
+	//asddd->drawLine(obj->eye->startPoint, obj->eye->startPoint + obj->eye->d * obj->eye->dir, Color4F::RED);
+	//obj->addChild(asddd);
+
+	//obj->detourSize = obj->eye->doRaycast()->obj->objImg->getContentSize();	//임시....
+
+	obj->detourSize = Vec2(100, 100);
 	obj->speed = 100;	//얘도 임시.....
 
 
