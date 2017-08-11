@@ -21,7 +21,7 @@ public:
 	virtual bool checkTransitionCond(ObjGuest * obj) = 0;
 	void doTransition(ObjGuest* obj, int source, int dest);
 
-	int actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+	float actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
 
 	static StateGuestNormal* guestNormal;
 	static StateGuestSelectShop* guestSelectShop;

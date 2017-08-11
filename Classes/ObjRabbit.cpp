@@ -13,6 +13,8 @@ ObjRabbit::ObjRabbit() : inUse(false), HP(2) {
 
 	addChild(rabbitSightTri);
 	addChild(objImg);
+	
+	qnodeBound = Size(objImg->getContentSize() * 3);
 
 }
 
@@ -111,5 +113,4 @@ void ObjRabbit::update(float delta) {
 	//check state transition condition
 	state->checkTransitionCond(this);
 
-	
 }

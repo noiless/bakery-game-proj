@@ -35,11 +35,13 @@ public:
 	int HP = 5;	//각 오브젝트의 체력
 	int dir;	//현재의 방향
 	int qnodeIndex[4];	//소속된 qtree node index
-	float pausedTime = 0;
+	float pausedTime;
 
 	cocos2d::Sprite *objImg;
 	cocos2d::Vec2 moveLen;	//speed * delta값
 	cocos2d::Vec2 setMoveLen(int dir, float speed);
+
+	cocos2d::Size qnodeBound;
 
 	virtual void loseHPByPlayer() {};
 	virtual void loseHPByOther(int damage) {};

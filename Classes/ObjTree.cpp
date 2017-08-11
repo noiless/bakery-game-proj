@@ -8,6 +8,9 @@ ObjTree::ObjTree() : inUse(false), HP(5) {
 	objImg = Sprite::create("img/tree_down.png");
 
 	this->addChild(objImg);
+
+	qnodeBound = Size(objImg->getContentSize());
+
 }
 
 bool ObjTree::init(cocos2d::Vec2 initPos) {

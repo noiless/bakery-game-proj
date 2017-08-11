@@ -160,10 +160,13 @@ void Player::update(float delta) {
 			if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
 				//충돌하지 않으면 이동
 				objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
+
+
 			}
 
 			//플레이어 이동에 따라 카메라 이동
 			cam->setPosition(objImg->getPosition());
+
 
 
 		}

@@ -14,6 +14,9 @@ ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(1
 
 	addChild(squaralSightCircle);
 	addChild(objImg);
+
+	qnodeBound = Size(squaralSightRadius, squaralSightRadius) * 4;
+
 }
 
 ObjSquaral::~ObjSquaral() {

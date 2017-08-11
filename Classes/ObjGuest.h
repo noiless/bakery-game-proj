@@ -31,9 +31,10 @@ public:
 	Size detourSize;
 	int detourSequence = -1;
 	
-	Raycasting* eye;
+	Raycasting* eye[3];
 
 	StateGuest* state;
 
-	//Vec2 moveLen;
+	float normalTime;
+
 };

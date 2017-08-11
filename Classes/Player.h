@@ -24,6 +24,7 @@ private:
 public:
 	Player() {
 		init();
+		qnodeBound = Size(objImg->getContentSize());
 	}
 
 	virtual void loseHPByPlayer();

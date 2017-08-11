@@ -331,12 +331,12 @@ bool ObjManager::mapBoundaryCheck(cocos2d::Rect* exBox) {
 
 //플레이어만 사용
 bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLen) {
-	int* exNodeIndexList;
+	int* exNodeIndexList = new int[4];
 
 	CCASSERT(!(moveLen->x != 0 && moveLen->y != 0), "moveLen : x or y val should be 0");
 
 	//움직였을 시의 예상 boundingbox를 받아서 그걸로 움직일 수 있는지 검사
-	exNodeIndexList = qtree->getExNodeIndexList(exBox);
+	exNodeIndexList = qtree->getExNodeIndexList(exBox, exNodeIndexList);
 
 	QTree * tempPtr;
 
@@ -352,23 +352,24 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 				//x축으로 움직이고 있었을 때
 				//좌
 				if (moveLen->x < 0) {
-					obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox->size.width / 2 + 1);
+					obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox->size.width / 2 + 5);
 				}
 				//우
 				else if (moveLen->x > 0) {
-					obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox->size.width / 2 - 1);
+					obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox->size.width / 2 - 5);
 				}
 				//y축으로 움직이고 있었을 때
 				//상
 				else if (moveLen->y > 0) {
-					obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox->size.height / 2 - 1);
+					obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox->size.height / 2 - 5);
 				}
 				//하
 				else if (moveLen->y < 0) {
-					obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox->size.height / 2 + 1);
+					obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox->size.height / 2 + 5);
 				}
 
 				qtree->renewObjNode(obj);
+				delete[] exNodeIndexList;
 
 				return false;
 			}
@@ -398,6 +399,7 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 					}
 
 					qtree->renewObjNode(obj);
+					delete[] exNodeIndexList;
 
 					return false;
 				}
@@ -409,7 +411,13 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 
 	//충돌하지 않았을 때
 
-	qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
+	if (exNodeIndexList[0] != obj->qnodeIndex[0] || exNodeIndexList[1] != obj->qnodeIndex[1] || exNodeIndexList[2] != obj->qnodeIndex[2] || exNodeIndexList[3] != obj->qnodeIndex[3]) {
+		qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
+	}
+
+	//qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
+
+	delete[] exNodeIndexList;
 
 	return true;
 }
@@ -419,18 +427,27 @@ void ObjManager::update(float delta) {
 
 	bool doCntn = false;
 	QTree* qtreePtr;
-	int* exNodeIndexList;
+	int* exNodeIndexList = new int[4];
 
 	//각 오브젝트마다 exBox
-	Rect exBox;
+	Rect exBoundBox;
+	Rect exImgBox;
 
 	//각 오브젝트마다 충돌 체크
 	for each (Obj* obj in objUpdateList) {
 
 		doCntn = false;
+		
+		//exBoundBox : 예상 노드 구할때 사용
+		exBoundBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2 + obj->moveLen.x * delta, obj->objImg->getPositionY() - obj->qnodeBound.height / 2 + obj->moveLen.y * delta, obj->qnodeBound.width, obj->qnodeBound.height);
+		exNodeIndexList = qtree->getExNodeIndexList(&exBoundBox, exNodeIndexList);
 
-		exBox.setRect(obj->objImg->getBoundingBox().origin.x + obj->moveLen.x * delta, obj->objImg->getBoundingBox().origin.y + obj->moveLen.y * delta, obj->objImg->getBoundingBox().size.width, obj->objImg->getBoundingBox().size.height);
-		exNodeIndexList = qtree->getExNodeIndexList(&exBox);
+		//DrawNode * tempdnode = DrawNode::create();
+		//tempdnode->drawRect(exBoundBox.origin, exBoundBox.origin + exBoundBox.size, Color4F::GRAY);
+		//this->addChild(tempdnode);
+
+		//exImgBox : 다음 프레임에 현재 오브젝트(obj)의 sprite의 바운딩 박스의 위치
+		exImgBox.setRect(obj->objImg->getBoundingBox().origin.x + obj->moveLen.x * delta, obj->objImg->getBoundingBox().origin.y + obj->moveLen.y * delta, obj->objImg->getBoundingBox().size.width, obj->objImg->getBoundingBox().size.height);
 
 		////////////
 		//각 노드별로 충돌 확인
@@ -444,41 +461,37 @@ void ObjManager::update(float delta) {
 				//외곽 노드이면 맵 밖으로 나가는지 확인
 				if (qtreePtr->isOutside) {
 
-					if (mapBoundaryCheck(&exBox)) {
-				
+					if (mapBoundaryCheck(&exImgBox)) {
+
 						//첫 충돌 체크
 						if (obj->pausedTime == 0) {
 
 							obj->getActionManager()->pauseTarget(obj->objImg);
-				
+
 							//x축으로 움직이고 있었을 때
 							//좌
 							if (obj->moveLen.x < 0) {
-								obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exBox.size.width / 2 + 1);
-				
+								obj->objImg->setPositionX(mapBoundaryRect[0].getMaxX() + exImgBox.size.width / 2 + 1);
 							}
 							//우
 							else if (obj->moveLen.x > 0) {
-								obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exBox.size.width / 2 - 1);
-				
+								obj->objImg->setPositionX(mapBoundaryRect[1].getMinX() - exImgBox.size.width / 2 - 1);
 							}
 							//y축으로 움직이고 있었을 때
 							//상
 							else if (obj->moveLen.y > 0) {
-								obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exBox.size.height / 2 - 1);
-				
+								obj->objImg->setPositionY(mapBoundaryRect[2].getMinY() - exImgBox.size.height / 2 - 1);
 							}
 							//하
 							else if (obj->moveLen.y < 0) {
-				
-								obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exBox.size.height / 2 + 1);
+								obj->objImg->setPositionY(mapBoundaryRect[3].getMaxY() + exImgBox.size.height / 2 + 1);
 							}
-				
+
 							//충돌 후 멈추므로 첫 충돌 체크에서 renew해줌
 							qtree->renewObjNode(obj);
-				
+
 						}
-				
+
 						obj->pausedTime += delta;
 						doCntn = true;
 						break;	//continuing outer loop
@@ -490,7 +503,7 @@ void ObjManager::update(float delta) {
 				for each (Obj* colEle in qtreePtr->element) {
 
 					//충돌
-					if ((obj->objIndex != colEle->objIndex) && exBox.intersectsRect(colEle->objImg->getBoundingBox())) {
+					if ((obj->objIndex != colEle->objIndex) && exImgBox.intersectsRect(colEle->objImg->getBoundingBox())) {
 
 						//오브젝트가 이미 멈춰있는 경우 pausedTime이 0보다 큼
 
@@ -499,26 +512,26 @@ void ObjManager::update(float delta) {
 
 							obj->getActionManager()->pauseTarget(obj->objImg); //오브젝트 정지
 
-							//x축으로 움직이고 있었을 때
-							//좌
+																			   //x축으로 움직이고 있었을 때
+																			   //좌
 							if (obj->moveLen.x < 0) {
-								obj->objImg->setPositionX(colEle->objImg->getBoundingBox().getMaxX() + exBox.size.width / 2 + 1);
+								obj->objImg->setPositionX(colEle->objImg->getBoundingBox().getMaxX() + exImgBox.size.width / 2 + 1);
 
 							}
 							//우
 							else if (obj->moveLen.x > 0) {
-								obj->objImg->setPositionX(colEle->objImg->getBoundingBox().getMinX() - exBox.size.width / 2 - 1);
+								obj->objImg->setPositionX(colEle->objImg->getBoundingBox().getMinX() - exImgBox.size.width / 2 - 1);
 
 							}
 							//y축으로 움직이고 있었을 때
 							//상
 							else if (obj->moveLen.y > 0) {
-								obj->objImg->setPositionY(colEle->objImg->getBoundingBox().getMinY() - exBox.size.height / 2 - 1);
+								obj->objImg->setPositionY(colEle->objImg->getBoundingBox().getMinY() - exImgBox.size.height / 2 - 1);
 
 							}
 							//하
 							else if (obj->moveLen.y < 0) {
-								obj->objImg->setPositionY(colEle->objImg->getBoundingBox().getMaxY() + exBox.size.height / 2 + 1);
+								obj->objImg->setPositionY(colEle->objImg->getBoundingBox().getMaxY() + exImgBox.size.height / 2 + 1);
 							}
 
 							//충돌 후 멈추므로 첫 충돌 체크에서 renew해줌
@@ -549,12 +562,22 @@ void ObjManager::update(float delta) {
 		}
 
 		//충돌하지 않았을 때 아까 찾은 exbox의 node를 오브젝트의 노드로 대입
-		qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
+
+		if (exNodeIndexList[0] != obj->qnodeIndex[0] || exNodeIndexList[1] != obj->qnodeIndex[1] || exNodeIndexList[2] != obj->qnodeIndex[2] || exNodeIndexList[3] != obj->qnodeIndex[3]) {
+			qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
+		}
+
 		obj->getActionManager()->resumeTarget(obj->objImg);
 		obj->pausedTime = 0;	//pauseTime 초기화
 
+		CCLOG("one loop end");
+
+
 	}
 	////update loop end
+
+	delete[] exNodeIndexList;
+
 }
 
 
@@ -773,7 +796,7 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 ColObj* ObjManager::doRaycast(int callerIndex, Vec2 startPoint, Vec2 dir, float d) {
 
 	bool intersectionUpdate = false;
-	
+
 	float t1x;
 	float t1y;
 	float t2x;
@@ -784,7 +807,7 @@ ColObj* ObjManager::doRaycast(int callerIndex, Vec2 startPoint, Vec2 dir, float 
 
 	Vec2 invDir = Vec2(1.0f / dir.x, 1.0f / dir.y);
 
-	intersectedObj->intersectDistance = d*2;	//d보다 크도록 초기화
+	intersectedObj->intersectDistance = d * 2;	//d보다 크도록 초기화
 
 
 	for each (Obj* element in objAvailList) {
@@ -811,7 +834,7 @@ ColObj* ObjManager::doRaycast(int callerIndex, Vec2 startPoint, Vec2 dir, float 
 
 		//여기까지 살아남았으면 교점이 존재함		
 		//교점까지의 거리가 d보다 커도 안됨
-		if ((startPoint + Tnear * dir).distance(startPoint) > d){
+		if ((startPoint + Tnear * dir).distance(startPoint) > d) {
 			continue;
 		}
 

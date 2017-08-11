@@ -15,8 +15,6 @@ ObjEnemy *GameWorld::enemy;	//적도 하나만 존재
 UI * GameWorld::ui;
 bool GameWorld::initiated = false;
 
-
-
 Scene* GameWorld::createScene()
 {
 	
@@ -65,17 +63,17 @@ bool GameWorld::init()
 	myShop->objImg = Sprite::create("img/myShop.png");
 	myShop->objImg->setPosition(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 8 * 7);
 	myShop->addChild(myShop->objImg, 5);
-	objManager->addObjectAvailList(myShop);
+	myShop->qnodeBound = myShop->objImg->getContentSize();
+	objManager->addObjectAvailListFRONT(myShop);
 
-	CCLOG("dest %f", map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 + myShop->objImg->getBoundingBox().size.width);
 
 	Obj* otherShop = new Obj;
 	otherShop->objImg = Sprite::create("img/otherShop.png");
 	otherShop->objImg->setPosition(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 8 * 7);
 	otherShop->addChild(otherShop->objImg, 5);
-	objManager->addObjectAvailList(otherShop);
+	otherShop->qnodeBound = otherShop->objImg->getContentSize();
+	objManager->addObjectAvailListFRONT(otherShop);
 
-	CCLOG("dest %f", map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3 - otherShop->objImg->getBoundingBox().size.width);
 
 	objManager->addChild(myShop, 5);
 	objManager->addChild(otherShop, 5);
@@ -83,7 +81,7 @@ bool GameWorld::init()
 
 
 
-	//plant trees
+	////plant trees
 	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
 
 	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4 * 3, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));

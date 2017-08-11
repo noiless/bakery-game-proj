@@ -64,10 +64,11 @@ StateEnemyDead* StateEnemy::enemyDead = new StateEnemyDead;
 void StateEnemyNormal::initAction(ObjEnemy * obj) {
 
 	obj->speed = 100;
-	actionDuration = 5;
+	actionDuration = 3;
 
 	MoveBy* move = makeRandDir(obj);
-	obj->setMoveLen(obj->dir, obj->speed);
+
+	obj->moveLen = obj->setMoveLen(obj->dir, obj->speed);
 
 	auto callback = CallFunc::create(
 		[=]
@@ -159,8 +160,6 @@ bool StateEnemyNormal::checkTransitionCond(ObjEnemy * obj) {
 
 void StateEnemyDetour::initAction(ObjEnemy * obj) {
 
-	CCLOG("detour");
-
 	MoveBy* move;
 
 	if (obj->colEyeIndex == 0) {
@@ -246,9 +245,7 @@ bool StateEnemyDetour::checkTransitionCond(ObjEnemy * obj) {
 
 void StateEnemyAttack::initAction(ObjEnemy * obj) {
 
-	CCLOG("attack init");
-
-	actionDuration = 1;
+	actionDuration = 0.5;
 
 	targetPos = obj->target->objImg->getPosition();
 	
@@ -341,9 +338,6 @@ bool StateEnemyAttack::checkTransitionCond(ObjEnemy * obj) {
 		}
 
 	}
-
-
-
 
 	return true;
 }

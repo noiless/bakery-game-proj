@@ -52,7 +52,7 @@ public:
 
 	bool checkNodeBoundaryTouch(cocos2d::Rect nodeBound, cocos2d::Rect objBound);
 
-	int* getExNodeIndexList(cocos2d::Rect* exbound);
+	int* getExNodeIndexList(cocos2d::Rect* exbound, int* exNodeList);
 	void exFindNode(QTree* nowNode, cocos2d::Rect* exbound, int* indexList);
 
 	//부모노드 기억...?

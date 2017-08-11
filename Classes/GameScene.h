@@ -15,6 +15,7 @@ private:
 	void gameLoad();
 	void setGuestInitAction();
 public:
+	
     static cocos2d::Scene* createScene();
 
     virtual bool init();

@@ -77,7 +77,7 @@ void StateGuestNormal::initAction(ObjGuest * obj) {
 
 	//state에 맞는 speed, actionDuration 설정
 	
-	actionDuration = 7;
+	actionDuration = obj->normalTime;
 	obj->speed = (destPos.y - obj->getPositionY()) / actionDuration;
 
 	MoveTo *move1 = MoveTo::create(actionDuration, destPos);	//가게 선택 위치까지 이동
@@ -94,7 +94,7 @@ bool StateGuestNormal::checkTransitionCond(ObjGuest * obj) {
 	}
 	///pausedTime > 0일때 detour 상태로 전이
 	else if (obj->pausedTime > 0) {
-		//obj->pausedTime = 0;	//초기화
+		CCLOG("1");
 		doTransition(obj, STATE_GUEST_NORMAL, STATE_GUEST_DETOURNORMAL);
 	}
 
@@ -111,23 +111,26 @@ bool StateGuestNormal::checkTransitionCond(ObjGuest * obj) {
 
 void StateGuestDetourNormal::initAction(ObjGuest * obj) {
 
-	obj->pausedTime = 0;	//초기화
+	obj->pausedTime = 0;	//pauseTime 초기화
+
 	actionDuration = 1;
 
 	//우회해야 할 오브젝트 확인, 그 boundbox size 저장
-	
-	//obj->eye->startPoint = obj->objImg->getPosition();
-	//obj->eye->setDir(obj->dir);
-	//
 
-	//DrawNode* asddd = DrawNode::create();
-	//asddd->drawLine(obj->eye->startPoint, obj->eye->startPoint + obj->eye->d * obj->eye->dir, Color4F::RED);
-	//obj->addChild(asddd);
+	for (int i = 0; i < 3; i++) {
+		obj->eye[i]->startPoint = obj->objImg->getPosition();
+		obj->eye[i]->setDir(obj->objImg->getRotation());
 
-	//obj->detourSize = obj->eye->doRaycast()->obj->objImg->getContentSize();	//임시....
+		ColObj* tempColObj = obj->eye[i]->doRaycast();
 
-	obj->detourSize = Vec2(100, 100);
-	obj->speed = 100;	//얘도 임시.....
+		if (tempColObj != nullptr) {
+			obj->detourSize = tempColObj->obj->objImg->getContentSize() + obj->objImg->getContentSize() + Size(10, 10);
+			break;
+		}
+
+	}
+
+	obj->speed = 100;
 
 
 	///////////////////////////////obj->detourSequence에 따라 상태 초기화 다르게

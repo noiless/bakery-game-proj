@@ -17,6 +17,9 @@ ObjEnemy::ObjEnemy() : HP(30) {
 	eye[0] = new Raycasting(this, 125, 0);
 	eye[1] = new Raycasting(this, 125, 45);
 	eye[2] = new Raycasting(this, 125, -45);
+
+	qnodeBound = Size(objImg->getContentSize() + Size(125, 125));
+
 	this->addChild(eye[0]);
 	this->addChild(eye[1]);
 	this->addChild(eye[2]);
@@ -24,7 +27,7 @@ ObjEnemy::ObjEnemy() : HP(30) {
 	this->addChild(objImg);
 	
 	//위치 : 임시
-	init(Vec2(100,100));
+	init(Vec2(0,0));
 
 	eye[0]->init();
 	eye[1]->init();
@@ -41,7 +44,7 @@ ObjEnemy::~ObjEnemy() {
 bool ObjEnemy::init(cocos2d::Vec2 initPos) {
 	//member value init
 
-	HP = 20;
+	HP = 30;
 	colEyeIndex = -1;
 
 	//re set sprite position
@@ -132,7 +135,15 @@ void ObjEnemy::update(float delta) {
 	state->checkTransitionCond(this);
 
 	if (pausedTime > 5) {
-		//state를 escape로 변경
+		//일단 노말 상태로 돌림
+		objImg->getActionManager()->removeAllActionsFromTarget(objImg);
+		pausedTime = 0;	//멈춘 시간 초기화
+		state = StateEnemy::enemyNormal;
+		objImg->getActionManager()->resumeTarget(objImg);
+		state->initAction(this);
+		CCLOG("enemy action init");
+		CCLOG("moveLen %f %f",moveLen.x, moveLen.y);
+
 	}
 
 

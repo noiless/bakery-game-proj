@@ -86,17 +86,16 @@ void QTree::split() {
 	//현재 원소 리스트 비움
 	clear();
 
+	///////temp
+	//DrawNode* d1 = DrawNode::create();
+	//d1->drawLine(bound.origin + Vec2(bound.size.width / 2, 0), bound.origin + Vec2(bound.size.width / 2, bound.size.height), Color4F::RED);
 
-	/////temp
-	DrawNode* d1 = DrawNode::create();
-	d1->drawLine(bound.origin + Vec2(bound.size.width / 2, 0), bound.origin + Vec2(bound.size.width / 2, bound.size.height), Color4F::RED);
+	//DrawNode* d2 = DrawNode::create();
+	//d2->drawLine(bound.origin + Vec2(0, bound.size.height / 2), bound.origin + Vec2(bound.size.width, bound.size.height / 2), Color4F::BLUE);
 
-	DrawNode* d2 = DrawNode::create();
-	d2->drawLine(bound.origin + Vec2(0, bound.size.height / 2), bound.origin + Vec2(bound.size.width, bound.size.height / 2), Color4F::BLUE);
-
-	GameWorld::objManager->addChild(d1);
-	GameWorld::objManager->addChild(d2);
-	//////end temp
+	//GameWorld::objManager->addChild(d1);
+	//GameWorld::objManager->addChild(d2);
+	////////end temp
 
 }
 
@@ -109,7 +108,7 @@ void QTree::insert(Obj* obj) {
 		element.push_back(obj);
 
 		//qnodeindex 변경
-		
+
 		for (int i = 0; i < 4; i++) {
 			if (obj->qnodeIndex[i] < 0) {
 				obj->qnodeIndex[i] = nodeIndex;
@@ -138,16 +137,19 @@ void QTree::insert(Obj* obj) {
 	else {
 		//자식 노드의 범위 확인해서 여기서 pruning 해줌. 범위 확인시 자식 노드에서 insert 호출
 
-		if(obj->objImg->getBoundingBox().intersectsRect(child[0]->bound)) {
+		Rect exBoundBox;
+		exBoundBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2, obj->objImg->getPositionY() - obj->qnodeBound.height / 2, obj->qnodeBound.width, obj->qnodeBound.height);
+
+		if (exBoundBox.intersectsRect(child[0]->bound)) {
 			child[0]->insert(obj);
 		}
-		if (obj->objImg->getBoundingBox().intersectsRect(child[1]->bound)) {
+		if (exBoundBox.intersectsRect(child[1]->bound)) {
 			child[1]->insert(obj);
 		}
-		if (obj->objImg->getBoundingBox().intersectsRect(child[2]->bound)) {
+		if (exBoundBox.intersectsRect(child[2]->bound)) {
 			child[2]->insert(obj);
 		}
-		if (obj->objImg->getBoundingBox().intersectsRect(child[3]->bound)) {
+		if (exBoundBox.intersectsRect(child[3]->bound)) {
 			child[3]->insert(obj);
 		}
 
@@ -191,8 +193,9 @@ QTree* QTree::searchNode(int nodeIndex) {
 void QTree::remove(Obj* obj) {
 
 	//CCLOG("nodeindex %d",nodeIndex);
-
+	
 	element.remove(obj);
+	
 	for (int i = 0; i < 4; i++) {
 		//remove 후 오브젝트의 qnodeindex 초기화
 		if (obj->qnodeIndex[i] == nodeIndex) {
@@ -236,6 +239,7 @@ void QTree::renewObjNodeWithSpec(Obj* obj, int* indexList) {
 	}
 }
 
+//안씀
 bool QTree::checkNodeBoundaryTouch(cocos2d::Rect nodeBound, cocos2d::Rect objBound) {
 
 	if ((nodeBound.origin.x > objBound.origin.x && nodeBound.origin.x < objBound.origin.x + objBound.size.width)
@@ -252,9 +256,7 @@ bool QTree::checkNodeBoundaryTouch(cocos2d::Rect nodeBound, cocos2d::Rect objBou
 }
 
 //exBox로 포함될 예상 노드 구하기
-int* QTree::getExNodeIndexList(Rect* exbound) {
-	int* exNodeList = new int[4];
-
+int* QTree::getExNodeIndexList(Rect* exbound, int* exNodeList) {
 	exNodeList[0] = -1; exNodeList[1] = -1; exNodeList[2] = -1; exNodeList[3] = -1;
 
 	exFindNode(root, exbound, exNodeList);
