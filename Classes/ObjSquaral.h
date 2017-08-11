@@ -4,6 +4,7 @@
 #include "Obj.h"
 #include "Attack.h"
 
+
 class ObjSquaral : public Obj{
 private:
 	void update(float) override;
@@ -21,7 +22,8 @@ public:
 
 	float normalTime;	//생성자, transCondition에서 초기화
 
-	virtual void loseHP();
+	virtual void loseHPByPlayer();
+	virtual void loseHPByOther(int damage);
 	int speed;
 	int HP;
 

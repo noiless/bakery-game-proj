@@ -14,16 +14,25 @@ ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(1
 
 	addChild(squaralSightCircle);
 	addChild(objImg);
+
+	qnodeBound = Size(squaralSightRadius, squaralSightRadius) * 4;
+
 }
 
 ObjSquaral::~ObjSquaral() {
 	squaralSightCircle->removeFromParentAndCleanup(true);
 }
 
-
-void ObjSquaral::loseHP() {
+void ObjSquaral::loseHPByPlayer() {
 	HP--;
+	deadByPlayer = true;
 }
+
+void ObjSquaral::loseHPByOther(int damage) {
+	HP -= damage;
+	deadByPlayer = false;
+}
+
 
 bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 	HP = 5;
@@ -31,6 +40,8 @@ bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 	inUse = true;
 	normalTime = 0;
 	pausedTime = 0;
+
+	qnodeIndexInit();
 
 	state = dynamic_cast<StateSquaral*> (StateSquaral::squaralNormal);
 	state->initAction(this);
@@ -42,7 +53,7 @@ bool ObjSquaral::init(cocos2d::Vec2 initPos) {
 }
 
 bool ObjSquaral::deInit() {
-	CCLOG("deinit squaral");
+	//CCLOG("deinit squaral..");
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경

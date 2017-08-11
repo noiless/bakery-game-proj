@@ -12,7 +12,8 @@ public:
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
 	
-	virtual void loseHP();
+	virtual void loseHPByPlayer();
+	virtual void loseHPByOther(int damage);
 
 	virtual bool init(cocos2d::Vec2 initPos);
 	virtual bool deInit();

@@ -1,4 +1,6 @@
 #include "Attack.h"
+#include "ObjSquaral.h"
+#include "ObjEnemy.h"
 #include "GameScene.h"
 
 Attack::Attack(Sprite* userSpr) {
@@ -40,7 +42,7 @@ void Attack::update(float) {
 
 	if (!success) {
 		//newOrigin
-		Vec2 p = attackImg->convertToWorldSpace(Vec2(attackImg->getBoundingBox().origin.x, attackImg->getBoundingBox().origin.y) - anchorDiff);
+		Vec2 p = attackImg->convertToWorldSpace(attackImg->getBoundingBox().origin - anchorDiff);
 
 		switch (callerDir) {
 		case DIR_LEFT:
@@ -58,11 +60,11 @@ void Attack::update(float) {
 		}
 
 		if ((callerDir == DIR_LEFT) || (callerDir == DIR_RIGHT)) {
-			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width));
+			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width), true);
 		}
 		//dir == up || down
 		else {
-			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height));
+			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), true);
 		}
 		
 	}
@@ -121,4 +123,77 @@ void AcornAttack::update(float delta) {
 		this->removeFromParent();
 		this->unscheduleUpdate();
 	}
+}
+
+
+////////////EnemyAttack
+
+EnemyAttack::EnemyAttack(Sprite* enemySpr) {
+	attackImg = Sprite::create("img/enemyAttack.png");
+
+	attackImg->setAnchorPoint(Vec2(0.5, 1));
+	attackImg->setPosition(enemySpr->getContentSize() / 2);	//¿øÁ¡
+	attackImg->setPositionY(attackImg->getPosition().y - enemySpr->getContentSize().height / 2 - 1);
+
+	anchorDiff = attackImg->getBoundingBox().origin;
+
+	this->addChild(attackImg);
+}
+
+EnemyAttack::~EnemyAttack() {
+	attackImg->removeFromParentAndCleanup(true);
+	this->removeFromParentAndCleanup(true);
+}
+
+bool EnemyAttack::init(ObjEnemy* caller) {
+	success = false;
+	callerDir = caller->dir;
+
+	this->scheduleUpdate();
+
+	caller->objImg->addChild(this);
+	auto callback = CallFunc::create(
+		[=]()
+	{
+		this->removeFromParent();
+		this->unscheduleUpdate();
+
+	});
+
+	this->attackImg->runAction(Sequence::create(DelayTime::create(0.3), callback, nullptr));
+
+	return true;
+
+}
+
+void EnemyAttack::update(float delta) {
+
+	if (!success) {
+		//newOrigin
+		Vec2 p = attackImg->convertToWorldSpace(attackImg->getBoundingBox().origin - anchorDiff);
+
+		switch (callerDir) {
+		case DIR_LEFT:
+			p.y = p.y - attackImg->getBoundingBox().size.width;
+			break;
+		case DIR_RIGHT:
+			p.x = p.x - attackImg->getBoundingBox().size.height;
+			break;
+		case DIR_DOWN:
+			break;
+		case DIR_UP:
+			p.x = p.x - attackImg->getBoundingBox().size.width;
+			p.y = p.y - attackImg->getBoundingBox().size.height;
+			break;
+		}
+
+		if ((callerDir == DIR_LEFT) || (callerDir == DIR_RIGHT)) {
+			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width), false);
+		}
+		//dir == up || down
+		else {
+			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), false);
+		}
+	}
+
 }

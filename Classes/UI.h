@@ -43,9 +43,12 @@ public:
 	void myBreadSold();
 	void otherBreadSold();
 	void myBreadPointGrow();
+	void myBreadPointDown();
+	void otherBreadPointGrow();
 	void otherBreadPointDown();
 	void myAdPointGrow();
-	void loseMyHP();
+	void myAdPointDown();
+	void loseMyHP(int damage);
 	int selectShop();
 	bool buyBread(bool myStore);
 

@@ -1,4 +1,5 @@
 #include "ObjRabbit.h"
+#include "StateRabbit.h"
 #include "GameScene.h"
 
 USING_NS_CC;
@@ -12,6 +13,8 @@ ObjRabbit::ObjRabbit() : inUse(false), HP(2) {
 
 	addChild(rabbitSightTri);
 	addChild(objImg);
+	
+	qnodeBound = Size(objImg->getContentSize() * 3);
 
 }
 
@@ -27,6 +30,8 @@ bool ObjRabbit::init(Vec2 initPos)
 	HP = 2;
 	
 	pausedTime = 0;
+
+	qnodeIndexInit();
 
 	//re set sprite position
 	objImg->setPosition(initPos);
@@ -46,7 +51,7 @@ bool ObjRabbit::init(Vec2 initPos)
 //오브젝트의 소멸
 bool ObjRabbit::deInit()
 {
-	CCLOG("deinit rabbit");
+	//CCLOG("deinit rabbit");
 	//member value init
 	
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
@@ -57,10 +62,16 @@ bool ObjRabbit::deInit()
 }
 
 
-void ObjRabbit::loseHP() {
+void ObjRabbit::loseHPByPlayer() {
 	HP--;
-	CCLOG("%d HP %d",objIndex,HP);
+	deadByPlayer = true;
 }
+
+void ObjRabbit::loseHPByOther(int damage) {
+	HP -= damage;
+	deadByPlayer = false;
+}
+
 
 
 void ObjRabbit::updateRabbitSight(){
@@ -101,5 +112,5 @@ void ObjRabbit::update(float delta) {
 	//각 state가 가지는 특수한 조건도 transition 내에서 확인
 	//check state transition condition
 	state->checkTransitionCond(this);
-	
+
 }

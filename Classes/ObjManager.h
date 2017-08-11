@@ -4,8 +4,8 @@
 
 USING_NS_CC;
 
-#define MAX_RABBIT_NUM 50
-#define MAX_TREE_NUM 30
+#define MAX_RABBIT_NUM 200
+#define MAX_TREE_NUM 50
 #define MAX_SQUARAL_NUM 30
 #define MAX_GUEST_NUM 10
 #define MAX_ACORN_NUM 10
@@ -13,14 +13,16 @@ USING_NS_CC;
 
 using namespace std;
 
-
 class Player;
 class Obj;
 class ObjRabbit;
 class ObjTree;
 class ObjSquaral;
 class ObjGuest;
+class ObjEnemy;
 class AcornAttack;
+class QTree;
+struct ColObj;
 
 class ObjManager : public cocos2d::Node {	//._.
 private:
@@ -44,6 +46,7 @@ private:
 	ObjSquaral* getFreeObjSquaral();
 	ObjGuest* getFreeGuest();
 	AcornAttack* getFreeAcornAttack();
+	ColObj* intersectedObj;
 
 	Vec2 createColCheck(Vec2* pos, const cocos2d::Size* size);
 	bool mapBoundaryCheck(cocos2d::Rect* exBox);
@@ -51,14 +54,11 @@ private:
 	int bloodNum;
 
 	void update(float) override;
-	
+
+	QTree* qtree;
 
 public:
-	ObjManager() {
-		CCLOG("objmanager init");
-		bloodNum = 0;
-	}
-	
+	ObjManager();
 	void ObjInit();
 	void Objdeinit();
 
@@ -71,7 +71,7 @@ public:
 	void addUpdateList(Obj* obj);
 	void deleteUpdateList(Obj *obj);
 
-	
+
 	void addBlood(Node* parent, const Vec2 initPos);
 	int getNumBood();
 
@@ -84,7 +84,7 @@ public:
 	bool isObjColAvail(Obj * obj);
 
 	bool checkMoveCollision(Obj *obj, cocos2d::Rect* exBox, cocos2d::Vec2* moveLen);
-	bool checkAttackCollision(cocos2d::Rect* exBox);
+	bool checkAttackCollision(cocos2d::Rect* exBox, bool isPlayer);
 
 	//토끼 시야
 	bool checkSightCollision(ObjRabbit * obj);
@@ -98,7 +98,8 @@ public:
 	//다람쥐 공격 확인
 	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
 
-	
-	
-	
+	//raycast 확인
+	ColObj* doRaycast(int callerIndex, cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
+
+
 };

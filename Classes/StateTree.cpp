@@ -48,7 +48,13 @@ StateTreeDead::StateTreeDead() {
 void StateTreeDead::initAction(ObjTree * obj) {
 
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
-	GameWorld::ui->myAdPointGrow();
+
+	if (obj->deadByPlayer) {
+		GameWorld::ui->myAdPointGrow();
+	}
+	else {
+		GameWorld::ui->myAdPointDown();
+	}
 
 	obj->objImg->stopAllActions();	//기존의 액션 중지
 

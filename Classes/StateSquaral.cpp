@@ -1,4 +1,5 @@
 #include "StateSquaral.h"
+#include "ObjSquaral.h"
 #include "GameScene.h"
 
 USING_NS_CC;
@@ -154,7 +155,6 @@ bool StateSquaralNormal::checkTransitionCond(ObjSquaral * obj) {
 
 	if (obj->target != nullptr) {
 		doTransition(obj, STATE_SQUARAL_NORMAL, STATE_SQUARAL_ATTACK);
-		CCLOG("index %d", obj->target->objIndex);
 	}
 
 	//10초
@@ -278,8 +278,12 @@ void StateSquaralDead::initAction(ObjSquaral * obj) {
 
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
 
-	//상대 재료 포인트 하강
-	GameWorld::ui->otherBreadPointDown();
+	if (obj->deadByPlayer) {
+		GameWorld::ui->otherBreadPointDown();
+	}
+	else {
+		GameWorld::ui->otherBreadPointGrow();
+	}
 
 	//action 설정
 	auto fadeout = FadeOut::create(actionDuration);

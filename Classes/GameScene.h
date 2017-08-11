@@ -2,10 +2,10 @@
 #define __GAME_SCENE_H__
 
 #include "cocos2d.h"
-#include "ObjRabbit.h"
+
 #include "Player.h"
+#include "ObjEnemy.h"
 #include "ObjManager.h"
-#include "Obj.h"
 #include "UI.h"
 
 
@@ -15,6 +15,7 @@ private:
 	void gameLoad();
 	void setGuestInitAction();
 public:
+	
     static cocos2d::Scene* createScene();
 
     virtual bool init();
@@ -26,7 +27,10 @@ public:
 
 	static ObjManager *objManager;
 	static Player *player;
+	static ObjEnemy *enemy;
 	static UI *ui;
+
+	static void gameEnd();
 
 };
 

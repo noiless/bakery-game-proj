@@ -6,11 +6,13 @@ USING_NS_CC;
 int Obj::totalObjNum = 0;
 
 //»ý¼ºÀÚ
-Obj::Obj(){
+Obj::Obj() {
 	typecode = TYPECODE_NONE;
 	pausedTime = 0;
 	objIndex = totalObjNum;
 	totalObjNum++;
+
+	qnodeIndexInit();
 }
 
 
@@ -45,4 +47,9 @@ Vec2 Obj::setMoveLen(int dir, float speed) {
 		CCLOG("...");
 		return Vec2(0, 0);
 	}
+}
+
+
+void Obj::qnodeIndexInit() {
+	qnodeIndex[0] = -1; qnodeIndex[1] = -1; qnodeIndex[2] = -1; qnodeIndex[3] = -1;
 }

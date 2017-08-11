@@ -8,6 +8,9 @@ ObjTree::ObjTree() : inUse(false), HP(5) {
 	objImg = Sprite::create("img/tree_down.png");
 
 	this->addChild(objImg);
+
+	qnodeBound = Size(objImg->getContentSize());
+
 }
 
 bool ObjTree::init(cocos2d::Vec2 initPos) {
@@ -17,6 +20,8 @@ bool ObjTree::init(cocos2d::Vec2 initPos) {
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);
 
+	qnodeIndexInit();
+
 	state = dynamic_cast<StateTree*> (StateTree::treeNormal);
 	state->initAction(this);
 
@@ -24,7 +29,7 @@ bool ObjTree::init(cocos2d::Vec2 initPos) {
 }
 
 bool ObjTree::deInit() {
-	CCLOG("deinit tree");
+	//CCLOG("deinit tree");
 	//member value init
 
 	inUse = false;	//오브젝트를 사용하지 않도록 변경
@@ -33,9 +38,21 @@ bool ObjTree::deInit() {
 	return true;
 }
 
-void ObjTree::loseHP() {
+void ObjTree::loseHPByPlayer() {
 	HP--;
 	if (HP <= 0) {
+		deadByPlayer = true;
+		//state 변경 후 action 초기화
+		state = dynamic_cast<StateTree*> (StateTree::treeDead);
+		state->initAction(this);
+
+	}
+}
+
+void ObjTree::loseHPByOther(int damage) {
+	HP -= damage;
+	if (HP <= 0) {
+		deadByPlayer = false;
 		//state 변경 후 action 초기화
 		state = dynamic_cast<StateTree*> (StateTree::treeDead);
 		state->initAction(this);

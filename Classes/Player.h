@@ -24,10 +24,12 @@ private:
 public:
 	Player() {
 		init();
+		qnodeBound = Size(objImg->getContentSize());
 	}
-	virtual void loseHP();
 
-	
+	virtual void loseHPByPlayer();
+	virtual void loseHPByOther(int damage);
+
 	int dir;
 	int speed = 500;
 	
