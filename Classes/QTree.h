@@ -18,6 +18,8 @@ private:
 	static cocos2d::Rect rightOutside;
 	static cocos2d::Rect rootBound;	//∏  ¿¸√º:3...
 
+	static QTree* qtreeMap[MAX_LEVEL*MAX_LEVEL*MAX_LEVEL*MAX_LEVEL];
+
 	static QTree* root;
 
 	void clear();	//clear elements
@@ -59,5 +61,7 @@ public:
 	//≥ÎµÂ¿Œµ¶Ω∫...??
 
 	static void removeNodes(QTree* nowNode);
+
+	QTree* getNode(int nodeIndex);
 
 };

@@ -141,8 +141,6 @@ void ObjEnemy::update(float delta) {
 		state = StateEnemy::enemyNormal;
 		objImg->getActionManager()->resumeTarget(objImg);
 		state->initAction(this);
-		CCLOG("enemy action init");
-		CCLOG("moveLen %f %f",moveLen.x, moveLen.y);
 
 	}
 

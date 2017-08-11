@@ -84,7 +84,8 @@ public:
 	bool isObjColAvail(Obj * obj);
 
 	bool checkMoveCollision(Obj *obj, cocos2d::Rect* exBox, cocos2d::Vec2* moveLen);
-	bool checkAttackCollision(cocos2d::Rect* exBox, bool isPlayer);
+	bool checkAttackCollision(Obj* caller, cocos2d::Rect* exBox, bool isPlayer);
+
 
 	//토끼 시야
 	bool checkSightCollision(ObjRabbit * obj);
@@ -96,10 +97,10 @@ public:
 	bool checkSightCond(int dir, float b1, float b2, const cocos2d::Vec2* rectPos);
 
 	//다람쥐 공격 확인
-	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
+	bool checkAttackCollision(Obj* obj, const cocos2d::Vec2* center, float radius);
 
 	//raycast 확인
-	ColObj* doRaycast(int callerIndex, cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
+	ColObj* doRaycast(Obj* caller, cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
 
 
 };

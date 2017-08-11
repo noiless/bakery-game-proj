@@ -343,7 +343,8 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 	//각 노드 별로 탐색
 	for (int i = 0; i < 4; i++) {
 
-		tempPtr = qtree->searchNode(exNodeIndexList[i]);
+		//tempPtr = qtree->searchNode(exNodeIndexList[i]);
+		tempPtr = qtree->getNode(exNodeIndexList[i]);
 
 		if (tempPtr != nullptr) {
 
@@ -415,8 +416,6 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 		qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
 	}
 
-	//qtree->renewObjNodeWithSpec(obj, exNodeIndexList);
-
 	delete[] exNodeIndexList;
 
 	return true;
@@ -442,10 +441,6 @@ void ObjManager::update(float delta) {
 		exBoundBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2 + obj->moveLen.x * delta, obj->objImg->getPositionY() - obj->qnodeBound.height / 2 + obj->moveLen.y * delta, obj->qnodeBound.width, obj->qnodeBound.height);
 		exNodeIndexList = qtree->getExNodeIndexList(&exBoundBox, exNodeIndexList);
 
-		//DrawNode * tempdnode = DrawNode::create();
-		//tempdnode->drawRect(exBoundBox.origin, exBoundBox.origin + exBoundBox.size, Color4F::GRAY);
-		//this->addChild(tempdnode);
-
 		//exImgBox : 다음 프레임에 현재 오브젝트(obj)의 sprite의 바운딩 박스의 위치
 		exImgBox.setRect(obj->objImg->getBoundingBox().origin.x + obj->moveLen.x * delta, obj->objImg->getBoundingBox().origin.y + obj->moveLen.y * delta, obj->objImg->getBoundingBox().size.width, obj->objImg->getBoundingBox().size.height);
 
@@ -456,7 +451,8 @@ void ObjManager::update(float delta) {
 
 			if (exNodeIndexList[i] >= 0) {
 
-				qtreePtr = qtree->searchNode(exNodeIndexList[i]);
+				//qtreePtr = qtree->searchNode(exNodeIndexList[i]);
+				qtreePtr = qtree->getNode(exNodeIndexList[i]);
 
 				//외곽 노드이면 맵 밖으로 나가는지 확인
 				if (qtreePtr->isOutside) {
@@ -570,9 +566,6 @@ void ObjManager::update(float delta) {
 		obj->getActionManager()->resumeTarget(obj->objImg);
 		obj->pausedTime = 0;	//pauseTime 초기화
 
-		CCLOG("one loop end");
-
-
 	}
 	////update loop end
 
@@ -582,31 +575,36 @@ void ObjManager::update(float delta) {
 
 
 //isPlayer가 true일때 플레이어 어택이 호출
-bool ObjManager::checkAttackCollision(cocos2d::Rect* exBox, bool isPlayer) {
+bool ObjManager::checkAttackCollision(Obj* caller, cocos2d::Rect* exBox, bool isPlayer) {
 
 	bool hit = false;
 
-	//충돌한 물체 검출
-	for each (Obj* i in objAvailList)
-	{
+	//각 노드별로 exBox - 노드 내의 element와 충돌하는지 확인
+	for (int i = 0; i < 4; i++) {
+		if (caller->qnodeIndex[i] >=0) {
 
-		//충돌시
-		if (exBox->intersectsRect(i->objImg->getBoundingBox())) {
+			//충돌한 물체 검출
+			for each (Obj* element in qtree->getNode(caller->qnodeIndex[i])->element)
+			{
+				//충돌시
+				if (exBox->intersectsRect(element->objImg->getBoundingBox())) {
 
-			playerCollisionList.pushBack(i);
-			hit = true;
+					playerCollisionList.pushBack(element);
+					hit = true;
 
+				}
+			}
 		}
 	}
 
 	//각 충돌한 물체에 대한 처리
-	for each (Obj* i in playerCollisionList) {
+	for each (Obj* element in playerCollisionList) {
 		//<-한꺼번에 나중에 처리
 		if (isPlayer) {
-			i->loseHPByPlayer();
+			element->loseHPByPlayer();
 		}
 		else {
-			i->loseHPByOther(1);
+			element->loseHPByOther(1);
 		}
 	}
 	playerCollisionList.clear();
@@ -627,38 +625,47 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 	float slope2 = (tri[0].y - tri[2].y) / (tri[0].x - tri[2].x);
 	float b2 = tri[0].y - slope2 * tri[0].x;
 
-	for each (Obj* i in objAvailList)
-	{
-		if (i->typecode != TYPECODE_PEOPLE) {
-			continue;
-		}
 
-		Vec2 rectPoint[4];
-		rectPoint[0] = Vec2(i->objImg->getBoundingBox().getMaxX(), i->objImg->getBoundingBox().getMaxY());
-		rectPoint[1] = Vec2(i->objImg->getBoundingBox().getMinX(), i->objImg->getBoundingBox().getMaxY());
-		rectPoint[2] = Vec2(i->objImg->getBoundingBox().getMaxX(), i->objImg->getBoundingBox().getMinY());
-		rectPoint[3] = Vec2(i->objImg->getBoundingBox().getMinX(), i->objImg->getBoundingBox().getMinY());
+	//각 노드별로 exBox - 노드 내의 element와 충돌하는지 확인
+	for (int i = 0; i < 4; i++) {
 
+		if (obj->qnodeIndex[i] >= 0) {
 
-		//삼각형 내에 사각형의 꼭짓점이 포함되는지 확인
-		for (int index = 0; index < 4; index++) {
-			if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
-				&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index]))
+			for each (Obj* element in objAvailList)
 			{
-				return true;
+				if (element->typecode != TYPECODE_PEOPLE) {
+					continue;
+				}
+
+				Vec2 rectPoint[4];
+				rectPoint[0] = Vec2(element->objImg->getBoundingBox().getMaxX(), element->objImg->getBoundingBox().getMaxY());
+				rectPoint[1] = Vec2(element->objImg->getBoundingBox().getMinX(), element->objImg->getBoundingBox().getMaxY());
+				rectPoint[2] = Vec2(element->objImg->getBoundingBox().getMaxX(), element->objImg->getBoundingBox().getMinY());
+				rectPoint[3] = Vec2(element->objImg->getBoundingBox().getMinX(), element->objImg->getBoundingBox().getMinY());
+
+
+				//삼각형 내에 사각형의 꼭짓점이 포함되는지 확인
+				for (int index = 0; index < 4; index++) {
+					if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
+						&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index]))
+					{
+						return true;
+					}
+
+				}
+
+				//사각형 내에 삼각형의 꼭짓점이 포함되는지 확인
+				for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
+					if (element->objImg->getBoundingBox().containsPoint(tri[index]))
+					{
+						return true;
+					}
+
+				}
+
 			}
 
 		}
-
-		//사각형 내에 삼각형의 꼭짓점이 포함되는지 확인
-		for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
-			if (i->objImg->getBoundingBox().containsPoint(tri[index]))
-			{
-				return true;
-			}
-
-		}
-
 	}
 
 	//겹치지 않는다면 false 반환
@@ -717,21 +724,30 @@ Obj* ObjManager::checkSightCollision(ObjSquaral * obj) {
 	//2
 	float b2 = obj->objImg->getPositionY() + obj->objImg->getPositionX();
 
-	for each (Obj* i in objAvailList)
-	{
-		if (i->typecode != TYPECODE_PEOPLE) {
-			continue;
-		}
+	//각 노드별로 exBox - 노드 내의 element와 충돌하는지 확인
+	for (int i = 0; i < 4; i++) {
+		if (obj->qnodeIndex[i] >= 0) {
 
-		//오브젝트가 원과 충돌하는지 확인
-		if (!i->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius))
-			continue;
+			for each (Obj* element in objAvailList)
+			{
+				if (element->typecode != TYPECODE_PEOPLE) {
+					continue;
+				}
 
-		//범위가 보고 있는 방향의 범위인지 확인 - 범위에 오브젝트의 중심이 포함되는지 확인
-		if (checkSightCond(obj->dir, b1, b2, &(i->objImg->getPosition()))) {
-			return i;	//충돌한 오브젝트 반환
+				//오브젝트가 원과 충돌하는지 확인
+				if (!element->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius))
+					continue;
+
+				//범위가 보고 있는 방향의 범위인지 확인 - 범위에 오브젝트의 중심이 포함되는지 확인
+				if (checkSightCond(obj->dir, b1, b2, &(element->objImg->getPosition()))) {
+					return element;	//충돌한 오브젝트 반환
+				}
+			}
+
 		}
 	}
+
+
 
 	return nullptr;
 }
@@ -760,30 +776,30 @@ bool ObjManager::checkSightCond(int dir, float b1, float b2, const cocos2d::Vec2
 }
 
 //다람쥐용 공격 체크
-bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius) {
+bool ObjManager::checkAttackCollision(Obj* obj, const cocos2d::Vec2* center, float radius) {
 	bool hit = false;
 
 	//충돌한 물체 검출
-	for each (Obj* i in objAvailList)
+	for each (Obj* element in objAvailList)
 	{
 
-		if (i->objIndex == callerIndex || i->typecode == TYPECODE_NONE) {	//발사자는 충돌 체크에서 제외
+		if (element->objIndex == obj->objIndex || element->typecode == TYPECODE_NONE) {	//발사자는 충돌 체크에서 제외
 			continue;
 		}
 
 		//충돌시
-		if (i->objImg->getBoundingBox().intersectsCircle(*center, radius)) {
+		if (element->objImg->getBoundingBox().intersectsCircle(*center, radius)) {
 
-			acornCollisionList.pushBack(i);
+			acornCollisionList.pushBack(element);
 			hit = true;
 
 		}
 	}
 
 	//각 충돌한 물체에 대한 처리
-	for each (Obj* i in acornCollisionList) {
-		if (i->typecode == TYPECODE_PEOPLE)
-			i->loseHPByOther(1);	//<-한꺼번에 나중에 처리
+	for each (Obj* element in acornCollisionList) {
+		if (element->typecode == TYPECODE_PEOPLE)
+			element->loseHPByOther(1);	//<-한꺼번에 나중에 처리
 	}
 	acornCollisionList.clear();
 
@@ -793,7 +809,7 @@ bool ObjManager::checkAttackCollision(int callerIndex, const cocos2d::Vec2* cent
 
 
 //raycasting
-ColObj* ObjManager::doRaycast(int callerIndex, Vec2 startPoint, Vec2 dir, float d) {
+ColObj* ObjManager::doRaycast(Obj* caller, Vec2 startPoint, Vec2 dir, float d) {
 
 	bool intersectionUpdate = false;
 
@@ -809,51 +825,66 @@ ColObj* ObjManager::doRaycast(int callerIndex, Vec2 startPoint, Vec2 dir, float 
 
 	intersectedObj->intersectDistance = d * 2;	//d보다 크도록 초기화
 
+												//각 노드별로 exBox - 노드 내의 element와 충돌하는지 확인
+	for (int i = 0; i < 4; i++) {
+		if (caller->qnodeIndex[i] >= 0) {
 
-	for each (Obj* element in objAvailList) {
+			//충돌한 물체 검출
+			for each (Obj* element in qtree->getNode(caller->qnodeIndex[i])->element)
+			{
 
-		if (element->objIndex == callerIndex) {
-			continue;
+				for each (Obj* element in objAvailList) {
+
+					if (element->objIndex == caller->objIndex) {
+						continue;
+					}
+
+					t1x = (element->objImg->getBoundingBox().getMinX() - startPoint.x) * invDir.x;
+					t2x = (element->objImg->getBoundingBox().getMaxX() - startPoint.x) * invDir.x;
+
+					Tnear = min(t1x, t2x);
+					Tfar = max(t1x, t2x);
+
+					t1y = (element->objImg->getBoundingBox().getMinY() - startPoint.y) * invDir.y;
+					t2y = (element->objImg->getBoundingBox().getMaxY() - startPoint.y) * invDir.y;
+
+					Tnear = max(Tnear, min(t1y, t2y));
+					Tfar = min(Tfar, max(t1y, t2y));
+
+					if (Tfar < 0 || Tfar < Tnear) {
+						continue;
+					}
+
+					//여기까지 살아남았으면 교점이 존재함		
+					//교점까지의 거리가 d보다 커도 안됨
+					if ((startPoint + Tnear * dir).distance(startPoint) > d) {
+						continue;
+					}
+
+					////기존에 존재하던 다른 오브젝트와의 교점과 비교해 더 가까운 것을 선택
+					if (intersectedObj->intersectDistance > (startPoint + Tnear * dir).distance(startPoint)) {
+						intersectionUpdate = true;
+
+						intersectedObj->obj = element;
+						intersectedObj->intersectPoint = startPoint + Tnear * dir;
+						intersectedObj->intersectDistance = intersectedObj->intersectPoint.distance(startPoint);
+
+						//교점
+						//DrawNode* dddd = DrawNode::create();
+						//dddd->drawPoint(intersectedObj->intersectPoint, 5, Color4F::BLACK);
+						//this->addChild(dddd);
+					}
+
+
+				}
+
+
+			}
 		}
-
-		t1x = (element->objImg->getBoundingBox().getMinX() - startPoint.x) * invDir.x;
-		t2x = (element->objImg->getBoundingBox().getMaxX() - startPoint.x) * invDir.x;
-
-		Tnear = min(t1x, t2x);
-		Tfar = max(t1x, t2x);
-
-		t1y = (element->objImg->getBoundingBox().getMinY() - startPoint.y) * invDir.y;
-		t2y = (element->objImg->getBoundingBox().getMaxY() - startPoint.y) * invDir.y;
-
-		Tnear = max(Tnear, min(t1y, t2y));
-		Tfar = min(Tfar, max(t1y, t2y));
-
-		if (Tfar < 0 || Tfar < Tnear) {
-			continue;
-		}
-
-		//여기까지 살아남았으면 교점이 존재함		
-		//교점까지의 거리가 d보다 커도 안됨
-		if ((startPoint + Tnear * dir).distance(startPoint) > d) {
-			continue;
-		}
-
-		////기존에 존재하던 다른 오브젝트와의 교점과 비교해 더 가까운 것을 선택
-		if (intersectedObj->intersectDistance > (startPoint + Tnear * dir).distance(startPoint)) {
-			intersectionUpdate = true;
-
-			intersectedObj->obj = element;
-			intersectedObj->intersectPoint = startPoint + Tnear * dir;
-			intersectedObj->intersectDistance = intersectedObj->intersectPoint.distance(startPoint);
-
-			//교점
-			//DrawNode* dddd = DrawNode::create();
-			//dddd->drawPoint(intersectedObj->intersectPoint, 5, Color4F::BLACK);
-			//this->addChild(dddd);
-		}
-
-
 	}
+
+
+
 
 	if (intersectionUpdate) {
 		return intersectedObj;

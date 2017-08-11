@@ -55,7 +55,7 @@ bool Player::init() {
 		if (keyCode == EventKeyboard::KeyCode::KEY_X) {
 			if (!attack->showing) {
 				experimental::AudioEngine::play2d("sound/sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
-				attack->init(objImg);
+				attack->init(this);
 			}
 		}
 
