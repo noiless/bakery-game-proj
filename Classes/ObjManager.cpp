@@ -17,6 +17,7 @@ ObjManager::ObjManager() {
 }
 
 void ObjManager::ObjInit(xml_node headnode) {
+	xml_node tempNode;
 
 	//시작 후 초기화
 	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
@@ -24,7 +25,7 @@ void ObjManager::ObjInit(xml_node headnode) {
 	}
 
 	for (int i = 0; i < MAX_TREE_NUM; i++) {
-		objTreeList[i] = new ObjTree;
+		objTreeList[i] = new ObjTree(headnode.child("Tree"));
 	}
 
 	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
@@ -36,7 +37,7 @@ void ObjManager::ObjInit(xml_node headnode) {
 	}
 
 	for (int i = 0; i < MAX_GUEST_NUM; i++) {
-		objGuestList[i] = new ObjGuest;
+		objGuestList[i] = new ObjGuest(headnode.child("Guest"));
 	}
 
 
@@ -157,7 +158,7 @@ bool ObjManager::getObjGuestFromPool(Node * parent) {
 		return false;	//생성에 실패하면 빈 게스트 자리가 생길 때까지 delay를 주고 wait함
 	}
 	else {
-		newGuest->init(Vec2(0, -1800));	//>>초기 손님 리젠 위치<<
+		newGuest->init();	//초기 손님 리젠 위치는 ObjGuest 내에 있음
 
 		parent->addChild(newGuest);
 

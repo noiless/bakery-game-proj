@@ -3,6 +3,7 @@
 #include "cocos2d.h"
 #include "GameScene.h"
 #include "Obj.h"
+#include "pugixml\pugixml.hpp"
 
 
 class StateEnemy;
@@ -20,7 +21,7 @@ private:
 
 public:
 
-	ObjEnemy();
+	ObjEnemy(pugi::xml_node enemyNode);
 	~ObjEnemy();
 
 	virtual bool init(cocos2d::Vec2 initPos);

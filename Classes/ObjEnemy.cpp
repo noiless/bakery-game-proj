@@ -5,18 +5,22 @@
 #include "Attack.h"
 
 USING_NS_CC;
+using namespace pugi;
 
 
-ObjEnemy::ObjEnemy() : HP(30) {
+ObjEnemy::ObjEnemy(xml_node enemyNode) {
+	xml_node objNode = enemyNode.child("Obj");
+
 	typecode = TYPECODE_PEOPLE;	//사람군
 
 	GameWorld::objManager->addObjectAvailList(this);
+	MaxHP = objNode.child("HP").text().as_int();
 	
 	objImg = Sprite::create("img/enemy_normal_down.png");	//초기 스프라이트
 
-	eye[0] = new Raycasting(this, 125, 0);
-	eye[1] = new Raycasting(this, 125, 45);
-	eye[2] = new Raycasting(this, 125, -45);
+	eye[0] = new Raycasting(this, objNode.child("Sight").text().as_int(), 0);
+	eye[1] = new Raycasting(this, objNode.child("Sight").text().as_int(), 45);
+	eye[2] = new Raycasting(this, objNode.child("Sight").text().as_int(), -45);
 
 	qnodeBound = Size(objImg->getContentSize() + Size(125, 125));
 
@@ -26,14 +30,25 @@ ObjEnemy::ObjEnemy() : HP(30) {
 
 	this->addChild(objImg);
 	
-	//위치 : 임시
-	init(Vec2(0,0));
+	//여기랑
 
 	eye[0]->init();
 	eye[1]->init();
 	eye[2]->init();
 
 	attack = new EnemyAttack(objImg);
+
+	state = dynamic_cast<StateEnemy*> (StateEnemy::enemyNormal);
+	state->initStates(enemyNode.child("State"));
+
+	stateHP = dynamic_cast<StateHPEnemy*> (StateHPEnemy::HPEnemyNormal);
+	stateHP->initHP(MaxHP);
+
+	//여기 사이에서 objImg의 위치를 바꾸는 뭔가 있는데 뭔지 모르겠음
+
+	init(Vec2(objNode.child("InitPosX").text().as_float(), objNode.child("InitPosY").text().as_float()));
+
+
 }
 
 ObjEnemy::~ObjEnemy() {
@@ -44,7 +59,7 @@ ObjEnemy::~ObjEnemy() {
 bool ObjEnemy::init(cocos2d::Vec2 initPos) {
 	//member value init
 
-	HP = 30;
+	HP = MaxHP;
 	colEyeIndex = -1;
 
 	//re set sprite position
@@ -58,15 +73,12 @@ bool ObjEnemy::init(cocos2d::Vec2 initPos) {
 	state = dynamic_cast<StateEnemy*> (StateEnemy::enemyNormal);
 	state->initAction(this);
 
-
 	stateHP = dynamic_cast<StateHPEnemy*> (StateHPEnemy::HPEnemyNormal);
 	stateHP->initAction(this);
 
 	qnodeIndexInit();
 
 	this->scheduleUpdate();
-
-	//임시
 
 	return true;
 
@@ -143,9 +155,5 @@ void ObjEnemy::update(float delta) {
 		state->initAction(this);
 
 	}
-
-
-
-
 
 }

@@ -107,7 +107,7 @@ bool GameWorld::init()
 	player->objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(player, 3);
 
-	enemy = new ObjEnemy;
+	enemy = new ObjEnemy(xmlHeadNode.child("Enemy"));
 	this->addChild(enemy);
 
 
@@ -174,10 +174,6 @@ bool GameWorld::init()
 	
 
 	CCLOG("gamescene init finish");
-
-
-
-
 
     return true;
 }

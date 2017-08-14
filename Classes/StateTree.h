@@ -19,8 +19,8 @@ public:
 	virtual void initAction(ObjTree * obj) = 0;
 	void initStates(pugi::xml_node stateNode);
 
-
-	int actionDuration = 10;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+	int stateSpeed;
+	int actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
 	experimental::AudioProfile treeDeadEffect;
 	static StateTreeNormal* treeNormal;
 	static StateTreeDead* treeDead;

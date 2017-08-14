@@ -9,7 +9,6 @@ using namespace pugi;
 
 ////StateGuest
 
-
 StateGuestNormal* StateGuest::guestNormal = new StateGuestNormal;
 StateGuestSelectShop* StateGuest::guestSelectShop = new StateGuestSelectShop;
 StateGuestBuyBread* StateGuest::guestBuyBread = new StateGuestBuyBread;
@@ -18,6 +17,31 @@ StateGuestDead* StateGuest::guestDead = new StateGuestDead;
 StateGuestDetourNormal* StateGuest::guestDetourNormal = new StateGuestDetourNormal;
 
 void StateGuest::initStates(xml_node stateNode) {
+
+	xml_node tempNode = stateNode.child("Normal");
+	guestNormal->destPos.x = tempNode.child("DestPosX").text().as_int();
+	guestNormal->destPos.y = tempNode.child("DestPosY").text().as_int();
+
+	tempNode = stateNode.child("DetourNormal");
+	guestDetourNormal->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	guestDetourNormal->stateSpeed = tempNode.child("Speed").text().as_int();
+	guestDetourNormal->destX = tempNode.child("DestPosX").text().as_float();
+
+	tempNode = stateNode.child("SelectShop");
+	guestSelectShop->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	guestSelectShop->stateSpeed = tempNode.child("Speed").text().as_int();
+	guestSelectShop->otherShopDest.x = tempNode.child("OtherShopDestX").text().as_int();
+	guestSelectShop->otherShopDest.y = tempNode.child("OtherShopDestY").text().as_int();
+	guestSelectShop->myShopDest.x = tempNode.child("MyShopDestX").text().as_int();
+	guestSelectShop->myShopDest.y = tempNode.child("MyShopDestY").text().as_int();
+	guestSelectShop->homeDest.x = tempNode.child("HomeDestX").text().as_int();
+	guestSelectShop->homeDest.y = tempNode.child("HomeDestY").text().as_int();
+
+	tempNode = stateNode.child("BuyBread");
+	guestBuyBread->actionDuration = tempNode.child("ActionDuration").text().as_int();
+
+	tempNode = stateNode.child("Dead");
+	guestDead->actionDuration = tempNode.child("ActionDuration").text().as_int();
 
 }
 
@@ -116,8 +140,6 @@ void StateGuestDetourNormal::initAction(ObjGuest * obj) {
 
 	obj->pausedTime = 0;	//pauseTime 초기화
 
-	actionDuration = 1;
-
 	//우회해야 할 오브젝트 확인, 그 boundbox size 저장
 
 	for (int i = 0; i < 3; i++) {
@@ -133,7 +155,7 @@ void StateGuestDetourNormal::initAction(ObjGuest * obj) {
 
 	}
 
-	obj->speed = 100;
+	obj->speed = stateSpeed;
 
 
 	///////////////////////////////obj->detourSequence에 따라 상태 초기화 다르게
@@ -288,11 +310,8 @@ bool StateGuestDetourNormal::checkTransitionCond(ObjGuest * obj) {
 //속도랑 위치 하드코딩했음
 void StateGuestSelectShop::initAction(ObjGuest * obj) {
 
-	actionDuration = 3;
+	obj->speed = stateSpeed;
 
-	obj->speed = 100;
-
-		
 	MoveTo *move1;
 
 	//dir에 따른 회전, 이동 위치 결정
@@ -342,7 +361,6 @@ bool StateGuestSelectShop::checkTransitionCond(ObjGuest * obj) {
 
 void StateGuestBuyBread::initAction(ObjGuest * obj) {
 	//이미지 바뀐 후 1초간 대기
-	actionDuration = 1;
 	obj->objImg->runAction(DelayTime::create(actionDuration));
 }
 
@@ -362,8 +380,6 @@ bool StateGuestBuyBread::checkTransitionCond(ObjGuest * obj) {
 
 void StateGuestGoHome::initAction(ObjGuest * obj) {
 	//1초간 fadeout 후 오브젝트 소멸 관련 처리
-	actionDuration = 1;
-
 	obj->unscheduleUpdate(); //업데이트 중지
 
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
@@ -390,8 +406,6 @@ bool StateGuestGoHome::checkTransitionCond(ObjGuest * obj) {
 
 void StateGuestDead::initAction(ObjGuest * obj) {
 	obj->unscheduleUpdate(); //업데이트 중지
-
-	actionDuration = 1;
 
 	GameWorld::objManager->deleteObjectAvailList(obj); //ObjManager에서 avail list에서 제거해줌
 

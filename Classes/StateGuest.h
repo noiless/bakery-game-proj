@@ -25,6 +25,7 @@ public:
 	void initStates(pugi::xml_node stateNode);
 
 	float actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+	int stateSpeed;
 
 	static StateGuestNormal* guestNormal;
 	static StateGuestSelectShop* guestSelectShop;
@@ -46,13 +47,12 @@ public:
 
 class StateGuestDetourNormal : public StateGuest {
 private:
-	float destX;	//목표 x좌표
 
 public:
 	StateGuestDetourNormal() {
-		destX = 0;
-
 	};
+	float destX;	//목표 x좌표
+
 	virtual void initAction(ObjGuest * obj);
 	virtual bool checkTransitionCond(ObjGuest * obj);
 	void setNextActionSeq(ObjGuest* obj, int callerTag);
@@ -62,9 +62,6 @@ public:
 class StateGuestSelectShop : public StateGuest {
 public:
 	StateGuestSelectShop() {
-		otherShopDest = Vec2(-750, 1400);
-		myShopDest = Vec2(750, 1400);
-		homeDest = Vec2(0, 1800);
 	};
 	Vec2 otherShopDest;
 	Vec2 myShopDest;

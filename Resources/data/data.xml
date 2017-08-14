@@ -80,8 +80,8 @@
       </Normal>
 
       <Dead>
-        <ActionDuration>1</ActionDuration>
-        <Speed>2</Speed>
+        <ActionDuration>2</ActionDuration>
+        <Speed>0</Speed>
       </Dead>
       
     </State>
@@ -94,6 +94,7 @@
 
       <HP>10</HP>
       <Sight>50</Sight>
+      <NormalTime>7</NormalTime>
       <InitPosX>0</InitPosX>
       <InitPosY>-1800</InitPosY>
 
@@ -109,8 +110,8 @@
       </Normal>
 
       <DetourNormal>
-        <ActionDuration>-1</ActionDuration>
-        <Speed>-1</Speed>
+        <ActionDuration>1</ActionDuration>
+        <Speed>100</Speed>
         <DestPosX>0</DestPosX>
       </DetourNormal>
 
@@ -142,12 +143,10 @@
   <Enemy>
 
     <Obj>
-
       <HP>30</HP>
       <Sight>125</Sight>
       <InitPosX>0</InitPosX>
       <InitPosY>0</InitPosY>
-      
     </Obj>
 
     <State>

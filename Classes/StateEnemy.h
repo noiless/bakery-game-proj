@@ -17,12 +17,13 @@ class StateHPEnemyHurt;
 class StateHPEnemyDeadly;
 
 
-enum { STATE_ENEMY_NORMAL, STATE_ENEMY_DETOUR, STATE_ENEMY_ATTACK, STATE_ENEMY_ESCAPE, STATE_ENEMY_DEAD };
+enum { STATE_ENEMY_NORMAL, STATE_ENEMY_DETOUR, STATE_ENEMY_ATTACK, STATE_ENEMY_ESCAPE };
 
 class StateEnemy {
 public:
 
 	float actionDuration;
+	int stateSpeed;
 	virtual void initAction(ObjEnemy * obj) = 0;
 	virtual bool checkTransitionCond(ObjEnemy * obj) = 0;
 	void doTransition(ObjEnemy* obj, int source, int dest);
@@ -32,7 +33,6 @@ public:
 	static StateEnemyDetour* enemyDetour;
 	static StateEnemyAttack* enemyAttack;
 	static StateEnemyEscape* enemyEscape;
-	static StateEnemyDead* enemyDead;
 
 };
 
@@ -90,17 +90,17 @@ public:
 };
 
 
-////적이 죽으면 게임 오버됨
-//피;ㄹ요 없을것같아.... HP 처리를 HPState에서 따로 해줘서
-class StateEnemyDead : public StateEnemy {
-public:
-	StateEnemyDead() {
-
-	};
-	virtual void initAction(ObjEnemy * obj);
-	virtual bool checkTransitionCond(ObjEnemy * obj);
-
-};
+//////적이 죽으면 게임 오버됨
+////피;ㄹ요 없을것같아.... HP 처리를 HPState에서 따로 해줘서
+//class StateEnemyDead : public StateEnemy {
+//public:
+//	StateEnemyDead() {
+//
+//	};
+//	virtual void initAction(ObjEnemy * obj);
+//	virtual bool checkTransitionCond(ObjEnemy * obj);
+//
+//};
 
 
 
@@ -115,11 +115,12 @@ public:
 	static StateHPEnemyHurt* HPEnemyHurt;
 	static StateHPEnemyDeadly* HPEnemyDeadly;
 
-	StateHPEnemy() : HP(20) {
+	StateHPEnemy() {
 
 	}
 
 	int HP;
+	void initHP(int MaxHP);
 	void changeHP(int newHP, ObjEnemy * obj);
 	virtual void checkTransitionCond(ObjEnemy * obj) = 0;
 	virtual void initAction(ObjEnemy * obj) = 0;

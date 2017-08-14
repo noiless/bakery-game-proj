@@ -3,20 +3,24 @@
 
 USING_NS_CC;
 
-ObjTree::ObjTree() : inUse(false), HP(5) {
+ObjTree::ObjTree(pugi::xml_node treeNode) : inUse(false) {
 	typecode = TYPECODE_TREE;
+	MaxHP = treeNode.child("Obj").child("HP").text().as_int();
 	objImg = Sprite::create("img/tree_down.png");
 
 	this->addChild(objImg);
 
 	qnodeBound = Size(objImg->getContentSize());
 
+	state = dynamic_cast<StateTree*> (StateTree::treeNormal);
+	state->initStates(treeNode.child("State"));
+
 }
 
 bool ObjTree::init(cocos2d::Vec2 initPos) {
 
 	inUse = true;
-	HP = 5;
+	HP = MaxHP;
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);
 
