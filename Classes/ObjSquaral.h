@@ -3,6 +3,7 @@
 #include "StateSquaral.h"
 #include "Obj.h"
 #include "Attack.h"
+#include "pugixml\pugixml.hpp"
 
 
 class ObjSquaral : public Obj{
@@ -10,7 +11,7 @@ private:
 	void update(float) override;
 
 public:
-	ObjSquaral();
+	ObjSquaral(pugi::xml_node squaralNode);
 	~ObjSquaral();
 	int squaralSightRadius;
 	DrawNode * squaralSightCircle;

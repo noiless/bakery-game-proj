@@ -3,9 +3,15 @@
 #include "GameScene.h"
 
 USING_NS_CC;
+using namespace pugi;
 
-ObjRabbit::ObjRabbit() : inUse(false), HP(2) {
+ObjRabbit::ObjRabbit(xml_node rabbitNode) {
+
+	xml_node objnode = rabbitNode.child("Obj");
+
 	typecode = TYPECODE_RABBIT;
+	inUse = false;
+	MaxHP = objnode.child("HP").text().as_int();
 	objImg = Sprite::create("img/rabbit_normal_down.png");
 
 	rabbitSightTri = DrawNode::create();
@@ -16,6 +22,9 @@ ObjRabbit::ObjRabbit() : inUse(false), HP(2) {
 	
 	qnodeBound = Size(objImg->getContentSize() * 3);
 
+	state = dynamic_cast<StateRabbit*> (StateRabbit::rabbitNormal);
+	state->initStates(rabbitNode.child("State"));
+	
 }
 
 ObjRabbit::~ObjRabbit() {
@@ -27,7 +36,7 @@ bool ObjRabbit::init(Vec2 initPos)
 	//member value init
 	inUse = true;	//오브젝트를 사용 중인 것으로 변경
 
-	HP = 2;
+	HP = MaxHP;
 	
 	pausedTime = 0;
 

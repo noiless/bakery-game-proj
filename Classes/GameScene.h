@@ -2,7 +2,7 @@
 #define __GAME_SCENE_H__
 
 #include "cocos2d.h"
-
+#include "pugixml\pugixml.hpp"
 #include "Player.h"
 #include "ObjEnemy.h"
 #include "ObjManager.h"
@@ -12,8 +12,9 @@
 class GameWorld : public cocos2d::Scene
 {
 private:
-	void gameLoad();
+	void gameLoad(pugi::xml_node headNode);
 	void setGuestInitAction();
+	int squaralCalled = 0;
 public:
 	
     static cocos2d::Scene* createScene();

@@ -2,12 +2,16 @@
 #include "StateEnemy.h"
 #include "ObjEnemy.h"
 #include "Raycasting.h"
-
 #include "GameScene.h"
 
 USING_NS_CC;
+using namespace pugi;
 
 ///////StateEnemy
+
+void StateEnemy::initStates(xml_node stateNode) {
+
+}
 
 
 void StateEnemy::doTransition(ObjEnemy* obj, int source, int dest) {

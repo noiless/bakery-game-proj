@@ -1,13 +1,21 @@
 #include "ObjSquaral.h"
 #include "GameScene.h"
 
+using namespace pugi;
+
+
 #define NUM_OF_SIGHT_POLY 5
 
 
-ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(150) {
+ObjSquaral::ObjSquaral(xml_node squaralNode) : inUse(false), speed(150) {
+	xml_node objNode = squaralNode.child("Obj");
+
 	typecode = TYPECODE_SQUARAL;
 	normalTime = 0;
 	objImg = Sprite::create("img/squaral_down.png");
+
+	squaralSightRadius = objNode.child("Sight").text().as_int();
+	MaxHP = objNode.child("HP").text().as_int();
 
 	squaralSightCircle = DrawNode::create();
 	squaralSightCircle->setOpacity(64);	//opacity 0~255
@@ -16,6 +24,10 @@ ObjSquaral::ObjSquaral() : inUse(false), HP(5), squaralSightRadius(100), speed(1
 	addChild(objImg);
 
 	qnodeBound = Size(squaralSightRadius, squaralSightRadius) * 4;
+
+	state = dynamic_cast<StateSquaral*> (StateSquaral::squaralNormal);
+	state->initStates(squaralNode.child("State"));
+
 
 }
 
@@ -35,7 +47,7 @@ void ObjSquaral::loseHPByOther(int damage) {
 
 
 bool ObjSquaral::init(cocos2d::Vec2 initPos) {
-	HP = 5;
+	HP = MaxHP;
 	objImg->setPosition(initPos);
 	inUse = true;
 	normalTime = 0;

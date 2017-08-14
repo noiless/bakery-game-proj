@@ -9,6 +9,8 @@
 
 USING_NS_CC;
 
+using namespace pugi;
+
 ObjManager *GameWorld::objManager = new ObjManager;
 Player *GameWorld::player;
 ObjEnemy *GameWorld::enemy;	//적도 하나만 존재
@@ -17,14 +19,13 @@ bool GameWorld::initiated = false;
 
 Scene* GameWorld::createScene()
 {
-	
     return GameWorld::create();
-
 }
 
-void GameWorld::gameLoad() {
+void GameWorld::gameLoad(xml_node headNode) {
+
 	//init pool's object
-	objManager->ObjInit();
+	objManager->ObjInit(headNode);
 
 	StateSquaralAttack::tempSquaral = new Obj;
 	StateSquaralAttack::tempSquaral->objImg = Sprite::create("img/squaral_down.png");
@@ -45,9 +46,22 @@ bool GameWorld::init()
         return false;
     }
 
+	//read data
+	xml_document xmlDoc;
+	xml_parse_result result = xmlDoc.load_file("data/data.xml");
+
+	if (!result) {
+		CCLOG("xml do not loaded");
+	}
+	else {
+		CCLOG("xml loaded");
+	}
+
+	xml_node xmlHeadNode = xmlDoc.child("data");
+
 
 	if (!initiated) {
-		gameLoad();
+		gameLoad(xmlHeadNode);
 		initiated = true;
 	}
     
@@ -78,9 +92,6 @@ bool GameWorld::init()
 	objManager->addChild(myShop, 5);
 	objManager->addChild(otherShop, 5);
 
-
-
-
 	////plant trees
 	objManager->getObjTreeFromPool(this, Vec2(map->getBoundingBox().origin.x + map->getBoundingBox().size.width / 4, map->getBoundingBox().origin.y + map->getBoundingBox().size.height / 4 * 3));
 
@@ -92,7 +103,7 @@ bool GameWorld::init()
 
 
 	//플레이어 생성
-	player = new Player;
+	player = new Player(xmlHeadNode.child("Player").child("HP").text().as_int(), xmlHeadNode.child("Player").child("Speed").text().as_int());
 	player->objImg->setPosition(cocos2d::Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	this->addChild(player, 3);
 
@@ -106,7 +117,26 @@ bool GameWorld::init()
 		//다람쥐 생성
 		if (keyCode == EventKeyboard::KeyCode::KEY_Z) {
 
-			objManager->getObjSquaralFromPool(this, Vec2(0,0));
+			Vec2 squaralPos;
+
+			switch ((squaralCalled % 4)) {
+			case 0:
+				squaralPos = Vec2(-map->getBoundingBox().size.width / 4, 0);
+				break;
+			case 1:
+				squaralPos = Vec2(map->getBoundingBox().size.width / 4, 0);
+				break;
+			case 2:
+				squaralPos = Vec2(0, map->getBoundingBox().size.height / 4);
+				break;
+			case 3:
+				squaralPos = Vec2(0, - map->getBoundingBox().size.height / 4);
+				break;
+			}
+
+			objManager->getObjSquaralFromPool(this, squaralPos);
+
+			squaralCalled++;
 			
 		}
 
@@ -128,7 +158,7 @@ bool GameWorld::init()
 	///////////////
 
 
-	ui = new UI();
+	ui = new UI(xmlHeadNode.child("Player").child("HP").text().as_int());
 	ui->init();
 	this->addChild(ui, 5);
 
@@ -144,6 +174,10 @@ bool GameWorld::init()
 	
 
 	CCLOG("gamescene init finish");
+
+
+
+
 
     return true;
 }

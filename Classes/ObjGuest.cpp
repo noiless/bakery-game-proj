@@ -7,6 +7,7 @@ USING_NS_CC;
 
 
 ObjGuest::ObjGuest() : inUse(false), HP(5), detourSequence(-1) {
+
 	typecode = TYPECODE_PEOPLE;
 	objImg = Sprite::create("img/guest_down.png");
 	addChild(objImg);

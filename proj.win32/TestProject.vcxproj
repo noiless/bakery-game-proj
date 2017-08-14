@@ -158,6 +158,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\ObjTree.cpp" />
     <ClCompile Include="..\Classes\OverScene.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
+    <ClCompile Include="..\Classes\pugixml\pugixml.cpp" />
     <ClCompile Include="..\Classes\QTree.cpp" />
     <ClCompile Include="..\Classes\Raycasting.cpp" />
     <ClCompile Include="..\Classes\StateEnemy.cpp" />
@@ -181,6 +182,8 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\ObjTree.h" />
     <ClInclude Include="..\Classes\OverScene.h" />
     <ClInclude Include="..\Classes\Player.h" />
+    <ClInclude Include="..\Classes\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="..\Classes\pugixml\pugixml.hpp" />
     <ClInclude Include="..\Classes\QTree.h" />
     <ClInclude Include="..\Classes\Raycasting.h" />
     <ClInclude Include="..\Classes\StateEnemy.h" />
@@ -205,6 +208,11 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\Resources\data\data.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

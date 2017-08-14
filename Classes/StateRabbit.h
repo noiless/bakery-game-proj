@@ -1,6 +1,8 @@
 #pragma once
 #include "cocos2d.h"
 #include "AudioEngine.h" 
+#include "pugixml\pugixml.hpp"
+
 
 class ObjRabbit;
 class StateRabbitNormal;
@@ -21,8 +23,10 @@ public:
 	virtual void initAction(ObjRabbit * obj) = 0;
 	virtual bool checkTransitionCond(ObjRabbit * obj) = 0;
 	void doTransition(ObjRabbit* obj, int source, int dest);
+	void initStates(pugi::xml_node stateNode);
 
 	int actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+	int stateSpeed;
 
 	experimental::AudioProfile rabbitDeadEffect;
 

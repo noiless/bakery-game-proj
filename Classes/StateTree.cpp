@@ -3,11 +3,17 @@
 #include "GameScene.h"
 
 USING_NS_CC;
+using namespace pugi;
 
 //class StateTree
 
 StateTreeNormal* StateTree::treeNormal = new StateTreeNormal;
 StateTreeDead* StateTree::treeDead = new StateTreeDead;
+
+void StateTree::initStates(xml_node stateNode) {
+
+
+}
 
 
 //class StateTreeNormal

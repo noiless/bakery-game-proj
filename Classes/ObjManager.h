@@ -1,5 +1,6 @@
 #pragma once
 #include <cocos2d.h>
+#include "pugixml\pugixml.hpp"
 #include <list>
 
 USING_NS_CC;
@@ -59,7 +60,7 @@ private:
 
 public:
 	ObjManager();
-	void ObjInit();
+	void ObjInit(pugi::xml_node headnode);
 	void Objdeinit();
 
 	void setMapRect(cocos2d::Rect mapBoundingBox);

@@ -8,7 +8,7 @@ bool Player::deInit() {
 	return true;
 }
 
-bool Player::init() {
+bool Player::init(int MaxHP, int Speed) {
 
 	GameWorld::objManager->addObjectAvailListFRONT(this);	//availList에 추가...
 	//addObjectAvailList를 이용하지 않기 때문에updateList에는 추가되지 않아 독자적으로 충돌체크를 실행함
@@ -16,7 +16,9 @@ bool Player::init() {
 	qnodeIndexInit();
 
 	typecode = TYPECODE_PEOPLE;
-	HP = 20;
+	this->MaxHP = MaxHP;
+	HP = MaxHP;
+	this->speed = Speed;
 
 	isMoving[0] = false; isMoving[1] = false; isMoving[2] = false; isMoving[3] = false;
 

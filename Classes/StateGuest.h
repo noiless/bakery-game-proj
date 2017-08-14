@@ -1,5 +1,7 @@
 #pragma once
 #include "cocos2d.h"
+#include "pugixml\pugixml.hpp"
+
 
 class ObjGuest;
 class StateGuestNormal;
@@ -20,6 +22,7 @@ public:
 	virtual void initAction(ObjGuest * obj) = 0;
 	virtual bool checkTransitionCond(ObjGuest * obj) = 0;
 	void doTransition(ObjGuest* obj, int source, int dest);
+	void initStates(pugi::xml_node stateNode);
 
 	float actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
 

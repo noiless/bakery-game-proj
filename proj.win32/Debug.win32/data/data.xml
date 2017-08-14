@@ -1,0 +1,174 @@
+<data>
+
+  <Player>
+    
+    <HP>20</HP>
+    <Speed>500</Speed> <!-- player 외의 오브젝트는 state에서 속도값 가짐 -->
+
+  </Player>
+
+  <Rabbit>
+    <Obj>
+      <HP>2</HP>
+    </Obj>
+
+    <State>
+
+      <Normal>
+        <ActionDuration>2</ActionDuration>
+        <Speed>100</Speed>
+      </Normal>
+
+      <Run>
+        <ActionDuration>2</ActionDuration>
+        <Speed>400</Speed>
+      </Run>
+
+      <Dead>
+        <ActionDuration>1</ActionDuration>
+        <Speed>0</Speed>
+      </Dead>
+      
+    </State>
+
+  </Rabbit>
+
+  <Squaral>
+    
+    <Obj>
+      <HP>5</HP>
+      <Sight>100</Sight>
+    </Obj>
+
+    <State>
+
+      <Normal>
+        <ActionDuration>1</ActionDuration>
+        <Speed>150</Speed>
+      </Normal>
+
+      <Attack>
+        <ActionDuration>0.5</ActionDuration>
+        <Speed>0</Speed>
+      </Attack>
+
+      <Seed>
+        <ActionDuration>3</ActionDuration>
+        <Speed>0</Speed>
+      </Seed>
+
+      <Dead>
+        <ActionDuration>1</ActionDuration>
+        <Speed>0</Speed>
+      </Dead>
+      
+    </State>
+    
+  </Squaral>
+
+  <Tree>
+    
+    <Obj>
+      <HP>5</HP>
+    </Obj>
+
+    <State>
+
+      <Normal>
+        <ActionDuration>10</ActionDuration>
+        <Speed>0</Speed>
+      </Normal>
+
+      <Dead>
+        <ActionDuration>1</ActionDuration>
+        <Speed>2</Speed>
+      </Dead>
+      
+    </State>
+    
+  </Tree>
+
+  <Guest>
+
+    <Obj>
+
+      <HP>10</HP>
+      <Sight>50</Sight>
+      <InitPosX>0</InitPosX>
+      <InitPosY>-1800</InitPosY>
+
+    </Obj>
+
+    <State>
+
+      <Normal>
+        <ActionDuration>-1</ActionDuration>
+        <Speed>-1</Speed>
+        <DestPosX>0</DestPosX>
+        <DestPosY>1400</DestPosY>
+      </Normal>
+
+      <DetourNormal>
+        <ActionDuration>-1</ActionDuration>
+        <Speed>-1</Speed>
+        <DestPosX>0</DestPosX>
+      </DetourNormal>
+
+      <SelectShop>
+        <ActionDuration>3</ActionDuration>
+        <Speed>100</Speed>
+        <OtherShopDestX>-750</OtherShopDestX>
+        <OtherShopDestY>1400</OtherShopDestY>
+        <MyShopDestX>750</MyShopDestX>
+        <MyShopDestY>1400</MyShopDestY>
+        <HomeDestX>0</HomeDestX>
+        <HomeDestY>1800</HomeDestY>
+      </SelectShop>
+
+      <BuyBread>
+        <ActionDuration>1</ActionDuration>
+        <Speed>0</Speed>
+      </BuyBread>
+
+      <Dead>
+        <ActionDuration>1</ActionDuration>
+        <Speed>0</Speed>
+      </Dead>
+      
+    </State>
+    
+  </Guest>
+
+  <Enemy>
+
+    <Obj>
+
+      <HP>30</HP>
+      <Sight>125</Sight>
+      <InitPosX>0</InitPosX>
+      <InitPosY>0</InitPosY>
+      
+    </Obj>
+
+    <State>
+
+      <Normal>
+        <ActionDuration>3</ActionDuration>
+        <Speed>100</Speed>
+      </Normal>
+
+      <Detour>
+        <ActionDuration>3</ActionDuration>
+        <Speed>100</Speed>
+      </Detour>
+
+      <Attack>
+        <ActionDuration>0.5</ActionDuration>
+        <Speed>-1</Speed> <!-- 코드 내에서 유동적으로 값 변화 -->
+      </Attack>
+      
+    </State>
+    
+  </Enemy>
+
+</data>

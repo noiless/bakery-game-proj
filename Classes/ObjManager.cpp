@@ -8,6 +8,7 @@
 #include <QTree.h>
 
 USING_NS_CC;
+using namespace pugi;
 
 ObjManager::ObjManager() {
 	CCLOG("objmanager init");
@@ -15,10 +16,11 @@ ObjManager::ObjManager() {
 	bloodNum = 0;
 }
 
-void ObjManager::ObjInit() {
+void ObjManager::ObjInit(xml_node headnode) {
+
 	//시작 후 초기화
 	for (int i = 0; i < MAX_RABBIT_NUM; i++) {
-		objRabbitList[i] = new ObjRabbit;
+		objRabbitList[i] = new ObjRabbit(headnode.child("Rabbit"));
 	}
 
 	for (int i = 0; i < MAX_TREE_NUM; i++) {
@@ -26,7 +28,7 @@ void ObjManager::ObjInit() {
 	}
 
 	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
-		objSquaralList[i] = new ObjSquaral;
+		objSquaralList[i] = new ObjSquaral(headnode.child("Squaral"));
 	}
 
 	for (int i = 0; i < MAX_ACORN_NUM; i++) {

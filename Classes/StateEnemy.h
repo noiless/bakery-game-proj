@@ -1,5 +1,7 @@
 #pragma once
 #include "cocos2d.h"
+#include "pugixml\pugixml.hpp"
+
 
 class ObjEnemy;
 
@@ -24,7 +26,7 @@ public:
 	virtual void initAction(ObjEnemy * obj) = 0;
 	virtual bool checkTransitionCond(ObjEnemy * obj) = 0;
 	void doTransition(ObjEnemy* obj, int source, int dest);
-
+	void initStates(pugi::xml_node stateNode);
 
 	static StateEnemyNormal* enemyNormal;
 	static StateEnemyDetour* enemyDetour;

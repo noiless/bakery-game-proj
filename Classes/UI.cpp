@@ -13,30 +13,31 @@ USING_NS_CC;
 
 
 //생성자 - 변수 초기화
-UI::UI() : myMoney(0), otherMoney(0), myBreadPoint(50), otherBreadPoint(50), adPoint(50), checkTime(0), myHP(20) {
+UI::UI(int playerMaxHP) : myMoney(0), otherMoney(0), myBreadPoint(50), otherBreadPoint(50), adPoint(50), checkTime(0), myHP(playerMaxHP) {
 
 }
 
 UI::~UI() {
 	//내 빵 게이지
+	this->removeAllChildren();
 	this->unscheduleUpdate();
 	this->removeFromParentAndCleanup(true);
 
-	delete myBreadBox;
-	delete myBreadBar;
-	delete myMoneyLabel;
+	//delete myBreadBox;
+	//delete myBreadBar;
+	//delete myMoneyLabel;
 
-	//상대 빵 게이지
-	delete otherBreadBox;
-	delete otherBreadBar;
-	delete otherMoneyLabel;
+	////상대 빵 게이지
+	//delete otherBreadBox;
+	//delete otherBreadBar;
+	//delete otherMoneyLabel;
 
-	//홍보 게이지
-	delete adBox;
-	delete adOtherBar;
-	delete adMyBar;
+	////홍보 게이지
+	//delete adBox;
+	//delete adOtherBar;
+	//delete adMyBar;
 
-	delete HPLable;
+	//delete HPLable;
 }
 
 bool UI::init() {

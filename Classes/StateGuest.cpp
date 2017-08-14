@@ -5,7 +5,7 @@
 
 
 USING_NS_CC;
-
+using namespace pugi;
 
 ////StateGuest
 
@@ -16,6 +16,10 @@ StateGuestBuyBread* StateGuest::guestBuyBread = new StateGuestBuyBread;
 StateGuestGoHome* StateGuest::guestGoHome = new StateGuestGoHome;
 StateGuestDead* StateGuest::guestDead = new StateGuestDead;
 StateGuestDetourNormal* StateGuest::guestDetourNormal = new StateGuestDetourNormal;
+
+void StateGuest::initStates(xml_node stateNode) {
+
+}
 
 void StateGuest::doTransition(ObjGuest* obj, int source, int dest) {
 
@@ -94,7 +98,6 @@ bool StateGuestNormal::checkTransitionCond(ObjGuest * obj) {
 	}
 	///pausedTime > 0일때 detour 상태로 전이
 	else if (obj->pausedTime > 0) {
-		CCLOG("1");
 		doTransition(obj, STATE_GUEST_NORMAL, STATE_GUEST_DETOURNORMAL);
 	}
 
@@ -227,7 +230,7 @@ void StateGuestDetourNormal::setNextActionSeq(ObjGuest* obj, int callerTag) {
 			obj->objImg->setRotation(90);
 		}
 
-		move = MoveBy::create(actionDuration, Vec2(destX - obj->objImg->getPositionX(), 0));
+		move = MoveBy::create(abs(destX - obj->objImg->getPositionX()) / 100.0f, Vec2(destX - obj->objImg->getPositionX(), 0));
 
 		//objindex에 따른 moveLen, dir 설정
 

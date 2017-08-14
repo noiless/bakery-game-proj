@@ -1,6 +1,8 @@
 #pragma once
 #include "cocos2d.h"
 #include "AudioEngine.h"
+#include "pugixml\pugixml.hpp"
+
 
 class Obj;
 class ObjSquaral;
@@ -21,8 +23,10 @@ public:
 	virtual void initAction(ObjSquaral * obj) = 0;
 	virtual bool checkTransitionCond(ObjSquaral * obj) = 0;
 	void doTransition(ObjSquaral* obj, int source, int dest);
+	void initStates(pugi::xml_node stateNode);
 
-	int actionDuration = 1;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+	float actionDuration;	//각 action이 가지는 시간. 한 state가 가지는 action들의 duration을 모두 통일...?
+	int stateSpeed;
 
 	static StateSquaralNormal* squaralNormal;
 	static StateSquaralAttack* squaralAttack;

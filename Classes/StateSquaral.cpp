@@ -3,6 +3,7 @@
 #include "GameScene.h"
 
 USING_NS_CC;
+using namespace pugi;
 
 //StateSquaral
 
@@ -10,6 +11,22 @@ StateSquaralNormal* StateSquaral::squaralNormal = new StateSquaralNormal;
 StateSquaralAttack* StateSquaral::squaralAttack = new StateSquaralAttack;
 StateSquaralSeed* StateSquaral::squaralSeed = new StateSquaralSeed;
 StateSquaralDead* StateSquaral::squaralDead = new StateSquaralDead;
+
+void StateSquaral::initStates(xml_node stateNode) {
+	xml_node tempNode = stateNode.child("Normal");
+	squaralNormal->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	squaralNormal->stateSpeed = tempNode.child("Speed").text().as_int();
+
+	tempNode = stateNode.child("Attack");
+	squaralAttack->actionDuration = tempNode.child("ActionDuration").text().as_float();
+
+	tempNode = stateNode.child("Seed");
+	squaralSeed->actionDuration = tempNode.child("ActionDuration").text().as_int();
+
+	tempNode = stateNode.child("Dead");
+	squaralDead->actionDuration = tempNode.child("ActionDuration").text().as_int();
+
+}
 
 void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 
@@ -117,8 +134,7 @@ void StateSquaralNormal::initAction(ObjSquaral * obj) {
 	obj->objImg->setOpacity(255);
 
 	//state에 맞는 speed, actionDuration 설정
-	obj->speed = 150;
-	actionDuration = 1;
+	obj->speed = stateSpeed;
 
 	//init random dir
 	srand(time(NULL) + obj->objIndex);	//random seed 설정
@@ -188,7 +204,7 @@ void StateSquaralAttack::initAction(ObjSquaral * obj) {
 	});
 
 	//지정한 move들을 통한 sequence 지정
-	Sequence* seq = Sequence::create(DelayTime::create(0.5) ,callback, nullptr);
+	Sequence* seq = Sequence::create(DelayTime::create(actionDuration) ,callback, nullptr);
 
 	obj->objImg->runAction(RepeatForever::create(seq));
 
@@ -241,7 +257,7 @@ void StateSquaralSeed::initAction(ObjSquaral * obj) {
 	});
 
 	//지정한 move들을 통한 sequence 지정
-	Sequence* seq = Sequence::create(DelayTime::create(3), callback, nullptr);
+	Sequence* seq = Sequence::create(DelayTime::create(actionDuration), callback, nullptr);
 
 	obj->objImg->runAction(seq);
 
@@ -272,7 +288,6 @@ void StateSquaralDead::initAction(ObjSquaral * obj) {
 	obj->squaralSightCircle->clear();	//시야 삼각형 제거
 	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/squaral_dead_down.png"));	//sprite image 변경
 	obj->speed = 0;
-	actionDuration = 1;
 
 	obj->unscheduleUpdate(); //업데이트 중지
 
