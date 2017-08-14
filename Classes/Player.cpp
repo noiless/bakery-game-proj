@@ -141,11 +141,6 @@ void Player::update(float delta) {
 
 		GameWorld::gameEnd();
 
-		//this->unscheduleUpdate();
-		//GameWorld::ui->~UI();
-		//GameWorld::objManager->Objdeinit();
-		//auto gameOverScene = GameOver::createScene();
-		//Director::getInstance()->replaceScene(gameOverScene);
 	}
 	else {
 
@@ -157,19 +152,15 @@ void Player::update(float delta) {
 			//moveLen = speed * delta
 			exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
-
 			//충돌 체크
 			if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
 				//충돌하지 않으면 이동
 				objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
 
-
 			}
 
 			//플레이어 이동에 따라 카메라 이동
 			cam->setPosition(objImg->getPosition());
-
-
 
 		}
 	}

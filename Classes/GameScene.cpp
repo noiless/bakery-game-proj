@@ -32,6 +32,8 @@ void GameWorld::gameLoad(xml_node headNode) {
 	StateSquaralAttack::tempSquaral->objImg->setScale(1.4);
 	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
 
+	CCLOG("temp index %d", StateSquaralAttack::tempSquaral->objIndex);
+
 }
 
 
@@ -149,8 +151,6 @@ bool GameWorld::init()
 	};
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
-
-	//objManager->getObjSquaralFromPool(this, Vec2(-100, -100));
 
 	//////////////
 	this->addChild(objManager, 10);

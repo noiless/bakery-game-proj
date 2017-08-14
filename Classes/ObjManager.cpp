@@ -82,7 +82,7 @@ void ObjManager::addObjectAvailList(Obj *obj) {
 
 void ObjManager::addObjectAvailListFRONT(Obj *obj) {
 	objAvailList.push_front(obj);
-	qtree->insert(obj);
+	qtree->insert(obj, true);
 }
 
 void ObjManager::deleteObjectAvailList(Obj *obj) {
@@ -107,13 +107,18 @@ void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 
 	ObjRabbit* newRabbit = getFreeObjRabbit();
 
-	CCASSERT((newRabbit != nullptr), "NEED LARGER OBJECT POOL : Rabbit");
+	if (newRabbit != nullptr) {
 
-	newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
+		newRabbit->init(createColCheck(&initPos, &(objRabbitList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
-	parent->addChild(newRabbit);
+		parent->addChild(newRabbit);
 
-	qtree->insert(newRabbit);
+		qtree->insert(newRabbit, false);
+	}
+	else {
+		CCLOG("NEED LARGER OBJECT POOL : Rabbit. now obj # %d", objAvailList.size());
+	}
+
 }
 
 void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
@@ -125,7 +130,7 @@ void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
 
 	parent->addChild(newTree);
 
-	qtree->insert(newTree);
+	qtree->insert(newTree, false);
 }
 
 void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
@@ -137,7 +142,7 @@ void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
 
 	parent->addChild(newSquaral);
 
-	qtree->insert(newSquaral);
+	qtree->insert(newSquaral, false);
 }
 
 void ObjManager::getObjAcornFromPool(Node * parent, ObjSquaral* caller) {
@@ -162,7 +167,7 @@ bool ObjManager::getObjGuestFromPool(Node * parent) {
 
 		parent->addChild(newGuest);
 
-		qtree->insert(newGuest);
+		qtree->insert(newGuest, false);
 
 		return true;
 	}
@@ -383,6 +388,7 @@ bool ObjManager::checkMoveCollision(Obj *obj, Rect* exBox, cocos2d::Vec2* moveLe
 				//충돌시
 				if ((obj->objIndex != element->objIndex) && exBox->intersectsRect(element->objImg->getBoundingBox())) {
 
+
 					//x축으로 움직이고 있었을 때
 					//좌
 					if (moveLen->x < 0) {
@@ -548,6 +554,9 @@ void ObjManager::update(float delta) {
 
 				}
 			}
+			else {
+				break;
+			}
 
 			if (doCntn) {
 				break;	//node loop break
@@ -573,7 +582,6 @@ void ObjManager::update(float delta) {
 	////update loop end
 
 	delete[] exNodeIndexList;
-
 }
 
 

@@ -83,7 +83,7 @@ void QTree::split() {
 
 	//가지고 있던 오브젝트 재배치
 	for each (Obj* obj in element) {
-		insert(obj);
+		insert(obj, false);
 	}
 
 	//현재 원소 리스트 비움
@@ -102,13 +102,18 @@ void QTree::split() {
 
 }
 
-void QTree::insert(Obj* obj) {
+void QTree::insert(Obj* obj, bool front) {
 
 	//현재 노드가 leaf
 	if (!haveChild) {
 
 		//element에 삽입 - insert 호출 전 범위에 포함되는지 먼저 확인했음
-		element.push_back(obj);
+		if (front) {
+			element.push_front(obj);
+		}
+		else {
+			element.push_back(obj);
+		}
 
 		//qnodeindex 변경
 
@@ -144,16 +149,16 @@ void QTree::insert(Obj* obj) {
 		exBoundBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2, obj->objImg->getPositionY() - obj->qnodeBound.height / 2, obj->qnodeBound.width, obj->qnodeBound.height);
 
 		if (exBoundBox.intersectsRect(child[0]->bound)) {
-			child[0]->insert(obj);
+			child[0]->insert(obj, front);
 		}
 		if (exBoundBox.intersectsRect(child[1]->bound)) {
-			child[1]->insert(obj);
+			child[1]->insert(obj, front);
 		}
 		if (exBoundBox.intersectsRect(child[2]->bound)) {
-			child[2]->insert(obj);
+			child[2]->insert(obj, front);
 		}
 		if (exBoundBox.intersectsRect(child[3]->bound)) {
-			child[3]->insert(obj);
+			child[3]->insert(obj, front);
 		}
 
 	}
@@ -224,7 +229,7 @@ void QTree::removeObjFromAllNode(Obj* obj) {
 void QTree::renewObjNode(Obj* obj) {
 
 	removeObjFromAllNode(obj);
-	insert(obj);	//root로 호출해서 root에다 넣음
+	insert(obj, false);	//root로 호출해서 root에다 넣음
 
 }
 
@@ -236,7 +241,7 @@ void QTree::renewObjNodeWithSpec(Obj* obj, int* indexList) {
 		//각 노드에 이 오브젝트 추가
 		obj->qnodeIndex[i] = indexList[i];
 		if (indexList[i] >= 0) {
-			qtreeMap[indexList[i]]->insert(obj);
+			qtreeMap[indexList[i]]->insert(obj, false);
 		}
 	}
 }

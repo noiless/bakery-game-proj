@@ -84,7 +84,6 @@ void ObjGuest::loseHPByOther(int damage) {
 
 void ObjGuest::update(float delta) {
 
-	//각 state가 가지는 특수한 조건도 transition 내에서 확인
 	//check state transition condition
 	if (state->checkTransitionCond(this) && state == StateGuest::guestNormal) {
 		normalTime -= delta;

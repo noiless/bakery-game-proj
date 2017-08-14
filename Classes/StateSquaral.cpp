@@ -75,7 +75,6 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 	else if (source == STATE_SQUARAL_ATTACK && dest == STATE_SQUARAL_NORMAL) {
 		//normal로 전이될 때 updateList에 추가
 		GameWorld::objManager->addUpdateList(obj);
-
 		GameWorld::objManager->deleteObjectAvailList(StateSquaralAttack::tempSquaral);
 
 		obj->squaralSightCircle->clear();

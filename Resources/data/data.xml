@@ -152,13 +152,13 @@
     <State>
 
       <Normal>
-        <ActionDuration>3</ActionDuration>
-        <Speed>100</Speed>
+        <ActionDuration>2</ActionDuration>
+        <Speed>200</Speed>
       </Normal>
 
       <Detour>
-        <ActionDuration>3</ActionDuration>
-        <Speed>100</Speed>
+        <ActionDuration>2</ActionDuration>
+        <Speed>200</Speed>
       </Detour>
 
       <Attack>
