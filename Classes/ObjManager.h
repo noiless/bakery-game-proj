@@ -5,8 +5,8 @@
 
 USING_NS_CC;
 
-#define MAX_RABBIT_NUM 100
-#define MAX_TREE_NUM 50
+#define MAX_RABBIT_NUM 200
+#define MAX_TREE_NUM 100
 #define MAX_SQUARAL_NUM 30
 #define MAX_GUEST_NUM 10
 #define MAX_ACORN_NUM 10
@@ -56,6 +56,8 @@ private:
 
 	void update(float) override;
 
+	int* exNodeIndexList;
+
 	QTree* qtree;
 
 public:
@@ -90,13 +92,9 @@ public:
 
 	//토끼 시야
 	bool checkSightCollision(ObjRabbit * obj);
-	bool checkSightCond(int dir, float slope1, float b1, float slope2, float b2, const cocos2d::Vec2* rectPoint);
-	bool checkSightCond3(int dir, cocos2d::Vec2* triP1, cocos2d::Vec2* rectPoint);
 
 	//다람쥐 시야
 	Obj* checkSightCollision(ObjSquaral * obj);
-	bool checkSightCond(int dir, float b1, float b2, const cocos2d::Vec2* rectPos);
-
 	//다람쥐 공격 확인
 	bool checkAttackCollision(Obj* obj, const cocos2d::Vec2* center, float radius);
 

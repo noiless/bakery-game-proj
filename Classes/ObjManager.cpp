@@ -7,6 +7,8 @@
 #include <Attack.h>
 #include <QTree.h>
 
+#define cos45 cos(CC_DEGREES_TO_RADIANS(45))
+
 USING_NS_CC;
 using namespace pugi;
 
@@ -14,6 +16,7 @@ ObjManager::ObjManager() {
 	CCLOG("objmanager init");
 	intersectedObj = new ColObj;
 	bloodNum = 0;
+	exNodeIndexList = new int[4];
 }
 
 void ObjManager::ObjInit(xml_node headnode) {
@@ -124,13 +127,19 @@ void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 void ObjManager::getObjTreeFromPool(Node * parent, Vec2 initPos) {
 	ObjTree* newTree = getFreeObjTree();
 
-	CCASSERT((newTree != nullptr), "NEED LARGER OBJECT POOL : Tree");
+	if (newTree != nullptr) {
+		newTree->init(createColCheck(&initPos, &(objTreeList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
 
-	newTree->init(createColCheck(&initPos, &(objTreeList[0]->objImg->getContentSize())));	//초기 위치 이용해 초기화
+		parent->addChild(newTree);
 
-	parent->addChild(newTree);
+		qtree->insert(newTree, false);
 
-	qtree->insert(newTree, false);
+	}
+	else {
+		CCLOG("NEED LARGER OBJECT POOL : Tree. now obj # %d", objAvailList.size());
+
+	}
+
 }
 
 void ObjManager::getObjSquaralFromPool(Node * parent, Vec2 initPos) {
@@ -435,7 +444,6 @@ void ObjManager::update(float delta) {
 
 	bool doCntn = false;
 	QTree* qtreePtr;
-	int* exNodeIndexList = new int[4];
 
 	//각 오브젝트마다 exBox
 	Rect exBoundBox;
@@ -445,7 +453,7 @@ void ObjManager::update(float delta) {
 	for each (Obj* obj in objUpdateList) {
 
 		doCntn = false;
-		
+
 		//exBoundBox : 예상 노드 구할때 사용
 		exBoundBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2 + obj->moveLen.x * delta, obj->objImg->getPositionY() - obj->qnodeBound.height / 2 + obj->moveLen.y * delta, obj->qnodeBound.width, obj->qnodeBound.height);
 		exNodeIndexList = qtree->getExNodeIndexList(&exBoundBox, exNodeIndexList);
@@ -580,8 +588,6 @@ void ObjManager::update(float delta) {
 
 	}
 	////update loop end
-
-	delete[] exNodeIndexList;
 }
 
 
@@ -592,7 +598,7 @@ bool ObjManager::checkAttackCollision(Obj* caller, cocos2d::Rect* exBox, bool is
 
 	//각 노드별로 exBox - 노드 내의 element와 충돌하는지 확인
 	for (int i = 0; i < 4; i++) {
-		if (caller->qnodeIndex[i] >=0) {
+		if (caller->qnodeIndex[i] >= 0) {
 
 			//충돌한 물체 검출
 			for each (Obj* element in qtree->getNode(caller->qnodeIndex[i])->element)
@@ -626,17 +632,9 @@ bool ObjManager::checkAttackCollision(Obj* caller, cocos2d::Rect* exBox, bool is
 
 bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 
-	Vec2* tri = obj->rabbitSight;
-
-	//1
-	float slope1 = (tri[0].y - tri[1].y) / (tri[0].x - tri[1].x);
-	float b1 = tri[0].y - slope1 * tri[0].x;
-
-	//2
-	float slope2 = (tri[0].y - tri[2].y) / (tri[0].x - tri[2].x);
-	float b2 = tri[0].y - slope2 * tri[0].x;
-
-
+	Rect sightBox;
+	sightBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2, obj->objImg->getPositionY() - obj->qnodeBound.height/2, obj->qnodeBound.width, obj->qnodeBound.height);
+	
 	//각 노드별로 exBox - 노드 내의 element와 충돌하는지 확인
 	for (int i = 0; i < 4; i++) {
 
@@ -648,31 +646,16 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 					continue;
 				}
 
-				Vec2 rectPoint[4];
-				rectPoint[0] = Vec2(element->objImg->getBoundingBox().getMaxX(), element->objImg->getBoundingBox().getMaxY());
-				rectPoint[1] = Vec2(element->objImg->getBoundingBox().getMinX(), element->objImg->getBoundingBox().getMaxY());
-				rectPoint[2] = Vec2(element->objImg->getBoundingBox().getMaxX(), element->objImg->getBoundingBox().getMinY());
-				rectPoint[3] = Vec2(element->objImg->getBoundingBox().getMinX(), element->objImg->getBoundingBox().getMinY());
-
-
-				//삼각형 내에 사각형의 꼭짓점이 포함되는지 확인
-				for (int index = 0; index < 4; index++) {
-					if (checkSightCond(obj->dir, slope1, b1, slope2, b2, &rectPoint[index])
-						&& checkSightCond3(obj->dir, &tri[1], &rectPoint[index]))
-					{
-						return true;
-					}
-
+				if (!sightBox.intersectsRect(element->objImg->getBoundingBox())) {
+					continue;
 				}
 
-				//사각형 내에 삼각형의 꼭짓점이 포함되는지 확인
-				for (int index = 1; index < 3; index++) {	//tri[0]은 항상 object 내에 있으므로 어차피 못겹친다
-					if (element->objImg->getBoundingBox().containsPoint(tri[index]))
-					{
-						return true;
-					}
+				Vec2 dirVec = element->objImg->getPosition() - obj->objImg->getPosition();
 
+				if (((dirVec.x * obj->moveLen.x + dirVec.y * obj->moveLen.y) / (dirVec.length() * obj->moveLen.length())) > cos45) {
+					return true;
 				}
+
 
 			}
 
@@ -683,50 +666,8 @@ bool ObjManager::checkSightCollision(ObjRabbit * obj) {
 	return false;
 }
 
-//토끼용
-bool ObjManager::checkSightCond(int dir, float slope1, float b1, float slope2, float b2, const Vec2* rectPoint) {
-	if (dir == DIR_LEFT) {
-		return ((slope1 * rectPoint->x - rectPoint->y + b1 > 0)
-			&& (slope2 * rectPoint->x - rectPoint->y + b2 < 0));
-	}
-	else if (dir == DIR_RIGHT) {
-		return ((slope1 * rectPoint->x - rectPoint->y + b1 > 0)
-			&& (slope2 * rectPoint->x - rectPoint->y + b2 < 0));
-	}
-	else if (dir == DIR_UP) {
-		return ((slope1 * rectPoint->x - rectPoint->y + b1 < 0)
-			&& (slope2 * rectPoint->x - rectPoint->y + b2 < 0));
-	}
-	else if (dir == DIR_DOWN) {
-		return ((slope1 * rectPoint->x - rectPoint->y + b1 > 0)
-			&& (slope2 * rectPoint->x - rectPoint->y + b2 > 0));
-	}
-	else {
-		return false;
-	}
 
-}
-
-bool ObjManager::checkSightCond3(int dir, Vec2* triP1, Vec2* rectPoint) {
-	if (dir == DIR_LEFT) {
-		if (triP1->x < rectPoint->x)
-			return true;
-	}
-	else if (dir == DIR_RIGHT) {
-		if (triP1->x > rectPoint->x)
-			return true;
-	}
-	else if (dir == DIR_UP) {
-		if (triP1->y > rectPoint->y)
-			return true;
-	}
-	else if (dir == DIR_DOWN) {
-		if (triP1->y < rectPoint->y)
-			return true;
-	}
-	return false;
-}
-
+//다람쥐용 시야체크
 Obj* ObjManager::checkSightCollision(ObjSquaral * obj) {
 
 	//1
@@ -746,13 +687,16 @@ Obj* ObjManager::checkSightCollision(ObjSquaral * obj) {
 				}
 
 				//오브젝트가 원과 충돌하는지 확인
-				if (!element->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius))
+				if (!element->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius)) {
 					continue;
-
-				//범위가 보고 있는 방향의 범위인지 확인 - 범위에 오브젝트의 중심이 포함되는지 확인
-				if (checkSightCond(obj->dir, b1, b2, &(element->objImg->getPosition()))) {
-					return element;	//충돌한 오브젝트 반환
 				}
+
+				Vec2 dirVec = element->objImg->getPosition() - obj->objImg->getPosition();
+
+				if (((dirVec.x*obj->moveLen.x + dirVec.y*obj->moveLen.y)/ (dirVec.length() * obj->moveLen.length())) > cos45) {
+					return element;
+				}
+
 			}
 
 		}
@@ -761,29 +705,6 @@ Obj* ObjManager::checkSightCollision(ObjSquaral * obj) {
 
 
 	return nullptr;
-}
-
-//다람쥐용 시야 체크
-bool ObjManager::checkSightCond(int dir, float b1, float b2, const cocos2d::Vec2* rectPos) {
-	if (dir == DIR_LEFT) {
-		return ((rectPos->x - rectPos->y + b1 < 0)
-			&& (-rectPos->x - rectPos->y + b2 > 0));
-	}
-	else if (dir == DIR_RIGHT) {
-		return ((rectPos->x - rectPos->y + b1 > 0)
-			&& (-rectPos->x - rectPos->y + b2 < 0));
-	}
-	else if (dir == DIR_UP) {
-		return ((rectPos->x - rectPos->y + b1 < 0)
-			&& (-rectPos->x - rectPos->y + b2 < 0));
-	}
-	else if (dir == DIR_DOWN) {
-		return ((rectPos->x - rectPos->y + b1 > 0)
-			&& (-rectPos->x - rectPos->y + b2 > 0));
-	}
-	else {
-		return false;
-	}
 }
 
 //다람쥐용 공격 체크
@@ -880,10 +801,6 @@ ColObj* ObjManager::doRaycast(Obj* caller, Vec2 startPoint, Vec2 dir, float d) {
 						intersectedObj->intersectPoint = startPoint + Tnear * dir;
 						intersectedObj->intersectDistance = intersectedObj->intersectPoint.distance(startPoint);
 
-						//교점
-						//DrawNode* dddd = DrawNode::create();
-						//dddd->drawPoint(intersectedObj->intersectPoint, 5, Color4F::BLACK);
-						//this->addChild(dddd);
 					}
 
 

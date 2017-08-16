@@ -144,7 +144,6 @@ bool StateRabbitNormal::checkTransitionCond(ObjRabbit * obj) {
 	//Run 상태로의 전이 조건 확인
 	else if (StateRabbitNormal::checkSight(obj)) {
 		//Run 상태로 전이
-
 		doTransition(obj, STATE_RABBIT_NORMAL, STATE_RABBIT_RUN);
 		
 		return true;
