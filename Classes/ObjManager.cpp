@@ -105,7 +105,6 @@ void ObjManager::deleteUpdateList(Obj *obj) {
 }
 
 
-
 void ObjManager::getObjRabbitFromPool(Node * parent, Vec2 initPos) {
 
 	ObjRabbit* newRabbit = getFreeObjRabbit();

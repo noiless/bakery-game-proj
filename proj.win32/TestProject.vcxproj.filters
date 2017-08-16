@@ -84,6 +84,9 @@
     <ClCompile Include="..\Classes\pugixml\pugixml.cpp">
       <Filter>src\pugixml</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Score.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -154,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\pugixml\pugixml.hpp">
       <Filter>src\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Score.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

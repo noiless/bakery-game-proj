@@ -1,4 +1,5 @@
 #include "UI.h"
+#include "Score.h"
 
 #define LABEL_FONT_SIZE 20
 #define BAR_HEIGHT 25
@@ -19,6 +20,8 @@ UI::UI(int playerMaxHP) : myMoney(0), otherMoney(0), myBreadPoint(50), otherBrea
 
 UI::~UI() {
 	//내 빵 게이지
+	Score::finalScore = myMoney;
+
 	this->removeAllChildren();
 	this->unscheduleUpdate();
 	this->removeFromParentAndCleanup(true);
@@ -265,8 +268,8 @@ void UI::drawUI() {
 
 void UI::update(float delta) {
 
-	//2초마다 포인트 변동 - 지난 시간만큼 게이지 하락/상승
-	if (checkTime > 5) {
+	//3초마다 포인트 변동 - 지난 시간만큼 게이지 하락/상승
+	if (checkTime > 3) {
 		checkTime = 0;
 		allPointChange();
 	}
