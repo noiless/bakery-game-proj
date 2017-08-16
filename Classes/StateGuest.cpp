@@ -167,7 +167,6 @@ void StateGuestDetourNormal::initAction(ObjGuest * obj) {
 		//init to seq1
 		obj->detourSequence = 1;
 
-		//seq->setTag(1);
 		MoveBy * move;
 
 		//ÁÂÃø ¿ìÈ¸

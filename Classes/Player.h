@@ -29,7 +29,6 @@ public:
 
 	virtual void loseHPByPlayer();
 	virtual void loseHPByOther(int damage);
-
 	int dir;
 	int speed;
 	

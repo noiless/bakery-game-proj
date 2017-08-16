@@ -8,6 +8,9 @@ class ObjEnemy;
 USING_NS_CC;
 
 class Attack : public Node {
+private:
+	float showingTime;
+	void deinit();
 protected:
 	Sprite * attackImg;
 	Vec2 anchorDiff;

@@ -18,6 +18,7 @@ public:
 
 	void drawSquaralSight();
 	Obj * target;
+	Obj* tempSquaral;
 
 	bool inUse;	//사용중이면 true, 사용중이지 않으면 false
 

@@ -136,24 +136,24 @@ void ObjEnemy::updateEye() {
 void ObjEnemy::update(float delta) {
 
 
-	if (state != StateEnemy::enemyAttack && state != StateEnemy::enemyEscape) {
+	if (state != StateEnemy::enemyAttack) {
 		updateEye();
-	}
 
-	if (state == StateEnemy::enemyAttack) {
+		if (pausedTime > 1) {
+			//일단 노말 상태로 돌림
+			objImg->getActionManager()->removeAllActionsFromTarget(objImg);
+			pausedTime = 0;	//멈춘 시간 초기화
+			state = StateEnemy::enemyNormal;
+			objImg->getActionManager()->resumeTarget(objImg);
+			state->initAction(this);
+
+		}
+	}
+	else {
 		dynamic_cast<StateEnemyAttack*>(state)->attackDuration += delta;
+
 	}
 
 	state->checkTransitionCond(this);
-
-	if (pausedTime > 1) {
-		//일단 노말 상태로 돌림
-		objImg->getActionManager()->removeAllActionsFromTarget(objImg);
-		pausedTime = 0;	//멈춘 시간 초기화
-		state = StateEnemy::enemyNormal;
-		objImg->getActionManager()->resumeTarget(objImg);
-		state->initAction(this);
-
-	}
 
 }

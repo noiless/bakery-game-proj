@@ -58,7 +58,6 @@ public:
 	StateSquaralAttack();
 	experimental::AudioProfile squaralAttackEffect;	///È¿°úÀ½
 
-	static Obj * tempSquaral;
 	virtual void initAction(ObjSquaral * obj);
 	virtual bool checkTransitionCond(ObjSquaral * obj);
 

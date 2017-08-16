@@ -33,7 +33,14 @@ void ObjManager::ObjInit(xml_node headnode) {
 
 	for (int i = 0; i < MAX_SQUARAL_NUM; i++) {
 		objSquaralList[i] = new ObjSquaral(headnode.child("Squaral"));
+
+		objSquaralList[i]->tempSquaral = new Obj;
+		objSquaralList[i]->tempSquaral->objImg = Sprite::create("img/squaral_down.png");
+		objSquaralList[i]->tempSquaral->objImg->setScale(1.5);
+		objSquaralList[i]->tempSquaral->addChild(objSquaralList[i]->tempSquaral->objImg);
 	}
+
+	
 
 	for (int i = 0; i < MAX_ACORN_NUM; i++) {
 		objAcornList[i] = new AcornAttack;
