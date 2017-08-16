@@ -48,5 +48,5 @@ void Raycasting::setDir(int callerRot) {
 //충돌시 출동한 오브젝트 반환
 ColObj* Raycasting::doRaycast() {
 
-	return GameWorld::objManager->doRaycast(caller->objIndex, startPoint, dir, d);
+	return GameWorld::objManager->doRaycast(caller, startPoint, dir, d);
 }

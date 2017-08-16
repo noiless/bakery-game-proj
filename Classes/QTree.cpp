@@ -6,6 +6,7 @@ cocos2d::Rect QTree::downOutside;
 cocos2d::Rect QTree::leftOutside;
 cocos2d::Rect QTree::rightOutside;
 QTree* QTree::root;
+QTree* QTree::qtreeMap[MAX_LEVEL*MAX_LEVEL*MAX_LEVEL*MAX_LEVEL];
 
 //objManager - setMapRect에서 호출
 void QTree::init(cocos2d::Rect mapBoundingBox) {
@@ -23,6 +24,7 @@ QTree::QTree(cocos2d::Rect parentBound) {
 	isOutside = true;
 	nodeIndex = 0;
 	root = this;	//되나...?
+	qtreeMap[0] = this;
 
 	haveChild = false;
 }
@@ -53,6 +55,7 @@ QTree::QTree(int parentLevel, cocos2d::Rect parentBound, int childIndex, int par
 	}
 
 	nodeIndex = parentIndex * 4 + childIndex + 1;
+	qtreeMap[nodeIndex] = this;
 	haveChild = false;
 
 }
@@ -80,32 +83,37 @@ void QTree::split() {
 
 	//가지고 있던 오브젝트 재배치
 	for each (Obj* obj in element) {
-		insert(obj);
+		insert(obj, false);
 	}
 
 	//현재 원소 리스트 비움
 	clear();
 
-	///////temp
-	//DrawNode* d1 = DrawNode::create();
-	//d1->drawLine(bound.origin + Vec2(bound.size.width / 2, 0), bound.origin + Vec2(bound.size.width / 2, bound.size.height), Color4F::RED);
+	/////temp
+	DrawNode* d1 = DrawNode::create();
+	d1->drawLine(bound.origin + Vec2(bound.size.width / 2, 0), bound.origin + Vec2(bound.size.width / 2, bound.size.height), Color4F::RED);
 
-	//DrawNode* d2 = DrawNode::create();
-	//d2->drawLine(bound.origin + Vec2(0, bound.size.height / 2), bound.origin + Vec2(bound.size.width, bound.size.height / 2), Color4F::BLUE);
+	DrawNode* d2 = DrawNode::create();
+	d2->drawLine(bound.origin + Vec2(0, bound.size.height / 2), bound.origin + Vec2(bound.size.width, bound.size.height / 2), Color4F::BLUE);
 
-	//GameWorld::objManager->addChild(d1);
-	//GameWorld::objManager->addChild(d2);
-	////////end temp
+	GameWorld::objManager->addChild(d1);
+	GameWorld::objManager->addChild(d2);
+	//////end temp
 
 }
 
-void QTree::insert(Obj* obj) {
+void QTree::insert(Obj* obj, bool front) {
 
 	//현재 노드가 leaf
 	if (!haveChild) {
 
 		//element에 삽입 - insert 호출 전 범위에 포함되는지 먼저 확인했음
-		element.push_back(obj);
+		if (front) {
+			element.push_front(obj);
+		}
+		else {
+			element.push_back(obj);
+		}
 
 		//qnodeindex 변경
 
@@ -141,22 +149,23 @@ void QTree::insert(Obj* obj) {
 		exBoundBox.setRect(obj->objImg->getPositionX() - obj->qnodeBound.width / 2, obj->objImg->getPositionY() - obj->qnodeBound.height / 2, obj->qnodeBound.width, obj->qnodeBound.height);
 
 		if (exBoundBox.intersectsRect(child[0]->bound)) {
-			child[0]->insert(obj);
+			child[0]->insert(obj, front);
 		}
 		if (exBoundBox.intersectsRect(child[1]->bound)) {
-			child[1]->insert(obj);
+			child[1]->insert(obj, front);
 		}
 		if (exBoundBox.intersectsRect(child[2]->bound)) {
-			child[2]->insert(obj);
+			child[2]->insert(obj, front);
 		}
 		if (exBoundBox.intersectsRect(child[3]->bound)) {
-			child[3]->insert(obj);
+			child[3]->insert(obj, front);
 		}
 
 	}
 }
 
 //nodeIndex로 노드 탐색 후 해당 노드 반환
+//이젠 안씀...
 QTree* QTree::searchNode(int nodeIndex) {
 	if (nodeIndex < 0) {
 		return nullptr;
@@ -207,13 +216,11 @@ void QTree::remove(Obj* obj) {
 }
 
 void QTree::removeObjFromAllNode(Obj* obj) {
-	QTree* tempPtr;
-
 	for (int i = 0; i < 4; i++) {
-		tempPtr = searchNode(obj->qnodeIndex[i]);
-		if (tempPtr != nullptr)
-			tempPtr->remove(obj);
+		if (qtreeMap[obj->qnodeIndex[i]] != nullptr)
+			qtreeMap[obj->qnodeIndex[i]]->remove(obj);
 	}
+
 
 }
 
@@ -222,7 +229,7 @@ void QTree::removeObjFromAllNode(Obj* obj) {
 void QTree::renewObjNode(Obj* obj) {
 
 	removeObjFromAllNode(obj);
-	insert(obj);	//root로 호출해서 root에다 넣음
+	insert(obj, false);	//root로 호출해서 root에다 넣음
 
 }
 
@@ -234,7 +241,7 @@ void QTree::renewObjNodeWithSpec(Obj* obj, int* indexList) {
 		//각 노드에 이 오브젝트 추가
 		obj->qnodeIndex[i] = indexList[i];
 		if (indexList[i] >= 0) {
-			searchNode(indexList[i])->insert(obj);
+			qtreeMap[indexList[i]]->insert(obj, false);
 		}
 	}
 }
@@ -314,4 +321,8 @@ void QTree::removeNodes(QTree* nowNode) {
 		nowNode->~QTree();	//해제
 	}
 
+}
+
+QTree* QTree::getNode(int nodeIndex) {
+	return qtreeMap[nodeIndex];
 }

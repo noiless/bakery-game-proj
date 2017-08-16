@@ -10,6 +10,12 @@
     <Filter Include="src">
       <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\pugixml">
+      <UniqueIdentifier>{a4041e72-801c-4783-a391-31ed714f8d63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\data">
+      <UniqueIdentifier>{51856118-7815-409a-9739-b98dc9ea6dc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\Raycasting.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\pugixml\pugixml.cpp">
+      <Filter>src\pugixml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,10 +149,21 @@
     <ClInclude Include="..\Classes\Raycasting.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\pugixml\pugiconfig.hpp">
+      <Filter>src\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\pugixml\pugixml.hpp">
+      <Filter>src\pugixml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
       <Filter>resource</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\Resources\data\data.xml">
+      <Filter>resource\data</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

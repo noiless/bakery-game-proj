@@ -3,20 +3,30 @@
 #include "GameScene.h"
 #include "Raycasting.h"
 
+
 USING_NS_CC;
+using namespace pugi;
 
+ObjGuest::ObjGuest(xml_node guestNode) : inUse(false), detourSequence(-1) {
 
-ObjGuest::ObjGuest() : inUse(false), HP(5), detourSequence(-1) {
+	xml_node objNode = guestNode.child("Obj");
+
 	typecode = TYPECODE_PEOPLE;
 	objImg = Sprite::create("img/guest_down.png");
+	MaxHP = objNode.child("HP").text().as_int();
+
 	addChild(objImg);
-	eye[0] = new Raycasting(this, 50, 0);
-	eye[1] = new Raycasting(this, 50, -45);
-	eye[2] = new Raycasting(this, 50, 45);
+	eye[0] = new Raycasting(this, objNode.child("Sight").text().as_int(), 0);
+	eye[1] = new Raycasting(this, objNode.child("Sight").text().as_int(), -45);
+	eye[2] = new Raycasting(this, objNode.child("Sight").text().as_int(), 45);
 
 	qnodeBound = Size(objImg->getContentSize());	//충돌 뒤에 검사하므로 시야 범위랑 상관 없은ㅁ
 
-	normalTime = 7;
+	maxNormalTime = objNode.child("NormalTime").text().as_float();
+	initPos = Vec2(objNode.child("InitPosX").text().as_int(), objNode.child("InitPosY").text().as_int());
+
+	state = dynamic_cast<StateGuest*> (StateGuest::guestNormal);
+	state->initStates(guestNode.child("State"));
 
 }
 
@@ -25,18 +35,18 @@ ObjGuest::~ObjGuest() {
 
 }
 
-bool ObjGuest::init(Vec2 initPos) {
+bool ObjGuest::init() {
 	//member value init
 	inUse = true;	//오브젝트를 사용 중인 것으로 변경
 
-	HP = 5;
+	HP = MaxHP;
 
 	//re set sprite position
 	objImg->setPosition(initPos);
 	objImg->setOpacity(255);	//opacity 초기화
 
 	pausedTime = 0;
-	normalTime = 7;
+	normalTime = maxNormalTime;
 
 	qnodeIndexInit();
 
@@ -74,7 +84,6 @@ void ObjGuest::loseHPByOther(int damage) {
 
 void ObjGuest::update(float delta) {
 
-	//각 state가 가지는 특수한 조건도 transition 내에서 확인
 	//check state transition condition
 	if (state->checkTransitionCond(this) && state == StateGuest::guestNormal) {
 		normalTime -= delta;

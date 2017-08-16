@@ -19,19 +19,19 @@ private:
 	bool setPlayerMoveLen(float actionDuration);
 	void update(float) override;
 	virtual bool deInit();
-	virtual bool init();
+	virtual bool init(int MaxHP, int Speed);
 
 public:
-	Player() {
-		init();
-		qnodeBound = Size(objImg->getContentSize());
+	Player(int MaxHP, int Speed) {
+		init(MaxHP, Speed);
+		qnodeBound = Size(objImg->getContentSize() * 2);
 	}
 
 	virtual void loseHPByPlayer();
 	virtual void loseHPByOther(int damage);
 
 	int dir;
-	int speed = 500;
+	int speed;
 	
 	
 };

@@ -8,7 +8,7 @@ bool Player::deInit() {
 	return true;
 }
 
-bool Player::init() {
+bool Player::init(int MaxHP, int Speed) {
 
 	GameWorld::objManager->addObjectAvailListFRONT(this);	//availList에 추가...
 	//addObjectAvailList를 이용하지 않기 때문에updateList에는 추가되지 않아 독자적으로 충돌체크를 실행함
@@ -16,7 +16,9 @@ bool Player::init() {
 	qnodeIndexInit();
 
 	typecode = TYPECODE_PEOPLE;
-	HP = 20;
+	this->MaxHP = MaxHP;
+	HP = MaxHP;
+	this->speed = Speed;
 
 	isMoving[0] = false; isMoving[1] = false; isMoving[2] = false; isMoving[3] = false;
 
@@ -55,7 +57,7 @@ bool Player::init() {
 		if (keyCode == EventKeyboard::KeyCode::KEY_X) {
 			if (!attack->showing) {
 				experimental::AudioEngine::play2d("sound/sound_player_attack.mp3", false, 1.0f, &playerAttactEffect);
-				attack->init(objImg);
+				attack->init(this);
 			}
 		}
 
@@ -139,11 +141,6 @@ void Player::update(float delta) {
 
 		GameWorld::gameEnd();
 
-		//this->unscheduleUpdate();
-		//GameWorld::ui->~UI();
-		//GameWorld::objManager->Objdeinit();
-		//auto gameOverScene = GameOver::createScene();
-		//Director::getInstance()->replaceScene(gameOverScene);
 	}
 	else {
 
@@ -155,19 +152,15 @@ void Player::update(float delta) {
 			//moveLen = speed * delta
 			exBox.setRect(objImg->getBoundingBox().origin.x + moveLen.x, objImg->getBoundingBox().origin.y + moveLen.y, objImg->getBoundingBox().size.width, objImg->getBoundingBox().size.height);
 
-
 			//충돌 체크
 			if (GameWorld::objManager->checkMoveCollision(this, &exBox, &moveLen)) {
 				//충돌하지 않으면 이동
 				objImg->setPosition(objImg->getPositionX() + moveLen.x, objImg->getPositionY() + moveLen.y);
 
-
 			}
 
 			//플레이어 이동에 따라 카메라 이동
 			cam->setPosition(objImg->getPosition());
-
-
 
 		}
 	}

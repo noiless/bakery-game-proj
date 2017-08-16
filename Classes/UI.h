@@ -36,7 +36,7 @@ private:
 public:
 	cocos2d::Camera* cam;
 
-	UI();
+	UI(int playerMaxHP);
 	~UI();
 	virtual bool init();
 

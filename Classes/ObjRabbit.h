@@ -1,9 +1,9 @@
 #pragma once
 #include "cocos2d.h"
 #include "Obj.h"
+#include "pugixml\pugixml.hpp"
 
 
-class StateRabbit;
 
 class StateRabbit;
 
@@ -12,7 +12,7 @@ private:
 	void update(float) override;
 	
 public:
-	ObjRabbit();
+	ObjRabbit(pugi::xml_node rabbitNode);
 	~ObjRabbit();
 
 	virtual bool init(cocos2d::Vec2 initPos);

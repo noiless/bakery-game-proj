@@ -1,11 +1,12 @@
 #pragma once
 #include <cocos2d.h>
+#include "pugixml\pugixml.hpp"
 #include <list>
 
 USING_NS_CC;
 
 #define MAX_RABBIT_NUM 200
-#define MAX_TREE_NUM 50
+#define MAX_TREE_NUM 100
 #define MAX_SQUARAL_NUM 30
 #define MAX_GUEST_NUM 10
 #define MAX_ACORN_NUM 10
@@ -55,11 +56,13 @@ private:
 
 	void update(float) override;
 
+	int* exNodeIndexList;
+
 	QTree* qtree;
 
 public:
 	ObjManager();
-	void ObjInit();
+	void ObjInit(pugi::xml_node headnode);
 	void Objdeinit();
 
 	void setMapRect(cocos2d::Rect mapBoundingBox);
@@ -84,22 +87,19 @@ public:
 	bool isObjColAvail(Obj * obj);
 
 	bool checkMoveCollision(Obj *obj, cocos2d::Rect* exBox, cocos2d::Vec2* moveLen);
-	bool checkAttackCollision(cocos2d::Rect* exBox, bool isPlayer);
+	bool checkAttackCollision(Obj* caller, cocos2d::Rect* exBox, bool isPlayer);
+
 
 	//토끼 시야
 	bool checkSightCollision(ObjRabbit * obj);
-	bool checkSightCond(int dir, float slope1, float b1, float slope2, float b2, const cocos2d::Vec2* rectPoint);
-	bool checkSightCond3(int dir, cocos2d::Vec2* triP1, cocos2d::Vec2* rectPoint);
 
 	//다람쥐 시야
 	Obj* checkSightCollision(ObjSquaral * obj);
-	bool checkSightCond(int dir, float b1, float b2, const cocos2d::Vec2* rectPos);
-
 	//다람쥐 공격 확인
-	bool checkAttackCollision(int callerIndex, const cocos2d::Vec2* center, float radius);
+	bool checkAttackCollision(Obj* obj, const cocos2d::Vec2* center, float radius);
 
 	//raycast 확인
-	ColObj* doRaycast(int callerIndex, cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
+	ColObj* doRaycast(Obj* caller, cocos2d::Vec2 startPoint, cocos2d::Vec2 dir, float d);
 
 
 };

@@ -16,12 +16,14 @@ Attack::Attack(Sprite* userSpr) {
 	
 }
 
-bool Attack::init(Node* caller){
+bool Attack::init(Obj* caller) {
+	this->caller = caller;
+
 	showing = true;
 	success = false;
 	this->scheduleUpdate();
 
-	caller->addChild(this);
+	caller->objImg->addChild(this);
 	
 	auto callback = CallFunc::create(
 		[=]()
@@ -60,11 +62,11 @@ void Attack::update(float) {
 		}
 
 		if ((callerDir == DIR_LEFT) || (callerDir == DIR_RIGHT)) {
-			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width), true);
+			success = GameWorld::objManager->checkAttackCollision(caller, &Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width), true);
 		}
 		//dir == up || down
 		else {
-			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), true);
+			success = GameWorld::objManager->checkAttackCollision(caller, &Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), true);
 		}
 		
 	}
@@ -86,6 +88,8 @@ AcornAttack::~AcornAttack() {
 }
 
 bool AcornAttack::init(ObjSquaral* caller) {
+	this->caller = caller;
+
 	attackImg->setPosition(caller->objImg->getPosition());
 	attackImg->setRotation(caller->objImg->getRotation());
 	//position, rotation 설정
@@ -117,7 +121,7 @@ void AcornAttack::update(float delta) {
 
 	//다른 오브젝트와 충돌확인
 
-	if (GameWorld::objManager->checkAttackCollision(callerIndex, &attackImg->getPosition(), attackImg->getContentSize().width / 2)) {
+	if (GameWorld::objManager->checkAttackCollision(caller, &attackImg->getPosition(), attackImg->getContentSize().width / 2)) {
 		attackImg->getActionManager()->removeAllActionsFromTarget(attackImg);
 		inUse = false;
 		this->removeFromParent();
@@ -146,6 +150,8 @@ EnemyAttack::~EnemyAttack() {
 }
 
 bool EnemyAttack::init(ObjEnemy* caller) {
+	this->caller = caller;
+
 	success = false;
 	callerDir = caller->dir;
 
@@ -188,11 +194,11 @@ void EnemyAttack::update(float delta) {
 		}
 
 		if ((callerDir == DIR_LEFT) || (callerDir == DIR_RIGHT)) {
-			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width), false);
+			success = GameWorld::objManager->checkAttackCollision(caller, &Rect(p.x, p.y, attackImg->getBoundingBox().size.height, attackImg->getBoundingBox().size.width), false);
 		}
 		//dir == up || down
 		else {
-			success = GameWorld::objManager->checkAttackCollision(&Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), false);
+			success = GameWorld::objManager->checkAttackCollision(caller, &Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), false);
 		}
 	}
 

@@ -2,12 +2,32 @@
 #include "StateEnemy.h"
 #include "ObjEnemy.h"
 #include "Raycasting.h"
-
 #include "GameScene.h"
 
 USING_NS_CC;
+using namespace pugi;
+
+StateEnemyNormal* StateEnemy::enemyNormal = new StateEnemyNormal;
+StateEnemyDetour* StateEnemy::enemyDetour = new StateEnemyDetour;
+StateEnemyAttack* StateEnemy::enemyAttack = new StateEnemyAttack;
+StateEnemyEscape* StateEnemy::enemyEscape = new StateEnemyEscape;
 
 ///////StateEnemy
+
+void StateEnemy::initStates(xml_node stateNode) {
+
+	xml_node tempNode = stateNode.child("Normal");
+	enemyNormal->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	enemyNormal->stateSpeed = tempNode.child("Speed").text().as_int();
+
+	tempNode = stateNode.child("Detour");
+	enemyDetour->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	enemyDetour->stateSpeed = tempNode.child("Speed").text().as_int();
+
+	tempNode = stateNode.child("Attack");
+	enemyAttack->actionDuration = tempNode.child("ActionDuration").text().as_float();
+
+}
 
 
 void StateEnemy::doTransition(ObjEnemy* obj, int source, int dest) {
@@ -23,12 +43,12 @@ void StateEnemy::doTransition(ObjEnemy* obj, int source, int dest) {
 
 	}
 
-	else if (dest == STATE_ENEMY_ESCAPE) {
+	//else if (dest == STATE_ENEMY_ESCAPE) {
 
-		obj->state = dynamic_cast<StateEnemy*> (StateEnemy::enemyEscape);
-		obj->state->initAction(obj);
+	//	obj->state = dynamic_cast<StateEnemy*> (StateEnemy::enemyEscape);
+	//	obj->state->initAction(obj);
 
-	}
+	//}
 
 	else if (dest == STATE_ENEMY_ATTACK) {
 
@@ -52,19 +72,14 @@ void StateEnemy::doTransition(ObjEnemy* obj, int source, int dest) {
 
 }
 
-StateEnemyNormal* StateEnemy::enemyNormal = new StateEnemyNormal;
-StateEnemyDetour* StateEnemy::enemyDetour = new StateEnemyDetour;
-StateEnemyAttack* StateEnemy::enemyAttack = new StateEnemyAttack;
-StateEnemyEscape* StateEnemy::enemyEscape = new StateEnemyEscape;
-StateEnemyDead* StateEnemy::enemyDead = new StateEnemyDead;
-
 
 //////////StateEnemyNormal
 
 void StateEnemyNormal::initAction(ObjEnemy * obj) {
 
-	obj->speed = 100;
-	actionDuration = 3;
+	//obj->objImg->setPositionX(0);
+
+	obj->speed = stateSpeed;
 
 	MoveBy* move = makeRandDir(obj);
 
@@ -160,6 +175,8 @@ bool StateEnemyNormal::checkTransitionCond(ObjEnemy * obj) {
 
 void StateEnemyDetour::initAction(ObjEnemy * obj) {
 
+	obj->speed = stateSpeed;
+
 	MoveBy* move;
 
 	if (obj->colEyeIndex == 0) {
@@ -245,8 +262,6 @@ bool StateEnemyDetour::checkTransitionCond(ObjEnemy * obj) {
 
 void StateEnemyAttack::initAction(ObjEnemy * obj) {
 
-	actionDuration = 0.5;
-
 	targetPos = obj->target->objImg->getPosition();
 	
 	//action 설정
@@ -325,7 +340,7 @@ bool StateEnemyAttack::checkTransitionCond(ObjEnemy * obj) {
 
 	//escape 처리
 
-	if (attackDuration > 0.5) {
+	if (attackDuration > actionDuration) {
 		attackDuration = 0;
 
 		//attack 띄우기
@@ -356,21 +371,6 @@ bool StateEnemyEscape::checkTransitionCond(ObjEnemy * obj) {
 }
 
 
-
-
-
-///////////StateEnemyDead
-
-void StateEnemyDead::initAction(ObjEnemy * obj) {
-
-}
-
-bool StateEnemyDead::checkTransitionCond(ObjEnemy * obj) {
-	return true;
-}
-
-
-
 /////////////////////////////////////
 //StateHPEnemy : HP에 따른 sprite 변경 수행
 ////////////////////////////////////
@@ -382,6 +382,10 @@ StateHPEnemyDeadly* StateHPEnemy::HPEnemyDeadly = new StateHPEnemyDeadly;
 void StateHPEnemy::changeHP(int newHP, ObjEnemy * obj) {
 	HP = newHP;
 	checkTransitionCond(obj);
+}
+
+void StateHPEnemy::initHP(int MaxHP) {
+	HP = MaxHP;
 }
 
 ////////////

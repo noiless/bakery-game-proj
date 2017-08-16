@@ -3,11 +3,22 @@
 #include "GameScene.h"
 
 USING_NS_CC;
+using namespace pugi;
 
 //class StateTree
 
 StateTreeNormal* StateTree::treeNormal = new StateTreeNormal;
 StateTreeDead* StateTree::treeDead = new StateTreeDead;
+
+void StateTree::initStates(xml_node stateNode) {
+	xml_node tempNode = stateNode.child("Normal");
+
+	treeNormal->actionDuration = tempNode.child("ActionDuration").text().as_int();
+
+	tempNode = stateNode.child("Dead");
+	treeDead->actionDuration = tempNode.child("ActionDuration").text().as_int();
+
+}
 
 
 //class StateTreeNormal
@@ -18,7 +29,6 @@ StateTreeNormal::StateTreeNormal() {
 
 void StateTreeNormal::initAction(ObjTree * obj) {
 
-	//5초간 대기
 	//delay
 	DelayTime * delay1 = DelayTime::create(actionDuration);
 
@@ -62,7 +72,7 @@ void StateTreeDead::initAction(ObjTree * obj) {
 	experimental::AudioEngine::play2d("sound/sound_tree_dead.mp3", false, 0.3, &treeDeadEffect);
 
 	//action 설정
-	auto fadeout = FadeOut::create(2);
+	auto fadeout = FadeOut::create(actionDuration);
 
 	auto callback = CallFunc::create(
 		[=]

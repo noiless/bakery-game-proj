@@ -4,7 +4,7 @@
 #include <list>
 
 #define MAX_LEVEL 4
-#define MAX_ELEMENT 10
+#define MAX_ELEMENT 15
 
 using namespace std;
 
@@ -17,6 +17,8 @@ private:
 	static cocos2d::Rect leftOutside;
 	static cocos2d::Rect rightOutside;
 	static cocos2d::Rect rootBound;	//맵 전체:3...
+
+	static QTree* qtreeMap[MAX_LEVEL*MAX_LEVEL*MAX_LEVEL*MAX_LEVEL];
 
 	static QTree* root;
 
@@ -38,7 +40,7 @@ public:
 	list<Obj*> element;	//노드에 포함되는 오브젝트들
 	bool isOutside;	//외곽에 있는 노드인가?
 
-	void insert(Obj* obj);
+	void insert(Obj* obj, bool front);
 	void remove(Obj* obj);
 
 	QTree* child[4];	//자식 노드 - 0:위왼 1:위오른 2:아래왼 3:아래오른
@@ -59,5 +61,7 @@ public:
 	//노드인덱스...??
 
 	static void removeNodes(QTree* nowNode);
+
+	QTree* getNode(int nodeIndex);
 
 };

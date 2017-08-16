@@ -32,6 +32,7 @@ public:
 	int objIndex;	//각 Obj의 인스턴스들이 가지는 인스턴스의 고유 번호
 	int speed;
 	int typecode = TYPECODE_NONE;	//각 클래스가 가지는 타입
+	int MaxHP = 5;	//각 오브젝트의 체력
 	int HP = 5;	//각 오브젝트의 체력
 	int dir;	//현재의 방향
 	int qnodeIndex[4];	//소속된 qtree node index

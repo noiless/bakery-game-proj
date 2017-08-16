@@ -4,11 +4,27 @@
 #include "cstdlib"
 
 USING_NS_CC;
+using namespace pugi;
 
 ////StateRabbit func
 StateRabbitNormal *StateRabbit::rabbitNormal = new StateRabbitNormal;
 StateRabbitRun *StateRabbit::rabbitRun = new StateRabbitRun;
 StateRabbitDead *StateRabbit::rabbitDead = new StateRabbitDead;
+
+void StateRabbit::initStates(pugi::xml_node stateNode) {
+	xml_node tempNode = stateNode.child("Normal");
+
+	rabbitNormal->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	rabbitNormal->stateSpeed = tempNode.child("Speed").text().as_int();
+
+	tempNode = stateNode.child("Run");
+	rabbitRun->actionDuration = tempNode.child("ActionDuration").text().as_int();
+	rabbitRun->stateSpeed = tempNode.child("Speed").text().as_int();
+
+	tempNode = stateNode.child("Dead");
+	rabbitDead->actionDuration = tempNode.child("ActionDuration").text().as_int();
+
+}
 
 void StateRabbit::doTransition(ObjRabbit* obj, int source, int dest) {
 
@@ -60,15 +76,14 @@ void StateRabbitNormal::initAction(ObjRabbit* obj) {
 	obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/rabbit_normal_down.png"));	//sprite 이미지 재설정
 
 	//state에 맞는 speed, actionDuration 설정
-	obj->speed = 100;
-	actionDuration = 2;
+	obj->speed = stateSpeed;
 
 	//move1 : 랜덤한 방향으로 2초간 이동	
 	MoveBy *move1 = StateRabbitNormal::makeRandDir(obj);
 	obj->moveLen = obj->setMoveLen(obj->dir, obj->speed);	//이동 방향, 속도에 따른 moveLen 초기화
 
 	//move2 : 2초간 휴식
-	DelayTime *move2 = DelayTime::create(2);
+	DelayTime *move2 = DelayTime::create(actionDuration);
 
 	//시퀸스의 종료를 알리기 위한 callback func
 	auto callback = CallFunc::create(
@@ -129,7 +144,6 @@ bool StateRabbitNormal::checkTransitionCond(ObjRabbit * obj) {
 	//Run 상태로의 전이 조건 확인
 	else if (StateRabbitNormal::checkSight(obj)) {
 		//Run 상태로 전이
-
 		doTransition(obj, STATE_RABBIT_NORMAL, STATE_RABBIT_RUN);
 		
 		return true;
@@ -143,8 +157,7 @@ bool StateRabbitNormal::checkTransitionCond(ObjRabbit * obj) {
 void StateRabbitRun::initAction(ObjRabbit * obj) {
 
 	//state에 맞는 속도 설정
-	obj->speed = 300;
-	actionDuration = 2;
+	obj->speed = stateSpeed;
 
 	//이동 방향 설정 -> 기존 이동 방향의 반대편으로
 	//move1 : 기존 이동 방향의 반대편으로 2초간 이동
