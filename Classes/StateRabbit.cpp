@@ -39,10 +39,12 @@ void StateRabbit::doTransition(ObjRabbit* obj, int source, int dest) {
 	}
 	else if (source == STATE_RABBIT_NORMAL && dest == STATE_RABBIT_RUN) {
 		// NORMAL->RUN 전이
+		obj->rabbitSightTri->clear();
+		if (obj->objImg->getPositionX() > Camera::getDefaultCamera()->getPositionX() - 480 && obj->objImg->getPositionX() < Camera::getDefaultCamera()->getPositionX() + 480
+			&& obj->objImg->getPositionY() > Camera::getDefaultCamera()->getPositionY() - 320 && obj->objImg->getPositionY() < Camera::getDefaultCamera()->getPositionY() + 320) {
+			experimental::AudioEngine::play2d("sound/sound_rabbit_dead.mp3", false, 1.0f, &rabbitDeadEffect);
+		}
 
-		experimental::AudioEngine::play2d("sound/sound_rabbit_dead.mp3", false, 1.0f, &rabbitDeadEffect);
-		obj->rabbitSightTri->clear();	//시야 삼각형 제거
-		//obj->objImg->getActionManager()->removeActionByTag(0, obj->objImg);	//액션 제거
 		obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/rabbit_run_down.png"));	//sprite 이미지 재설정
 		obj->state = StateRabbit::rabbitRun;	//rabbitRun으로의 상태 전이
 		obj->state->initAction(obj);

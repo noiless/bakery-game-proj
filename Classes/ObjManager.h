@@ -5,11 +5,11 @@
 
 USING_NS_CC;
 
-#define MAX_RABBIT_NUM 200
-#define MAX_TREE_NUM 100
+#define MAX_RABBIT_NUM 100
+#define MAX_TREE_NUM 50
 #define MAX_SQUARAL_NUM 30
 #define MAX_GUEST_NUM 10
-#define MAX_ACORN_NUM 10
+#define MAX_ACORN_NUM 30
 
 
 using namespace std;

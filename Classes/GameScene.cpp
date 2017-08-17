@@ -27,13 +27,6 @@ void GameWorld::gameLoad(xml_node headNode) {
 	//init pool's object
 	objManager->ObjInit(headNode);
 
-	StateSquaralAttack::tempSquaral = new Obj;
-	StateSquaralAttack::tempSquaral->objImg = Sprite::create("img/squaral_down.png");
-	StateSquaralAttack::tempSquaral->objImg->setScale(1.4);
-	StateSquaralAttack::tempSquaral->addChild(StateSquaralAttack::tempSquaral->objImg);
-
-	CCLOG("temp index %d", StateSquaralAttack::tempSquaral->objIndex);
-
 }
 
 
@@ -160,7 +153,7 @@ bool GameWorld::init()
 
 	ui = new UI(xmlHeadNode.child("Player").child("HP").text().as_int());
 	ui->init();
-	this->addChild(ui, 5);
+	this->addChild(ui, 10);
 
 
 	//////////// 5초마다 게스트 생성

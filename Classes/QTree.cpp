@@ -89,16 +89,16 @@ void QTree::split() {
 	//현재 원소 리스트 비움
 	clear();
 
-	/////temp
-	DrawNode* d1 = DrawNode::create();
-	d1->drawLine(bound.origin + Vec2(bound.size.width / 2, 0), bound.origin + Vec2(bound.size.width / 2, bound.size.height), Color4F::RED);
+	///////temp
+	//DrawNode* d1 = DrawNode::create();
+	//d1->drawLine(bound.origin + Vec2(bound.size.width / 2, 0), bound.origin + Vec2(bound.size.width / 2, bound.size.height), Color4F::RED);
 
-	DrawNode* d2 = DrawNode::create();
-	d2->drawLine(bound.origin + Vec2(0, bound.size.height / 2), bound.origin + Vec2(bound.size.width, bound.size.height / 2), Color4F::BLUE);
+	//DrawNode* d2 = DrawNode::create();
+	//d2->drawLine(bound.origin + Vec2(0, bound.size.height / 2), bound.origin + Vec2(bound.size.width, bound.size.height / 2), Color4F::BLUE);
 
-	GameWorld::objManager->addChild(d1);
-	GameWorld::objManager->addChild(d2);
-	//////end temp
+	//GameWorld::objManager->addChild(d1);
+	//GameWorld::objManager->addChild(d2);
+	////////end temp
 
 }
 

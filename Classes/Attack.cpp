@@ -17,6 +17,7 @@ Attack::Attack(Sprite* userSpr) {
 }
 
 bool Attack::init(Obj* caller) {
+	showingTime = 0;
 	this->caller = caller;
 
 	showing = true;
@@ -40,7 +41,18 @@ bool Attack::init(Obj* caller) {
 	return true;
 }
 
-void Attack::update(float) {
+void Attack::deinit() {
+	showing = false;	//보이지 않게 변경
+	success = false;
+	this->removeFromParent();
+	this->unscheduleUpdate();
+
+	CCLOG("delete attack");
+}
+
+void Attack::update(float delta) {
+
+	showingTime += delta;
 
 	if (!success) {
 		//newOrigin
@@ -69,6 +81,10 @@ void Attack::update(float) {
 			success = GameWorld::objManager->checkAttackCollision(caller, &Rect(p.x, p.y, attackImg->getBoundingBox().size.width, attackImg->getBoundingBox().size.height), true);
 		}
 		
+	}
+
+	if (showingTime > 0.5) {
+		deinit();
 	}
 	
 }

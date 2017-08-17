@@ -37,7 +37,7 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 	//dead 처리 가장 먼저
 	if (dest == STATE_SQUARAL_DEAD) {
 		if (source == STATE_SQUARAL_ATTACK) {
-			GameWorld::objManager->deleteObjectAvailList(StateSquaralAttack::tempSquaral);
+			GameWorld::objManager->deleteObjectAvailList(obj->tempSquaral);
 		}
 
 		obj->state = StateSquaral::squaralDead;
@@ -54,12 +54,15 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 			obj->squaralSightCircle->clear();	//시야 제거
 			obj->squaralSightCircle->drawSolidCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2, 30, 12, Color4F::RED);
 			obj->objImg->setTexture(Director::getInstance()->getTextureCache()->addImage("img/squaral_attack_down.png"));	//sprite 이미지 재설정
+
+			obj->moveLen = Vec2::ZERO;
+
 			obj->state = StateSquaral::squaralAttack;
 			obj->state->initAction(obj);
 
 			//tempSquaral
-			StateSquaralAttack::tempSquaral->objImg->setPosition(obj->objImg->getPosition());
-			GameWorld::objManager->addObjectAvailListFRONT(StateSquaralAttack::tempSquaral);
+			obj->tempSquaral->objImg->setPosition(obj->objImg->getPosition());
+			GameWorld::objManager->addObjectAvailListFRONT(obj->tempSquaral);
 
 		}
 
@@ -75,7 +78,7 @@ void StateSquaral::doTransition(ObjSquaral* obj, int source, int dest) {
 	else if (source == STATE_SQUARAL_ATTACK && dest == STATE_SQUARAL_NORMAL) {
 		//normal로 전이될 때 updateList에 추가
 		GameWorld::objManager->addUpdateList(obj);
-		GameWorld::objManager->deleteObjectAvailList(StateSquaralAttack::tempSquaral);
+		GameWorld::objManager->deleteObjectAvailList(obj->tempSquaral);
 
 		obj->squaralSightCircle->clear();
 		obj->normalTime = 0;
@@ -184,8 +187,6 @@ bool StateSquaralNormal::checkTransitionCond(ObjSquaral * obj) {
 
 //다람쥐 : 공격 상태 클래스
 
-Obj * StateSquaralAttack::tempSquaral;
-
 StateSquaralAttack::StateSquaralAttack() {
 	squaralAttackEffect.name = "squaralAttackEffect";
 	squaralAttackEffect.maxInstances = 10;
@@ -194,10 +195,15 @@ StateSquaralAttack::StateSquaralAttack() {
 void StateSquaralAttack::initAction(ObjSquaral * obj) {
 	//obj->moveLen = Vec2::ZERO;
 
+
 	auto callback = CallFunc::create(
 		[=]
 	{
-		experimental::AudioEngine::play2d("sound/acorn_shot.mp3", false, 1.0f, &squaralAttackEffect);
+		if (obj->objImg->getPositionX() > Camera::getDefaultCamera()->getPositionX() - 480 && obj->objImg->getPositionX() < Camera::getDefaultCamera()->getPositionX() + 480
+			&& obj->objImg->getPositionY() > Camera::getDefaultCamera()->getPositionY() - 320 && obj->objImg->getPositionY() < Camera::getDefaultCamera()->getPositionY() + 320) 
+		{
+			experimental::AudioEngine::play2d("sound/acorn_shot.mp3", false, 0.5f, &squaralAttackEffect);
+		}
 		GameWorld::objManager->getObjAcornFromPool(obj->getParent(), obj);
 
 	});
@@ -218,8 +224,6 @@ bool StateSquaralAttack::checkTransitionCond(ObjSquaral * obj) {
 
 	float radVal = atan2f((obj->target->objImg->getPositionY() - obj->objImg->getPositionY()) , (obj->target->objImg->getPositionX() - obj->objImg->getPositionX()));
 	obj->objImg->setRotation( - CC_RADIANS_TO_DEGREES(radVal) - 90);
-
-	obj->moveLen = Vec2::ZERO;
 
 	//타겟이 시야 범위에서 벗어났을때 / 타겟이 availList에서 벗어났을때(소멸 상태) 노말 상태로 전이
 	if (!obj->target->objImg->getBoundingBox().intersectsCircle(obj->objImg->getPosition(), obj->squaralSightRadius * 2)
