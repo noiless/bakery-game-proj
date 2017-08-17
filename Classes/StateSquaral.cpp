@@ -195,10 +195,15 @@ StateSquaralAttack::StateSquaralAttack() {
 void StateSquaralAttack::initAction(ObjSquaral * obj) {
 	//obj->moveLen = Vec2::ZERO;
 
+
 	auto callback = CallFunc::create(
 		[=]
 	{
-		experimental::AudioEngine::play2d("sound/acorn_shot.mp3", false, 0.5f, &squaralAttackEffect);
+		if (obj->objImg->getPositionX() > Camera::getDefaultCamera()->getPositionX() - 480 && obj->objImg->getPositionX() < Camera::getDefaultCamera()->getPositionX() + 480
+			&& obj->objImg->getPositionY() > Camera::getDefaultCamera()->getPositionY() - 320 && obj->objImg->getPositionY() < Camera::getDefaultCamera()->getPositionY() + 320) 
+		{
+			experimental::AudioEngine::play2d("sound/acorn_shot.mp3", false, 0.5f, &squaralAttackEffect);
+		}
 		GameWorld::objManager->getObjAcornFromPool(obj->getParent(), obj);
 
 	});

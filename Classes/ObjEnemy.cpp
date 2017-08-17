@@ -143,6 +143,7 @@ void ObjEnemy::update(float delta) {
 			//일단 노말 상태로 돌림
 			objImg->getActionManager()->removeAllActionsFromTarget(objImg);
 			pausedTime = 0;	//멈춘 시간 초기화
+			objImg->setPosition(Vec2::ZERO);
 			state = StateEnemy::enemyNormal;
 			objImg->getActionManager()->resumeTarget(objImg);
 			state->initAction(this);

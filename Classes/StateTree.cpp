@@ -69,7 +69,10 @@ void StateTreeDead::initAction(ObjTree * obj) {
 	obj->objImg->stopAllActions();	//기존의 액션 중지
 
 	//사운드 재생
-	experimental::AudioEngine::play2d("sound/sound_tree_dead.mp3", false, 0.3, &treeDeadEffect);
+	if (obj->objImg->getPositionX() > Camera::getDefaultCamera()->getPositionX() - 480 && obj->objImg->getPositionX() < Camera::getDefaultCamera()->getPositionX() + 480
+		&& obj->objImg->getPositionY() > Camera::getDefaultCamera()->getPositionY() - 320 && obj->objImg->getPositionY() < Camera::getDefaultCamera()->getPositionY() + 320) {
+		experimental::AudioEngine::play2d("sound/sound_tree_dead.mp3", false, 0.3, &treeDeadEffect);
+	}
 
 	//action 설정
 	auto fadeout = FadeOut::create(actionDuration);
